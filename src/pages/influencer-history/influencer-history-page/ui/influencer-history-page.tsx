@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useInfluencerHistoryQuery } from "@/entities/influencer-history/api/use-influencer-history-query.ts";
 import {
   useInfluencersHistoryPageState
@@ -7,7 +6,6 @@ import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { InfluencerSearch } from "@/widgets/influencer-history/influencer-search";
 import { InfluencerHistoryTable } from "@/widgets/influencer-history/influencer-history-table";
-import { notifyApiError } from "@/app/api/errors/notify.ts";
 
 import s from './influencer-history-page.module.scss';
 import {
@@ -16,15 +14,9 @@ import {
 
 export const InfluencerHistoryPage = () => {
   const { searchValue, handleSearchChange, historyQueryParams, searchQueryParams } = useInfluencersHistoryPageState();
-  const { data: historyData, isLoading, isFetching, isError, error } = useInfluencerHistoryQuery(historyQueryParams);
+  const { data: historyData, isLoading, isFetching, isError } = useInfluencerHistoryQuery(historyQueryParams);
 
   const { data: influencersData } = useInfluencerSearchHistoryQuery(searchQueryParams);
-
-  useEffect(() => {
-    if (isError && error) {
-      notifyApiError(error);
-    }
-  }, [isError, error]);
 
   if (isLoading) {
     return <div>Loading...</div>;

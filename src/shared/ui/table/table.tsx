@@ -146,7 +146,6 @@ export function Table<TData>({
           </table>
 
           <div className={styles.footer}/>
-
         </div>
 
       </div>

@@ -19,7 +19,7 @@ export const CLIENT_LINKS: IDashboardNavItem[] = [
 
 export const INFLUENCER_LINKS: IDashboardNavItem[] = [
   { label: "Influencer List", to: "influencers", icon: influencersList },
-  { label: "Payment History", to: "payments", icon: paymentHistory },
+  { label: "Payment History", to: "payments-history", icon: paymentHistory },
   { label: "Influencer Invoices", to: "influencer-invoices", icon: influencersInvoices },
   { label: "Influencer History", to: "influencer-history", icon: influencersInvoices },
   { label: "Offers", to: "offers", icon: offers },

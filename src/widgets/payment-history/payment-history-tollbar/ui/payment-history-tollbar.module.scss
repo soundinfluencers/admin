@@ -1,0 +1,25 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.paymentHistoryTollbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+
+  @media screen and (max-width: 1105px){
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.searchWrapper {
+  width: 100%;
+  max-width: 600px;
+  min-width: 0;
+  flex: 0 1 600px;
+
+  @media screen and (max-width: 1105px){
+    max-width: none;
+    flex: 1 1 auto;
+  }
+}

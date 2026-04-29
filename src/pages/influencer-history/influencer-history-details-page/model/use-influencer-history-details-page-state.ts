@@ -7,7 +7,7 @@ import type {
 export const useInfluencersHistoryDetailsPageState = () => {
   const [limit] = useQueryState(
     "limit",
-    parseAsInteger.withDefault(10),
+    parseAsInteger.withDefault(50),
   );
 
   const [page, setPageQuery] = useQueryState(

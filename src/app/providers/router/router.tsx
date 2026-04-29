@@ -15,13 +15,12 @@ import { InfluencerDetailsPage } from "@/pages/influencers/influencer-details-pa
 import { CreateInfluencerAccountPage } from "@/pages/influencers/create-influencer-account-page";
 import { EditInfluencerAccountPage } from "@/pages/influencers/edit-influencer-account-page";
 import { CampaignManagment } from "@/pages/campaign-managment";
-import {
-  CampaignManagmentAddAccounts,
-} from "@/pages/campaign-managment-add-accounts/ui/campaign-managment-add-accounts";
+import { CampaignManagmentAddAccounts } from "@/pages/campaign-managment-add-accounts";
 import { InfluencerHistoryPage } from "@/pages/influencer-history/influencer-history-page";
 import { InfluencerHistoryDetailsPage } from "@/pages/influencer-history/influencer-history-details-page";
 import { InfluencerInvoicesPage } from "@/pages/influencer-invoices-page";
 import { ClientsInvoicesPage } from "@/pages/clients-invoices-page";
+import { PaymentHistoryPage } from "@/pages/payment-history-page";
 
 
 export const ROUTER = createBrowserRouter([
@@ -148,24 +147,10 @@ export const ROUTER = createBrowserRouter([
               },
 
               {
-                path: "dashboard/payments",
+                path: "dashboard/payments-history",
                 children: [
                   {
-                    index: true, element:
-                      <div style={{
-                        textAlign: "center",
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        gap: 20,
-                        paddingBlock: 150,
-                      }}>
-                        <h1 style={{ fontSize: 40 }}>🚧 Payments page is under development</h1>
-                        <p style={{ fontSize: 20, color: "#666" }}>
-                          We're working hard to bring this feature to life.<br/>
-                          It will be available very soon.
-                        </p>
-                      </div>,
+                    index: true, element: <PaymentHistoryPage />,
                   },
                 ],
               },

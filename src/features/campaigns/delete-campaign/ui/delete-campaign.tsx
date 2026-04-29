@@ -18,21 +18,22 @@ export const DeleteCampaign: React.FC<DeleteCampaignProps> = ({ campaignId, stat
 
   const handleDelete = () => {
     mutate({
-      campaignId,
-      status,
-    },
-    {
-      onSuccess: () => {
-        toast(`Campaign with ID: ${campaignId} was successfully deleted!`,
-          { type: "success", position: "bottom-center", autoClose: 3000 });
+        campaignId,
+        status,
+      },
+      {
+        onSuccess: () => {
+          toast(`Campaign with ID: ${campaignId} was successfully deleted!`,
+            { type: "success", position: "bottom-center", autoClose: 3000 });
 
-        onClose();
-      }
-    })
+          onClose();
+        },
+      })
   }
 
   return (
     <Modal onClose={onClose}>
+
       <div className={s.header}>
         <h3 className={s.title}>Are you sure you want to delete this campaign?</h3>
         <p className={s.description}>You won’t be able to restore this!</p>
@@ -58,6 +59,7 @@ export const DeleteCampaign: React.FC<DeleteCampaignProps> = ({ campaignId, stat
           {isPending ? 'Deleting...' : 'Delete'}
         </Button>
       </div>
+
     </Modal>
   );
 };

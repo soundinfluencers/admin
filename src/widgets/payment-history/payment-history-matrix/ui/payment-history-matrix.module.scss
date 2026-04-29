@@ -1,0 +1,364 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.outerScroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 16px;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--light-blue);
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--black-blue);
+    border-radius: 8px;
+  }
+}
+
+.wrapper {
+  min-width: 1224px;
+  position: relative;
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: var(--white);
+  overflow: hidden;
+}
+
+.headerClip {
+  overflow: hidden;
+  background: #F1F4FA;
+  user-select: none;
+}
+
+.headerShift,
+.bodyShift {
+  will-change: transform;
+}
+
+.accountHeader,
+.accountCell {
+  position: sticky;
+  left: 0;
+  overflow: hidden;
+}
+
+.accountHeader {
+  z-index: 20;
+  padding: 0;
+
+  border-bottom: 1px solid var(--blue);
+  border-right: 1px solid var(--blue);
+  background: #F1F4FA;
+}
+
+.accountHeaderInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 4px;
+
+  text-align: center;
+  font-size: 15px;
+  font-weight: 400;
+
+  background: #F1F4FA;
+
+  @include breakpoints.tablet {
+    font-size: 14px;
+  }
+}
+
+.campaignHeader {
+  padding: 8px;
+
+  background: #F1F4FA;
+  border-bottom: 1px solid var(--blue);
+  border-left: 1px solid var(--blue);
+
+  text-align: center;
+  font-size: 15px;
+  font-weight: 400;
+
+  @include breakpoints.tablet {
+    font-size: 14px;
+  }
+}
+
+.text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scrollbarHeaderSpacer {
+  padding: 0;
+  background: #F1F4FA;
+  border-bottom: 1px solid var(--blue);
+}
+
+.scrollbarBodySpacer {
+  padding: 0;
+  background: var(--white);
+}
+
+.bodyArea {
+  position: relative;
+}
+
+.bodyScroll {
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.accountCell {
+  z-index: 10;
+  padding: 0;
+  background: var(--white);
+}
+
+.accountCellInner {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  margin-block: 4px;
+  min-height: 43px;
+
+  font-size: 15px;
+  font-weight: 400;
+
+  user-select: none;
+
+  @include breakpoints.tablet {
+    padding: 2px 8px;
+    margin-block: 2px;
+    font-size: 14px;
+  }
+}
+
+.cell {
+  padding: 0;
+  border-left: 1px solid var(--gradient);
+}
+
+.statusCell {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 43px;
+  padding: 4px 8px;
+  margin-block: 4px;
+
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+  font-size: 14px;
+
+  @include breakpoints.tablet {
+    padding: 2px 8px;
+    margin-block: 2px;
+    font-size: 13px;
+  }
+}
+
+// status colors
+.in_process {
+  background: #FFF2BC;
+}
+
+.done {
+  background: #A4F4CF;
+}
+
+.paid {
+  background: #E5E4FF;
+}
+
+// vertical and horizontal scroll bars
+.verticalScrollbarGutter {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+
+  width: 11px;
+  background: var(--white);
+  border-left: 1px solid var(--gradient);
+}
+
+.verticalTrack {
+  position: absolute;
+  top: 8px;
+  right: 3px;
+  bottom: 8px;
+  z-index: 30;
+
+  width: 4px;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.verticalThumb {
+  width: 100%;
+  border-radius: inherit;
+  background: var(--black-blue);
+  cursor: grab;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.footerArea {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+}
+
+.scrollFooter {
+  display: flex;
+  align-items: center;
+
+  height: 32px;
+
+  background: var(--light-blue);
+  border-top: 1px solid var(--blue);
+}
+
+.scrollSpacerLeft {
+  flex: 0 0 auto;
+}
+
+.footerGutter {
+  flex: 0 0 auto;
+  height: 100%;
+  background: transparent;
+}
+
+.footerScroll {
+  width: 100%;
+  height: 100%;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.footerScrollContent {
+  height: 1px;
+}
+
+.horizontalTrack {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 11px;
+
+  height: 8px;
+  border-radius: 999px;
+  background: var(--white);
+  overflow: hidden;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.horizontalThumb {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--black-blue);
+  cursor: grab;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// loaders
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(2px);
+}
+
+.skeletonCell {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 54px;
+  background: var(--light-blue);
+  border-radius: 6px;
+}
+
+.skeletonCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.65) 50%,
+    transparent 100%
+  );
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.emptyState {
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--black-blue);
+  font-size: 14px;
+}

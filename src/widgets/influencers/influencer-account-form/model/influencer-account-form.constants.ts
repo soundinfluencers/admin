@@ -20,13 +20,13 @@ export const ACCOUNT_TYPE_OPTIONS: Array<{
 ];
 
 export const PRICE_INPUT_LABELS: Record<TSocialMediaValue, string> = {
-  instagram: "Price for influencer-history-text-cell Instagram post & story, include your currency",
-  tiktok: "Price for influencer-history-text-cell TikTok post & story, include your currency",
-  soundcloud: "Price for influencer-history-text-cell SoundCloud repost, include your currency",
-  spotify: "Price for influencer-history-text-cell Spotify feedback, include your currency",
-  facebook: "Price for influencer-history-text-cell Facebook post, include your currency",
-  youtube: "Price for influencer-history-text-cell YouTube post, include your currency",
-  press: "Price for influencer-history-text-cell Article, include your currency",
+  instagram: "Price for Instagram post & story, include your currency",
+  tiktok: "Price for TikTok post & story, include your currency",
+  soundcloud: "Price for SoundCloud repost, include your currency",
+  spotify: "Price for Spotify feedback, include your currency",
+  facebook: "Price for Facebook post, include your currency",
+  youtube: "Price for YouTube post, include your currency",
+  press: "Price for Article, include your currency",
 };
 
 // export const MUSIC_GENRES_COMMUNITY: NestedOption[] = [
@@ -490,7 +490,6 @@ export const COUNTRIES_LIST: ICountryOption[] = [
   { code: "ZM", name: "Zambia" },
   { code: "ZW", name: "Zimbabwe" },
 ];
-
 
 export const MUSIC_GENRES_COMMUNITY: NestedOption[] = [
   {

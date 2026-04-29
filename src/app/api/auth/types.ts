@@ -1,5 +1,5 @@
 export type TUserRole = "admin";
-export type TVerifiedStatus = "accept";
+export type TVerifiedStatus = "accept" | "decline" | "waitForAdmin" | "waitForUser" | "negotiation";
 
 export interface IAdmin {
   firstName: string;
