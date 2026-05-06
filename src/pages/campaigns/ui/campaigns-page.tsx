@@ -1,7 +1,5 @@
-import { useEffect } from "react";
 import { useCampaignsQuery } from "@/entities/campaign/api/use-campaigns-query.ts";
 import { useCampaignsPageState } from "@/pages/campaigns/model/use-campaigns-page-state.ts";
-import { notifyApiError } from "@/app/api/errors/notify.ts";
 import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { CampaignsToolbar } from "@/widgets/campaigns/campaigns-toolbar";
@@ -25,24 +23,9 @@ export const CampaignsPage = () => {
     handleModeChange,
   } = useCampaignsPageState();
 
-  const { data, isLoading, isFetching, isError, error } = useCampaignsQuery(queryParams);
-
-  useEffect(() => {
-    if (isError && error) {
-      notifyApiError(error);
-    }
-  }, [isError, error]);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error loading campaigns. Please try again later.</div>;
-  }
+  const { data, isLoading, isFetching, isError } = useCampaignsQuery(queryParams);
 
   const campaigns = data?.items ?? [];
-  console.log(campaigns);
   const totalPages = data?.totalPages ?? 1;
 
   return (
@@ -57,7 +40,7 @@ export const CampaignsPage = () => {
 
       <div className={styles.content}>
         <div className={styles.top}>
-          <PageTitle title={'Campaigns'} />
+          <PageTitle title={'Campaigns'}/>
 
           <CampaignsToolbar
             searchValue={searchValue}
@@ -69,15 +52,28 @@ export const CampaignsPage = () => {
         </div>
 
         <div className={styles.bottom}>
-          <OpenCampaignPayments campaignMode={mode} onToggle={handleModeChange}/>
+          {isError ? (
+            <div>Error loading campaigns. Please try again later.</div>
+          ) : (
+            <>
+              <OpenCampaignPayments campaignMode={mode} onToggle={handleModeChange}/>
 
-          <CampaignsTable data={campaigns} view={mode} isFetching={isFetching} />
+              <CampaignsTable
+                data={campaigns}
+                view={mode}
+                isFetching={isFetching}
+                isLoading={isLoading}
+              />
 
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={setPage}
-          />
+              {!isLoading && (
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                />
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

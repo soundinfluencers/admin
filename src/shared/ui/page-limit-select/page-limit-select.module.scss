@@ -61,7 +61,7 @@
   flex-shrink: 0;
   width: 24px;
   height: 24px;
-  rotate: 90deg;
+  transform: rotate(90deg);
 
   transition: transform var(--transition-fast);
 

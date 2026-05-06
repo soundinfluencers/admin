@@ -2,7 +2,7 @@ import { useLoginForm } from "@/features/auth-by-email/model/use-login-form.ts";
 import { BaseMaskedPasswordInput, BaseTextInput, Button, Form } from "@/shared/ui";
 import type { TLoginFormValues } from "@/features/auth-by-email/model/login-form.schema.ts";
 
-import styles from './login-from.module.scss';
+import styles from './login-form.module.scss';
 
 export const LoginForm = () => {
   const { methods, onSubmit, isPending } = useLoginForm();

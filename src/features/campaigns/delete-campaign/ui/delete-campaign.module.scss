@@ -2,6 +2,7 @@
 @use '@/app/styles/utils/mixins' as mixins;
 
 .header {
+  margin: 0 auto;
   max-width: 445px;
   display: flex;
   flex-direction: column;

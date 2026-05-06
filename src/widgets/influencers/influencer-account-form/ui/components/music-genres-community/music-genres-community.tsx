@@ -8,7 +8,6 @@ import {
 
 import s from './music-genres-community.module.scss';
 
-
 export const MusicGenresCommunity: React.FC = () => {
   return (
     <div className={s.musicGenresCommunity}>

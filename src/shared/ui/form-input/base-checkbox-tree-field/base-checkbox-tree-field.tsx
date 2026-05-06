@@ -4,7 +4,6 @@ import {
   type FieldValues,
   type Path,
 } from "react-hook-form";
-
 import { CheckboxTree } from "@/shared/ui";
 import type { NestedOption } from "@/shared/ui/checkbox-tree/checkbox-tree.types";
 

@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { HideInfluencerAccount } from "@/features/influencers/hide-influencer-account";
+import type { TSocialMediaValue } from "@/entities/influencers/model/influencers.constants.ts";
 
 import clsx from "clsx";
 
 import s from './influencers-networks-cell.module.scss';
-import type { TSocialMediaValue } from "@/entities/influencers/model/influencers.constants.ts";
 
 interface InfluencersNetworksCellProps {
   influencerId: string;
@@ -48,7 +48,7 @@ export const InfluencersNetworksCell: React.FC<InfluencersNetworksCellProps> = (
           loading={"lazy"}
           className={s.logo}
           width={32}
-          height={23}
+          height={32}
         />
         <span
           className={s.cellText}

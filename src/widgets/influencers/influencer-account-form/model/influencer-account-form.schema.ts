@@ -13,8 +13,11 @@ export const influencerAccountFormSchema = z.object({
 
   profileCategory: z.enum(["community", "creator"]),
 
+  //community
   musicGenresCommunity: z.array(z.string()),
   themeTopics:z.array(z.string()),
+
+  //creator
   musicGenresCreator: z.array(z.string()),
   contentFocus: z.array(z.string()),
 

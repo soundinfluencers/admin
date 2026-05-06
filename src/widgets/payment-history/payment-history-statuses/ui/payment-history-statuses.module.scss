@@ -1,0 +1,29 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.paymentHistoryStatuses {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+
+  @include breakpoints.tablet {
+    gap: 16px;
+  }
+}
+
+.statusItem {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.statusColor {
+  width: 20px;
+  height: 20px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+}
+
+.statusLabel {
+  font-size: 12px;
+}
