@@ -1,0 +1,18 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: normal;
+
+  @include breakpoints.tablet {
+    font-size: 14px;
+  }
+}
