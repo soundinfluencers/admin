@@ -3,7 +3,7 @@ import {
   useQueryState,
 } from "nuqs";
 import {
-  genresParser,
+  genresParser, offersModeParser,
   offersPlatformParser,
 } from "@/pages/influencers-offers-page/model/influencers-offers.query-parsers.ts";
 import type { TGenres } from "@/features/influencers-offers/filter-offers-by-genres/model/genres.config.ts";
@@ -12,12 +12,17 @@ import type { TPlatform } from "@/features/influencers-offers/filter-offers-by-p
 export const useInfluencersOffersPageState = () => {
   const [platform, setPlatformQuery] = useQueryState(
     "platform",
-    offersPlatformParser.withDefault('instagram'),
+    offersPlatformParser,
   );
 
   const [genre, setGenreQuery] = useQueryState(
     "genre",
-    genresParser.withDefault('Techno (Melodic, Minimal)'),
+    genresParser,
+  );
+
+  const [mode, setModeQuery] = useQueryState(
+    "mode",
+    offersModeParser,
   );
 
 
@@ -33,6 +38,12 @@ export const useInfluencersOffersPageState = () => {
     void setGenreQuery(resolvedGenre, { history: "replace" });
   };
 
+  const handleModeChange = () => {
+    const nextMode = mode === "offers" ? "live" : "offers";
+
+    void setModeQuery(nextMode, { history: "replace" });
+  };
+
   // const queryParams: any = useMemo(
   //   () => ({
   //     limit,
@@ -46,8 +57,10 @@ export const useInfluencersOffersPageState = () => {
   return {
     platform,
     genre,
+    mode,
 
     handlePlatformChange,
     handleGenreChange,
+    handleModeChange,
   };
 };

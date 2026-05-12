@@ -1,0 +1,36 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.toggleBtn {
+  @include mixins.reset-button;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  padding: 8px 12px;
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(180deg, #EBECFF 0%, #DFF0FF 100%) border-box;
+
+  box-shadow: -4px -4px 8px rgba(255, 255, 255, 0.25),
+  0 0 4px rgba(200, 225, 255, 0.25), 0 6px 12px rgba(0, 0, 0, 0.04);
+
+  font-size: 15px;
+
+  @include breakpoints.tablet {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+
+.toggleIcon {
+  width: 18px;
+  height: 18px;
+  aspect-ratio: 1 / 1;
+}

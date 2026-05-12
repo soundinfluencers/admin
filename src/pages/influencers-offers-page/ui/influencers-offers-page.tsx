@@ -2,6 +2,7 @@ import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { PlatformsFilterBar } from "@/widgets/influencers-offers/platform-filter-bar";
 import { GenreFilterBar } from "@/widgets/influencers-offers/genre-filter-bar";
+import { OffersMatrixActions } from "@/widgets/influencers-offers/offers-matrix-actions";
 import {
   useInfluencersOffersPageState,
 } from "@/pages/influencers-offers-page/model/use-influencers-offers-page-state.ts";
@@ -12,8 +13,10 @@ export const InfluencersOffersPage = () => {
   const {
     platform,
     genre,
+    mode,
     handlePlatformChange,
     handleGenreChange,
+    handleModeChange,
   } = useInfluencersOffersPageState();
 
   return (
@@ -38,8 +41,20 @@ export const InfluencersOffersPage = () => {
         </div>
 
         <div className={s.tableWrapper}>
-          <div>Table actions</div>
-          <div>Table</div>
+          <OffersMatrixActions
+            mode={mode}
+            onToggleOffersView={handleModeChange}
+          />
+
+          {mode === "offers" ?
+            (
+              <div>Table</div>
+            )
+            :
+            (
+              <div>Card view</div>
+            )
+          }
         </div>
       </div>
     </div>
