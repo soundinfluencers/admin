@@ -21,7 +21,7 @@ export type TGetInfluencerSearchHistoryParams = {
 export interface IInfluencerHistoryResponse {
   statusCode: number;
   message: string;
-  data: IInfluencerHistory[]
+  data: IInfluencerHistory[];
 }
 
 export interface IInfluencerSearchHistory {

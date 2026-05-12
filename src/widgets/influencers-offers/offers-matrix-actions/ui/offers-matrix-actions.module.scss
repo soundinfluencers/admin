@@ -1,0 +1,10 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.actions {
+  margin-left: auto;
+  display: grid;
+  justify-content: flex-end;
+  grid-template-columns: auto auto auto;
+  column-gap: 8px;
+}

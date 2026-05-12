@@ -21,7 +21,7 @@ import { InfluencerHistoryDetailsPage } from "@/pages/influencer-history/influen
 import { InfluencerInvoicesPage } from "@/pages/influencer-invoices-page";
 import { ClientsInvoicesPage } from "@/pages/clients-invoices-page";
 import { PaymentHistoryPage } from "@/pages/payment-history-page";
-
+import { InfluencersOffersPage } from "@/pages/influencers-offers-page";
 
 export const ROUTER = createBrowserRouter([
   {
@@ -181,21 +181,7 @@ export const ROUTER = createBrowserRouter([
                 path: "dashboard/offers",
                 children: [
                   {
-                    index: true, element:
-                      <div style={{
-                        textAlign: "center",
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        gap: 20,
-                        paddingBlock: 150,
-                      }}>
-                        <h1 style={{ fontSize: 40 }}>🚧 This page is under development</h1>
-                        <p style={{ fontSize: 20, color: "#666" }}>
-                          We're working hard to bring this feature to life.<br/>
-                          It will be available very soon.
-                        </p>
-                      </div>,
+                    index: true, element: <InfluencersOffersPage/>,
                   },
                 ],
               },
