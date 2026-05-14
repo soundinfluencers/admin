@@ -1,0 +1,25 @@
+.icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.chevron {
+  fill: none;
+
+  stroke: var(--gray-dark);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  opacity: 0.3;
+
+  transition:
+    opacity var(--transition-base),
+    stroke var(--transition-base);
+}
+
+.active {
+  opacity: 1;
+  stroke: var(--black);
+}

@@ -1,0 +1,98 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.tableWrapper {
+  width: 100%;
+}
+
+.scrollWrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
+
+  box-sizing: border-box;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--light-blue);
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--black-blue);
+    border-radius: 8px;
+  }
+}
+
+.tableInner {
+  position: relative;
+  overflow: hidden;
+  min-width: 800px;
+}
+
+.table {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @include breakpoints.tablet {
+    gap: 16px;
+  }
+}
+
+.body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @include breakpoints.tablet {
+    gap: 16px;
+  }
+}
+
+.header,
+.row {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 399fr)
+    minmax(100px, 150fr)
+    minmax(150px, 300fr)
+    minmax(110px, 248fr)
+    minmax(100px, 125fr);
+  align-items: center;
+}
+
+.row {
+  padding-block: 4px;
+  border-bottom: 1px solid var(--blue);
+}
+
+.headerCell,
+.cell {
+  min-width: 0;
+  padding: 8px;
+}
+
+.headerCell {
+  font-size: var(--text-md);
+}
+
+.cell {
+  font-size: 18px;
+  @include breakpoints.tablet {
+    font-size: 15px;
+  }
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}

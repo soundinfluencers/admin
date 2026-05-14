@@ -1,0 +1,21 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+@use '@/app/styles/utils/variables' as variables;
+
+.reviewRequest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 4px 24px;
+
+  border-radius: variables.$radius-md;
+  background-color: var(--gradient);
+
+  opacity: 1;
+  transition: opacity var(--transition-base);
+
+  @include mixins.hover {
+    opacity: 0.8;
+  }
+}

@@ -4,20 +4,61 @@ import { PlatformsFilterBar } from "@/widgets/influencers-offers/platform-filter
 import { GenreFilterBar } from "@/widgets/influencers-offers/genre-filter-bar";
 import { OffersMatrixActions } from "@/widgets/influencers-offers/offers-matrix-actions";
 import {
+  EMPTY_INFLUENCERS_OFFERS_MATRIX,
   useInfluencersOffersPageState,
 } from "@/pages/influencers-offers-page/model/use-influencers-offers-page-state.ts";
+import {
+  useInfluencersOffersInfiniteQuery,
+} from "@/pages/influencers-offers-page/model/use-influencers-offers.query.ts";
+import { OffersMatrix } from "@/widgets/influencers-offers/offers-matrix";
 
 import s from './influencers-offers-page.module.scss';
+
+/**
+ * TODO: Offers edit mode is paused.
+ * Current design does not match API/business logic.
+ * Keep matrix read-only until product/design confirms how account checkboxes should work.
+ * Done:
+ * - GET matrix works
+ * - URL state works
+ * - infinite query works
+ * - vertical accounts cursor works
+ * - horizontal offers cursor works
+ * - table renders offerHeaders/accountRows/links
+ * - custom scrollbars work
+ * - skeleton/empty/overlay prepared
+ * Paused:
+ * - platform/genre filters work
+ * - edit mode
+ * - checkbox behavior
+ * - PATCH links
+ * - publish
+ * - export
+ * - add offer
+ * - card view
+ * **/
 
 export const InfluencersOffersPage = () => {
   const {
     platform,
     genre,
     mode,
+    queryParams,
     handlePlatformChange,
     handleGenreChange,
     handleModeChange,
   } = useInfluencersOffersPageState();
+
+  const {
+    matrix,
+    isPending,
+    isError,
+    isFetchingNextPage,
+    fetchNextAccountsPage,
+    fetchNextOffersPage,
+  } = useInfluencersOffersInfiniteQuery(queryParams);
+
+  const matrixData = matrix ?? EMPTY_INFLUENCERS_OFFERS_MATRIX;
 
   return (
     <div className={s.offersPage}>
@@ -35,8 +76,16 @@ export const InfluencersOffersPage = () => {
           />
 
           <div className={s.toolbar}>
-            <PlatformsFilterBar platform={platform} onPlatformChange={handlePlatformChange}/>
-            <GenreFilterBar genre={genre} onGenreChange={handleGenreChange}/>
+            <PlatformsFilterBar
+              platform={platform}
+              onPlatformChange={handlePlatformChange}
+              isDisabled={isPending}
+            />
+            <GenreFilterBar
+              genre={genre}
+              onGenreChange={handleGenreChange}
+              isDisabled={isPending}
+            />
           </div>
         </div>
 
@@ -44,11 +93,20 @@ export const InfluencersOffersPage = () => {
           <OffersMatrixActions
             mode={mode}
             onToggleOffersView={handleModeChange}
+            isDisabled={isPending || isError}
           />
 
           {mode === "offers" ?
-            (
-              <div>Table</div>
+            isError ? (
+              <div>Error loading Influencers Offers. Please try again later.</div>
+            ) : (
+              <OffersMatrix
+                data={matrixData}
+                isLoading={isPending}
+                isFetching={isFetchingNextPage}
+                onLoadMoreAccounts={fetchNextAccountsPage}
+                onLoadMoreOffers={fetchNextOffersPage}
+              />
             )
             :
             (

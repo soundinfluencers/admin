@@ -14,6 +14,8 @@ export const useUpdateClientMutation = () => {
         (oldData: IClientDetails | undefined) => {
           if (!oldData) return oldData;
 
+          console.log("Updating client in cache with data:", updatedClient);
+
           return {
             ...oldData,
             ...updatedClient,

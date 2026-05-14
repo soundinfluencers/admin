@@ -9,6 +9,8 @@ export type TGenres =
   | 'Psy'
   | 'Dubstep'
   | 'Hip-Hop'
+  | 'Trance'
+  | 'Garage'
   | 'Dance Pop';
 
 interface IGenresOption {
@@ -25,9 +27,10 @@ export const GENRES_OPTIONS = [
   { label: "EDM", value: "EDM" },
   { label: "D&B", value: "D&B" },
   { label: "Bass", value: "Bass" },
-  { label: "Psy, Trance", value: "Psy" },
+  { label: "Psy", value: "Psy" },
+  { label: "Trance", value: "Trance" },
   { label: "Dubstep", value: "Dubstep" },
   { label: "Hip-Hop", value: "Hip-Hop" },
+  { label: "Garage", value: "Garage" },
   { label: "Pop", value: "Dance Pop" },
 ] as const satisfies IGenresOption[];
-

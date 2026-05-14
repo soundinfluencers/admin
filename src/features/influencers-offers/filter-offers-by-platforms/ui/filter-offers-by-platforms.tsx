@@ -7,11 +7,13 @@ import s from './filter-offers-by-platforms.module.scss';
 interface FilterOffersByPlatformsProps {
   platform: TPlatform;
   onPlatformChange: (platform: TPlatform) => void;
+  isDisabled?: boolean;
 }
 
 export const FilterOffersByPlatforms: React.FC<FilterOffersByPlatformsProps> = ({
   platform,
   onPlatformChange,
+  isDisabled,
 }) => {
   return (
     <div className={s.filterBar}>
@@ -24,6 +26,7 @@ export const FilterOffersByPlatforms: React.FC<FilterOffersByPlatformsProps> = (
           )}
           type="button"
           onClick={() => onPlatformChange(option.value)}
+          disabled={isDisabled}
         >
           <img
             src={option.icon}

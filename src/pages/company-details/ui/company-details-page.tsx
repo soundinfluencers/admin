@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useClientQuery } from "@/entities/client/api/use-client-query.ts";
 import { useParams } from "react-router-dom";
 
@@ -7,7 +6,6 @@ import { PageTitle } from "@/widgets/page-title";
 import { CompanyDetails } from "@/widgets/clients/company-details/ui/company-details.tsx";
 import { CompanyCampaigns } from "@/widgets/clients/campaigns-status";
 
-import { notifyApiError } from "@/app/api/errors/notify.ts";
 import styles from './company-details-page.module.scss';
 
 export const CompanyDetailsPage = () => {
@@ -16,12 +14,6 @@ export const CompanyDetailsPage = () => {
   const { data, isLoading, isError, error } = useClientQuery(clientId);
 
   console.log('Client details data', data, isLoading, isError, error);
-
-  useEffect(() => {
-    if (isError && error) {
-      notifyApiError(error);
-    }
-  }, [isError, error]);
 
   if (!clientId) {
     return <div>Client id is missing.</div>;

@@ -18,7 +18,8 @@
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(1px);
   -webkit-backdrop-filter: blur(1px);
-  animation: modalFadeIn 0.3s ease-in-out;
+
+  animation: modalOverlayFadeIn 0.2s ease-out;
 
   @include breakpoints.tablet {
     padding: 48px 16px 16px 16px;
@@ -41,6 +42,8 @@
 
   border-radius: vars.$radius-sm;
 
+  animation: modalContentFadeIn 0.22s ease-out;
+
   background: var(--background-color);
 
   @include breakpoints.tablet {
@@ -52,5 +55,27 @@
     width: calc(100vw - 32px);
     padding: 16px;
     gap: 24px;
+  }
+}
+
+@keyframes modalOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalContentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

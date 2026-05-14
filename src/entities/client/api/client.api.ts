@@ -46,3 +46,11 @@ export const updateClient = async ({ clientId, dto }: IUpdateClientParams) => {
 
   return data.data;
 };
+
+export const deleteClient = async (clientId: string) => {
+  console.log(`Deleting client ${clientId}...`);
+
+  await $api.delete(`/admin/clients/${clientId}`);
+
+  console.log(`Successfully deleted client ${clientId}`);
+};

@@ -10,20 +10,74 @@ export type TInfoField<T> = {
 }
 
 export const leftFields = [
-  { label: "First name", key: "firstName" },
-  { label: "Last name", key: "lastName" },
-  { label: "Email", key: "email" },
-  { label: "Phone number", key: "phone" },
+  {
+    label: "First name",
+    key: "firstName",
+    render: (data: IClientDetails) => (
+      <ClientNoteEditor
+        initialValue={data.firstName}
+        clientId={data.clientId}
+        fieldKey="firstName"
+      />
+    ),
+  },
+  {
+    label: "Last name",
+    key: "lastName",
+    render: (data: IClientDetails) => (
+      <ClientNoteEditor
+        initialValue={data.lastName}
+        clientId={data.clientId}
+        fieldKey="lastName"
+      />
+    ),
+  },
+  {
+    label: "Email",
+    key: "email",
+    render: (data: IClientDetails) => (
+      <ClientNoteEditor
+        initialValue={data.email}
+        clientId={data.clientId}
+        fieldKey="email"
+      />
+    ),
+  },
+  {
+    label: "Phone number",
+    key: "phone",
+    render: (data: IClientDetails) => (
+      <ClientNoteEditor
+        initialValue={data.phone}
+        clientId={data.clientId}
+        fieldKey="phone"
+      />
+    ),
+  },
 ] satisfies TInfoField<IClientDetails>[];
 
 export const rightFields = [
-  { label: "Company type", key: "companyType" },
+  {
+    label: "Company type",
+    key: "companyType",
+    render: (data: IClientDetails) => (
+      <ClientNoteEditor
+        initialValue={data.companyType}
+        clientId={data.clientId}
+        fieldKey="companyType"
+      />
+    ),
+  },
   { label: "ID", key: "clientId" },
   {
     label: "Proposal access",
-    key: "proposalAccess",
+    key: "isProposalClient",
     render: (data: IClientDetails) => (
-      <ClientProposalAccessSwitch value={data.proposalAccess} clientId={data.clientId} />
+      <ClientProposalAccessSwitch
+        value={data.isProposalClient}
+        clientId={data.clientId}
+        fieldKey="isProposalClient"
+      />
     ),
   },
   { label: "Latest campaign", key: "latestCampaignName" },
@@ -36,7 +90,9 @@ export const noteField = [
     render: (data: IClientDetails) => (
       <ClientNoteEditor
         initialValue={data.internalNote}
-        clientId={data.clientId} />
+        clientId={data.clientId}
+        fieldKey="internalNote"
+      />
     ),
   },
 ] satisfies TInfoField<IClientDetails>[];

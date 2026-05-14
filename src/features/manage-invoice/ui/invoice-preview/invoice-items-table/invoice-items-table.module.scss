@@ -18,7 +18,6 @@
 
 .gridRow {
   display: grid;
-  //grid-template-columns: 190px 139px 73px 35px 62px;
   grid-template-columns:
     minmax(190px, 190fr)
     minmax(139px, 139fr)

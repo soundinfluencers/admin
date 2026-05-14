@@ -52,7 +52,7 @@ export interface IClientDetails {
   firstName: string;
   email: string;
   companyType: string;
-  proposalAccess: boolean;
+  isProposalClient: boolean;
   lastName: string;
   phone: string;
   latestCampaignName: string;
@@ -68,12 +68,13 @@ export interface IClientResponse {
 }
 
 // Update client meta
-export interface IUpdateClientMetaDto {
-  isProposalClient?: boolean;
-  internalNote?: string;
-}
+export type TUpdateClientMetaDto = Partial<
+  Pick<
+    IClientDetails,
+    'firstName' | 'lastName' | 'email' | 'phone' | 'companyType' | 'isProposalClient' | 'internalNote'
+  >>;
 
 export interface IUpdateClientParams {
   clientId: string;
-  dto: IUpdateClientMetaDto;
+  dto: TUpdateClientMetaDto;
 }

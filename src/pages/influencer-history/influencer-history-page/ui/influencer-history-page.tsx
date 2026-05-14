@@ -2,15 +2,15 @@ import { useInfluencerHistoryQuery } from "@/entities/influencer-history/api/use
 import {
   useInfluencersHistoryPageState
 } from "@/pages/influencer-history/influencer-history-page/model/use-influencer-history-page-state.ts";
+import {
+  useInfluencerSearchHistoryQuery
+} from "@/entities/influencer-history/api/use-influencer-search-history-query.ts";
 import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { InfluencerSearch } from "@/widgets/influencer-history/influencer-search";
 import { InfluencerHistoryTable } from "@/widgets/influencer-history/influencer-history-table";
 
 import s from './influencer-history-page.module.scss';
-import {
-  useInfluencerSearchHistoryQuery
-} from "@/entities/influencer-history/api/use-influencer-search-history-query.ts";
 
 export const InfluencerHistoryPage = () => {
   const { searchValue, handleSearchChange, historyQueryParams, searchQueryParams } = useInfluencersHistoryPageState();
