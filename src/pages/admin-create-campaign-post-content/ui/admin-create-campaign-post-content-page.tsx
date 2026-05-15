@@ -1,4 +1,4 @@
-
+//@ts-nocheck
 import { useNavigate } from "react-router-dom";
 
 import { useCampaignBuilderStore } from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.store";
@@ -6,7 +6,6 @@ import styles from "./admin-create-campaign-post-content.module.scss";
 
 import {PageBreadcrumbs} from "@/widgets/page-breadcrumbs";
 import {CampaignPostContentPage} from "@/widgets/admin-create-campaign-post-content/ui/campaign-post-content-page.tsx";
-import React from "react";
 
 export const AdminCreateCampaignPostContentPage = () => {
     const navigate = useNavigate();

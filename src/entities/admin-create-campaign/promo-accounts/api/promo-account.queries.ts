@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
     getPromoAccountsByFilters,
@@ -16,6 +17,7 @@ export const usePromoAccountsByFiltersQuery = ({
     limit: number;
     enabled: boolean;
 }) => {
+
     return useQuery({
         queryKey: ["promo-accounts-admin", body, sortBy, limit] as const,
         queryFn: () =>

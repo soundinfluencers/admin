@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./live-view-card.module.scss";
-import {getVideoBlobUrl} from "@/entities/client-side/campaign-strategy-page/api/preview-file.ts";
+import {getVideoBlobUrl} from "@/entities/campaign-managment/api/preview-video.ts";
+
 
 type Props = {
     videoUrl?: string | null;

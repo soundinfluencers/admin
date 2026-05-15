@@ -3,7 +3,8 @@ import styles from "./live-view-card.module.scss";
 
 import previewFallback from "@/assets/icons/video (2).png";
 import play from "@/assets/icons/play.svg";
-import {getFilePreview} from "@/entities/client-side/campaign-strategy-page/api/preview-file.ts";
+import {getFilePreview} from "@/entities/campaign-managment/api/preview-video.ts";
+
 
 type Props = {
     previewUrl?: string | null;

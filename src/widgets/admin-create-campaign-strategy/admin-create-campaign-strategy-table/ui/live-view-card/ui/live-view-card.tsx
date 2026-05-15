@@ -6,9 +6,10 @@ import { LiveDescriptionsEditorDropdown } from "./live-descriptions-editor-dropd
 import { ExtraFieldsCard } from "./extra-fields-card";
 
 import styles from "./live-view-card.module.scss";
-import {useEditableContentItem} from "@/widgets/client-side/campaign-tables/model/use-editable-content-item.ts";
-import {getSocialMediaIconPostContent} from "@/constants/social-medias.ts";
-import type {socialMediaType} from "@/pages/influencer/promos/types/promos.types.ts";
+import {useEditableContentItem} from "@/entities/campaign-managment/model/campaign-management-card.helpers.ts";
+import {getSocialMediaIconPostContent} from "@/shared/libs/get-social-media-icon.ts";
+import type {SocialMedia} from "@/entities/campaign-managment/model/campaign.managment.ts";
+
 
 type NetworkItem = {
     addedAccountsId?: string;
@@ -148,7 +149,7 @@ export const LiveViewCard: React.FC<Props> = ({
                     <h3>Audience reach</h3>
                     <div className={styles.audienceList}>
                         <div className={styles.audienceItem}>
-                            <img src={getSocialMediaIconPostContent(merged?.socialMedia as socialMediaType)  || ""} alt=""/>
+                            <img src={getSocialMediaIconPostContent(merged?.socialMedia as SocialMedia)  || ""} alt=""/>
                             <p>{merged?.socialMedia || "—"}</p>
                         </div>
                     </div>
