@@ -103,8 +103,10 @@
   background-color:#EBF5FE;
 }
 .td {
+
   &:not(:first-child) {
     border-left: 1px solid var(--gradient);
+
   }
   &.noBorder{
     border: none;

@@ -31,7 +31,8 @@
 }
 
 .content {
-  width: min(625px, calc(100vw - 32px));
+  min-width: 625px;
+  //width: min(625px, calc(100vw - 32px));
   position: relative;
   padding: 32px 48px;
   display: flex;
@@ -47,6 +48,7 @@
   background: var(--background-color);
 
   @include breakpoints.tablet {
+    min-width: 100%;
     width: min(610px, calc(100vw - 32px));
     padding: 24px 32px;
   }

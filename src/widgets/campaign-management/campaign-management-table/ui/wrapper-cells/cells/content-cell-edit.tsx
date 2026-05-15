@@ -251,8 +251,8 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
                             placeholder="Paste video link..."
                         />
                         <div className="modal-card-btn">
-                            <button type="button" onClick={closeAddModal}>Cancel</button>
-                            <button type="button" onClick={createVideo}>Create</button>
+                            <button className='modal-secondary-btn' type="button" onClick={closeAddModal}>Cancel</button>
+                            <button className='modal-primary-btn' type="button" onClick={createVideo}>Create</button>
                         </div>
                     </div>
                 </Modal>
@@ -266,10 +266,10 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
                         </h2>
                         <p>You won’t be able to restore this!</p>
                         <div className="onDeleteModal-btn">
-                            <button type="button" onClick={() => setDeleteModal(false)}>
+                            <button className='modal-secondary-btn' type="button" onClick={() => setDeleteModal(false)}>
                                 Cancel
                             </button>
-                            <button type="button" onClick={confirmDelete}>
+                            <button className='modal-primary-btn' type="button" onClick={confirmDelete}>
                                 Delete
                             </button>
                         </div>

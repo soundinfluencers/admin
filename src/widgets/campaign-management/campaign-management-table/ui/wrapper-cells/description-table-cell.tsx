@@ -1,33 +1,88 @@
 import React from "react";
-import type { CampaignManagementRow } from "@/widgets/campaign-management/campaign-management-table/model/campaign-management-table.types";
-import { useCampaignManagementStore } from "@/entities/campaign-managment/store/campaign-management.store";
-import { DescriptionCellEdit } from "@/widgets/campaign-management/campaign-management-table/ui/wrapper-cells/cells/description-cell-edit.tsx";
-import { DescriptionCell } from "@/widgets/campaign-management/campaign-management-table/ui/wrapper-cells/cells/description-cell.tsx";
+
+import type {
+    CampaignManagementRow,
+} from "@/widgets/campaign-management/campaign-management-table/model/campaign-management-table.types";
+
+import {
+    useCampaignManagementStore,
+} from "@/entities/campaign-managment/store/campaign-management.store";
+
+import {
+    DescriptionCellEdit,
+} from "@/widgets/campaign-management/campaign-management-table/ui/wrapper-cells/cells/description-cell-edit.tsx";
+
+import {
+    DescriptionCell,
+} from "@/widgets/campaign-management/campaign-management-table/ui/wrapper-cells/cells/description-cell.tsx";
 
 type Props = {
     row: CampaignManagementRow;
     canEdit: boolean;
+    field?: "tracktitle" | "artworkLink";
+    status?: string;
 };
 
-export const DescriptionTableCell: React.FC<Props> = ({ row, canEdit }) => {
+export const DescriptionTableCell: React.FC<Props> = ({
+                                                          row,
+                                                          canEdit,
+                                                          field,
+                                                          status,
+                                                      }) => {
     const setAccountSelectedContent = useCampaignManagementStore(
         (s) => s.setAccountSelectedContent,
     );
 
     const [isOpen, setIsOpen] = React.useState(false);
 
-    const setSelectedPd = (nextPd: number) => {
-        const item = row.platformItems?.[row.selectedContentIndex];
-        const desc = item?.descriptions?.[nextPd];
-        if (!item || !desc) return;
+    const normalizedStatus = String(status ?? "").toLowerCase();
+    const isCompleted = normalizedStatus === "completed";
 
-        setAccountSelectedContent(row.accountKey, {
-            campaignContentItemId: String(item._id ?? ""),
-            descriptionId: String(desc._id ?? ""),
-        });
-    };
+    const setSelectedPd = React.useCallback(
+        (nextPd: number) => {
+            if (isCompleted) return;
 
-    if (canEdit) {
+            const item = row.platformItems?.[row.selectedContentIndex];
+            const desc = item?.descriptions?.[nextPd];
+
+            if (!item || !desc) return;
+
+            setAccountSelectedContent(row.accountKey, {
+                campaignContentItemId: String(item._id ?? ""),
+                descriptionId: String(desc._id ?? ""),
+            });
+        },
+        [
+            isCompleted,
+            row.platformItems,
+            row.selectedContentIndex,
+            row.accountKey,
+            setAccountSelectedContent,
+        ],
+    );
+
+    const onSelectDescriptionId = React.useCallback(
+        (descriptionId: string) => {
+            if (isCompleted) return;
+
+            const item = row.platformItems?.[row.selectedContentIndex];
+            if (!item) return;
+
+            setAccountSelectedContent(row.accountKey, {
+                campaignContentItemId: String(item._id ?? ""),
+                descriptionId: String(descriptionId ?? ""),
+            });
+        },
+        [
+            isCompleted,
+            row.platformItems,
+            row.selectedContentIndex,
+            row.accountKey,
+            setAccountSelectedContent,
+        ],
+    );
+
+    if (canEdit && !isCompleted) {
         return (
             <DescriptionCellEdit
                 isOpen={isOpen}
@@ -37,19 +92,9 @@ export const DescriptionTableCell: React.FC<Props> = ({ row, canEdit }) => {
                 selectedPd={row.selectedDescriptionIndex}
                 setSelectedPd={setSelectedPd}
                 group={row.group}
-                onSelectDescriptionId={(descriptionId) => {
-                    const item = row.platformItems?.[row.selectedContentIndex];
-                    if (!item) return;
-
-                    setAccountSelectedContent(row.accountKey, {
-                        campaignContentItemId: String(item._id ?? ""),
-                        descriptionId: String(descriptionId ?? ""),
-                    });
-                }} onToggle={function (): void {
-                throw new Error("Function not implemented.");
-            }} onClose={function (): void {
-                throw new Error("Function not implemented.");
-            }}            />
+                status={normalizedStatus}
+                onSelectDescriptionId={onSelectDescriptionId}
+            />
         );
     }
 
@@ -61,10 +106,9 @@ export const DescriptionTableCell: React.FC<Props> = ({ row, canEdit }) => {
             selectedContent={row.selectedContentIndex}
             selectedPd={row.selectedDescriptionIndex}
             setSelectedPd={setSelectedPd}
-            group={row.group} onToggle={function (): void {
-            throw new Error("Function not implemented.");
-        }} onClose={function (): void {
-            throw new Error("Function not implemented.");
-        }}        />
+            group={row.group}
+            field={field}
+            status={normalizedStatus}
+        />
     );
 };

@@ -1,8 +1,8 @@
 import email from '@/assets/icons/invoice/mail.svg';
 import phone from '@/assets/icons/invoice/phone.svg';
 
-import bank from '../../../../../soundinfluencers/src/assets/icons/invoice-document/bank.svg';
-import creditCard from '../../../../../soundinfluencers/src/assets/icons/invoice-document/credit-card.svg';
+import bank from '@/assets/icons/invoice/bank.svg';
+import creditCard from '@/assets/icons/invoice/credit-card.svg';
 import paypal from '@/assets/icons/invoice/paypal.svg'
 
 export type TMethod = "bankTransfer" | "cardPayments" | "paypal";

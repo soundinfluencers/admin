@@ -11,6 +11,7 @@ type Props = {
     disabledDelete?: boolean;
     disabledWhatsApp?: boolean;
     disabledEmail?: boolean;
+    onlyDelete?: boolean;
 };
 
 export const ActionInsight: React.FC<Props> = ({
@@ -20,7 +21,11 @@ export const ActionInsight: React.FC<Props> = ({
                                                    disabledDelete = false,
                                                    disabledWhatsApp = false,
                                                    disabledEmail = false,
+                                                   onlyDelete = false,
                                                }) => {
+    const showWhatsApp = !onlyDelete && !disabledWhatsApp;
+    const showEmail = !onlyDelete && !disabledEmail;
+
     return (
         <div className="action-insight">
             <button
@@ -33,25 +38,27 @@ export const ActionInsight: React.FC<Props> = ({
                 <img src={trash} alt="" />
             </button>
 
-            <button
-                type="button"
-                className="action-insight__btn"
-                onClick={onWhatsApp}
-                disabled={disabledWhatsApp}
-                aria-label="Send to WhatsApp"
-            >
-                <img src={whatsApp} alt="" />
-            </button>
+            {showWhatsApp && (
+                <button
+                    type="button"
+                    className="action-insight__btn"
+                    onClick={onWhatsApp}
+                    aria-label="Send to WhatsApp"
+                >
+                    <img src={whatsApp} alt="" />
+                </button>
+            )}
 
-            <button
-                type="button"
-                className="action-insight__btn"
-                onClick={onEmail}
-                disabled={disabledEmail}
-                aria-label="Send email"
-            >
-                <img src={email} alt="" />
-            </button>
+            {showEmail && (
+                <button
+                    type="button"
+                    className="action-insight__btn"
+                    onClick={onEmail}
+                    aria-label="Send email"
+                >
+                    <img src={email} alt="" />
+                </button>
+            )}
         </div>
     );
 };

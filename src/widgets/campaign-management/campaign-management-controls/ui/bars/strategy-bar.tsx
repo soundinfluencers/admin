@@ -1,6 +1,13 @@
+import { useEffect, useState } from "react";
+
 import styles from "./bar.module.scss";
 import type { EditableCampaign } from "@/entities/campaign-managment/store/campaign-management.store.ts";
-import { formatCampaignDate, formatFollowers } from "@/entities/campaign-managment/model/campaign-management.helpers.ts";
+import {
+    formatCampaignDate,
+    formatFollowers,
+} from "@/entities/campaign-managment/model/campaign-management.helpers.ts";
+import { getCampaignBudget } from "@/entities/campaign-managment/model/campaign-budget.helpers.ts";
+import { useCampaignManagementStore } from "@/entities/campaign-managment/store/campaign-management.store.ts";
 
 type Props = {
     campaign: EditableCampaign | null;
@@ -8,37 +15,93 @@ type Props = {
     status: string;
 };
 
-export const StrategyBar = ({ campaign, isLockedStatus,status }: Props) => {
-    const budget =
-        campaign?.addedAccounts?.reduce((sum, item) => {
-            return sum + Number(item.publicPrice ?? 0);
-        }, 0) ?? 0;
+export const StrategyBar = ({ campaign, isLockedStatus, status }: Props) => {
+    const setCampaignPrice = useCampaignManagementStore((s) => s.setCampaignPrice);
+    const canEdit = useCampaignManagementStore((s) => s.isEditable());
+
+    const budget = getCampaignBudget(campaign);
+
+    const [budgetInput, setBudgetInput] = useState(
+        budget > 0 ? String(budget) : "",
+    );
+
+    useEffect(() => {
+        setBudgetInput(budget > 0 ? String(budget) : "");
+    }, [budget]);
 
     const reach = campaign?.totalFollowers ?? 0;
     const posts = campaign?.addedAccounts?.length ?? 0;
     const videos = campaign?.campaignContent?.length ?? 0;
 
+    const handleBudgetChange = (value: string) => {
+        const normalized = value.replace(",", ".");
 
-    const barUIs = [
-        ...(!isLockedStatus
-            ? [{ name: `Status: ${status}`, row: true }]
-            : []),
-        { name: `Submitted: ${formatCampaignDate(campaign?.creationDate)}`, row: true },
-        { name: `Budget: ${budget}€`, row: true },
+        if (normalized === "") {
+            setBudgetInput("");
+            setCampaignPrice(0);
+            return;
+        }
 
-        { name: `Reach: ${formatFollowers(reach)} followers`, row: true },
-        { name: `Posts: ${posts}`, row: true },
-        { name: `Video: ${videos}`, row: false },
-    ];
+        if (!/^\d*\.?\d*$/.test(normalized)) {
+            return;
+        }
+
+        const cleaned = normalized.replace(/^0+(?=\d)/, "");
+
+        setBudgetInput(cleaned);
+
+        const next = Number(cleaned);
+        setCampaignPrice(Number.isNaN(next) ? 0 : next);
+    };
+
+    const inputWidth = `${Math.max(budgetInput.length || 1, 2)}ch`;
 
     return (
         <div className={styles.barStrategy}>
-            {barUIs.map((item, i) => (
-                <div key={i} className={styles.barStrategy__button}>
-                    <p>{item.name}</p>
-                    {item.row && <div className={styles.row} />}
+            {!isLockedStatus && (
+                <div className={styles.barStrategy__button}>
+                    <p>{`Status: ${status}`}</p>
+                    <div className={styles.row} />
                 </div>
-            ))}
+            )}
+
+            <div className={styles.barStrategy__button}>
+                <p>{`Submitted: ${formatCampaignDate(campaign?.creationDate)}`}</p>
+                <div className={styles.row} />
+            </div>
+
+            <div className={styles.barStrategy__button}>
+                {canEdit ? (
+                    <div className={styles.barEditable}>
+                        <span>Budget:</span>
+                        <input
+                            type="text"
+                            inputMode="decimal"
+                            value={budgetInput}
+                            style={{ width: inputWidth }}
+                            placeholder="0"
+                            onChange={(e) => handleBudgetChange(e.target.value)}
+                        />
+                    </div>
+                ) : (
+                    <p>{`Budget: ${budget}€`}</p>
+                )}
+                <div className={styles.row} />
+            </div>
+
+            <div className={styles.barStrategy__button}>
+                <p>{`Reach: ${formatFollowers(reach)} followers`}</p>
+                <div className={styles.row} />
+            </div>
+
+            <div className={styles.barStrategy__button}>
+                <p>{`Posts: ${posts}`}</p>
+                <div className={styles.row} />
+            </div>
+
+            <div className={styles.barStrategy__button}>
+                <p>{`Video: ${videos}`}</p>
+            </div>
         </div>
     );
 };

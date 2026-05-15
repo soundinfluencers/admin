@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 
 import React from "react";
 import {
@@ -20,6 +20,14 @@ import type {
 import {Modal} from "@/shared/ui/modal/modal.tsx";
 import {payPromoCampaign} from "@/entities/campaign-managment/api/campaign-controls.api.ts";
 import {toast} from "react-toastify";
+import {uploadCampaignFile} from "@/entities/campaign-managment/api/upload-campaign-file.ts";
+import {CircleLoader} from "@/shared/ui/circle-loader/circle-loader.tsx";
+import {
+    buildWhatsAppPromoData, buildWhatsAppPromoMessage
+} from "@/widgets/campaign-management/campaign-management-table/model/whats-app.helpers.ts";
+import {sendCampaignWhatsAppOne} from "@/entities/campaign-managment/api/campaign-whatsapp.api.ts";
+import type {CampaignStatus} from "@/entities/campaign-managment/model/campaign.managment.ts";
+import {useRealtime} from "@/app/providers/realtime-provider/use-realtime.ts";
 
 
 type Props = {
@@ -34,12 +42,15 @@ type Props = {
     };
     canEdit: boolean;
     canManageAccounts: boolean;
+    canContactInfluencer: boolean;
     campaignId: string;
     statusParam?: string | null;
     optionIndex: number;
     totalPrice?: number;
-    loadCampaignByOption?: (nextOptionIndex: number, nextStatus?: CampaignStatus) => Promise<void>
-
+    loadCampaignByOption?: (
+        nextOptionIndex: number,
+        nextStatus?: CampaignStatus,
+    ) => Promise<void>;
 };
 
 export const CampaignManagementInsightTable = ({
@@ -51,8 +62,34 @@ export const CampaignManagementInsightTable = ({
                                                    statusParam,
                                                    optionIndex,
                                                    totalPrice,
-                                                   loadCampaignByOption
+                                                   loadCampaignByOption,canContactInfluencer
                                                }: Props) => {
+    const { clientId,isConnected } = useRealtime();
+    const realtimeClientId = clientId;
+    const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+    const editable = useCampaignManagementStore((s) => s.editable);
+    const [whatsAppModal, setWhatsAppModal] = React.useState<{
+        isOpen: boolean;
+        data: null | {
+            influencerName: string;
+            platform: string;
+            page: string;
+            content: string;
+            description: string;
+            storyTag: string;
+            storyRequest: string;
+            storyLink: string;
+            specialRequest: string;
+            reward: string;
+        };
+        account: any | null;
+        isSending: boolean;
+    }>({
+        isOpen: false,
+        data: null,
+        account: null,
+        isSending: false,
+    });
     const rows = React.useMemo(
         () => buildCampaignManagementInsightRows(networks),
         [networks],
@@ -67,22 +104,40 @@ export const CampaignManagementInsightTable = ({
         accountKey: "",
         username: "",
     });
+
     const [linkModal, setLinkModal] = React.useState<{
         isOpen: boolean;
         accountKey: string;
         field: "postLink" | "screenshot" | null;
         value: string;
         title: string;
+        previewUrl: string;
+        isUploading: boolean;
     }>({
         isOpen: false,
         accountKey: "",
         field: null,
         value: "",
         title: "",
+        previewUrl: "",
+        isUploading: false,
     });
-
+    const whatsappFields = [
+        { label: "Platform", value: whatsAppModal.data?.platform },
+        { label: "Page", value: whatsAppModal.data?.page },
+        { label: "Content", value: whatsAppModal.data?.content },
+        { label: "Description", value: whatsAppModal.data?.description },
+        { label: "Story Tag", value: whatsAppModal.data?.storyTag },
+        { label: "Story Request", value: whatsAppModal.data?.storyRequest },
+        { label: "Story Link", value: whatsAppModal.data?.storyLink },
+        { label: "Special request", value: whatsAppModal.data?.specialRequest },
+        { label: "Reward", value: whatsAppModal.data?.reward },
+    ];
     const setAccountInsightField = useCampaignManagementStore(
         (s) => s.setAccountInsightField,
+    );
+    const recentlyAddedAccountKeys = useCampaignManagementStore(
+        (s) => s.recentlyAddedAccountKeys,
     );
     const [showCpm, setShowCpm] = React.useState(false);
     const handlePayPromo = React.useCallback(
@@ -109,17 +164,59 @@ export const CampaignManagementInsightTable = ({
     const handleOpenLinkModal = React.useCallback(
         (row: CampaignManagementInsightRow, field: "postLink" | "screenshot") => {
             const accountKey = getAccountKey(row.account);
+            const currentValue =
+                field === "postLink"
+                    ? row.account.postLink ?? ""
+                    : row.account.screenshot ?? "";
 
             setLinkModal({
                 isOpen: true,
                 accountKey,
                 field,
-                value:
-                    field === "postLink"
-                        ? row.account.postLink ?? ""
-                        : row.account.screenshot ?? "",
+                value: currentValue,
                 title: field === "postLink" ? "Edit post link" : "Edit screenshot link",
+                previewUrl: field === "screenshot" ? currentValue : "",
+                isUploading: false,
             });
+        },
+        [],
+    );
+    const handleFileChange = React.useCallback(
+        async (event: React.ChangeEvent<HTMLInputElement>) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            try {
+                setLinkModal((prev) => ({
+                    ...prev,
+                    isUploading: true,
+                }));
+
+                const response = await uploadCampaignFile(file);
+                const uploadedUrl = String(response ?? "");
+
+                if (!uploadedUrl) {
+                    throw new Error("Upload failed: file url was not returned");
+                }
+
+                setLinkModal((prev) => ({
+                    ...prev,
+                    value: uploadedUrl,
+                    previewUrl: uploadedUrl,
+                    isUploading: false,
+                }));
+
+                toast.success("File uploaded successfully");
+            } catch (error) {
+                console.error("Failed to upload file", error);
+
+                setLinkModal((prev) => ({
+                    ...prev,
+                    isUploading: false,
+                }));
+
+                toast.error("Failed to upload file");
+            }
         },
         [],
     );
@@ -155,16 +252,90 @@ export const CampaignManagementInsightTable = ({
             field: null,
             value: "",
             title: "",
+            previewUrl: "",
+            isUploading: false,
         });
     }, [linkModal, setAccountInsightField]);
 
+    const handleOpenWhatsAppModal = React.useCallback(
+        (row: CampaignManagementInsightRow) => {
+            if (!editable) return;
+
+            const data = buildWhatsAppPromoData({
+                account: row.account,
+                campaignContent: editable.campaignContent,
+            });
+
+            setWhatsAppModal({
+                isOpen: true,
+                data,
+                account: row.account,
+                isSending: false,
+            });
+        },
+        [editable],
+    );
+    const handleSendWhatsAppOne = React.useCallback(async () => {
+        if (!whatsAppModal.data || !whatsAppModal.account) return;
+
+        if (!realtimeClientId || !isConnected) {
+            toast.error("Socket client is not ready");
+            return;
+        }
+
+        try {
+            setWhatsAppModal((prev) => ({
+                ...prev,
+                isSending: true,
+            }));
+
+            const message = buildWhatsAppPromoMessage(whatsAppModal.data);
+
+            const payload = {
+                influencerId: String(whatsAppModal.account.influencerId ?? ""),
+                accountId: String(
+                    whatsAppModal.account.socialAccountId ??
+                    whatsAppModal.account.accountId ??
+                    "",
+                ),
+                socialMedia: String(whatsAppModal.account.socialMedia ?? ""),
+                message,
+                clientId: realtimeClientId,
+            };
+
+            console.log("[WHATSAPP ONE PAYLOAD]", payload);
+
+            await sendCampaignWhatsAppOne(payload);
+
+            toast.success("WhatsApp message sent");
+
+            setWhatsAppModal({
+                isOpen: false,
+                data: null,
+                account: null,
+                isSending: false,
+            });
+        } catch (error) {
+            console.error("Failed to send WhatsApp message", error);
+
+            setWhatsAppModal((prev) => ({
+                ...prev,
+                isSending: false,
+            }));
+
+            toast.error("Failed to send WhatsApp message");
+        }
+    }, [whatsAppModal, realtimeClientId, isConnected]);
     const columns = React.useMemo(
         () =>
             getCampaignManagementInsightColumns({
                 status: statusParam,
                 canEdit,
+                canContactInfluencer,
                 showCpm,
+                recentlyAddedAccountKeys,
                 onDelete: handleOpenDeleteModal,
+                onWhatsApp: handleOpenWhatsAppModal,
                 onEditLink: handleOpenLinkModal,
                 onMetricChange: (row, field, value) => {
                     setAccountInsightField(getAccountKey(row.account), field, value);
@@ -175,8 +346,11 @@ export const CampaignManagementInsightTable = ({
         [
             statusParam,
             canEdit,
+            canContactInfluencer,
             showCpm,
+            recentlyAddedAccountKeys,
             handleOpenDeleteModal,
+            handleOpenWhatsAppModal,
             handleOpenLinkModal,
             setAccountInsightField,
             handlePayPromo,
@@ -202,31 +376,106 @@ export const CampaignManagementInsightTable = ({
             {linkModal.isOpen && (
                 <Modal
                     onClose={() =>
-                        setLinkModal((prev) => ({ ...prev, isOpen: false }))
+                        setLinkModal({
+                            isOpen: false,
+                            accountKey: "",
+                            field: null,
+                            value: "",
+                            title: "",
+                            previewUrl: "",
+                            isUploading: false,
+                        })
                     }
                 >
                     <div className="create-option">
                         <h2>{linkModal.title}</h2>
 
-                        <input
-                            className="create-option-input"
-                            type="text"
-                            value={linkModal.value}
-                            onChange={(e) =>
-                                setLinkModal((prev) => ({
-                                    ...prev,
-                                    value: e.target.value,
-                                }))
-                            }
-                            placeholder="Paste link"
-                        />
+                        {linkModal.field === "screenshot" ? (
+                            <div className="create-option-upload">
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    style={{ display: "none" }}
+                                />
+
+                                <button
+                                    type="button"
+                                    className={`upload-preview ${linkModal.previewUrl ? "hasImage" : ""}`}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={linkModal.isUploading}
+                                >
+                                    {linkModal.previewUrl ? (
+                                        <>
+                                            <img
+                                                src={linkModal.previewUrl}
+                                                alt="Screenshot preview"
+                                                className="upload-preview__image"
+                                            />
+
+                                            <div className="upload-preview__overlay">
+                                                {linkModal.isUploading ? (
+                                                    <div className="upload-preview__loader">
+                                                        <CircleLoader />
+                                                        <span>Uploading...</span>
+                                                    </div>
+                                                ) : (
+                                                    <span>Change image</span>
+                                                )}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="upload-preview__empty">
+                                            {linkModal.isUploading ? (
+                                                <div className="upload-preview__loader">
+                                                    <CircleLoader />
+                                                    <span>Uploading...</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <span className="upload-preview__icon">+</span>
+                                                    <span className="upload-preview__title">
+                                                        Upload screenshot
+                                                    </span>
+                                                    <span className="upload-preview__hint">
+                                                        Click to choose image
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                </button>
+                            </div>
+                        ) : (
+                            <input
+                                className="create-option-input"
+                                type="text"
+                                value={linkModal.value}
+                                onChange={(e) =>
+                                    setLinkModal((prev) => ({
+                                        ...prev,
+                                        value: e.target.value,
+                                    }))
+                                }
+                                placeholder="Paste link"
+                            />
+                        )}
 
                         <div className="create-option-btn">
                             <button
                                 type="button"
-                                className="btn"
+                                className="modal-secondary-btn"
                                 onClick={() =>
-                                    setLinkModal((prev) => ({ ...prev, isOpen: false }))
+                                    setLinkModal({
+                                        isOpen: false,
+                                        accountKey: "",
+                                        field: null,
+                                        value: "",
+                                        title: "",
+                                        previewUrl: "",
+                                        isUploading: false,
+                                    })
                                 }
                             >
                                 Cancel
@@ -234,10 +483,74 @@ export const CampaignManagementInsightTable = ({
 
                             <button
                                 type="button"
-                                className="btn"
+                                className="modal-primary-btn"
                                 onClick={handleSaveLinkModal}
+                                disabled={linkModal.isUploading || !linkModal.value}
                             >
                                 Save
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+            {whatsAppModal.isOpen && whatsAppModal.data && (
+                <Modal
+                    onClose={() =>
+                        setWhatsAppModal({
+                            isOpen: false,
+                            data: null,
+                            account: null,
+                            isSending: false,
+                        })
+                    }
+                >
+                    <div className="create-option">
+                        <h2>WhatsApp message</h2>
+
+                        <div className="whatsapp-preview">
+                            <div className="whatsapp-preview__base">
+                                <div className="whatsapp-preview__title">
+                                    <h3>
+                                        <strong>
+                                            Hi {whatsAppModal.data?.influencerName || "there"},
+                                        </strong>
+                                    </h3>
+                                    <p>You have a new promo request.</p>
+                                </div>
+
+                                <p className="whatsapp-preview__caption">Campaign details:</p>
+                            </div>
+
+                            <div className="whatsapp-preview__content">
+                                {whatsappFields.map((field) => (
+                                    <div key={field.label} className="whatsapp-preview__row">
+                                        <p>{field.label}:</p>
+                                        <p>{field.value || "—"}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="whatsapp-preview__footer">
+                                <p className="whatsapp-preview__subtext">
+                                    You can manage this promo(s) in your account here:
+                                    <br />
+                                    https://go.soundinfluencers.com/account/influencer/new-promos
+                                </p>
+
+                                <h4 className='whatsapp-preview__subtitle'>
+                                    Let us know if you’d like to take part in this campaign(s).
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div className="create-option-btn">
+                            <button
+                                type="button"
+                                className="modal-primary-btn"
+                                onClick={handleSendWhatsAppOne}
+                                disabled={whatsAppModal.isSending}
+                            >
+                                {whatsAppModal.isSending ? "Sending..." : "Send"}
                             </button>
                         </div>
                     </div>
@@ -246,10 +559,14 @@ export const CampaignManagementInsightTable = ({
             {deleteModal.isOpen && (
                 <Modal
                     onClose={() =>
-                        setDeleteModal({
+                        setLinkModal({
                             isOpen: false,
                             accountKey: "",
-                            username: "",
+                            field: null,
+                            value: "",
+                            title: "",
+                            previewUrl: "",
+                            isUploading: false,
                         })
                     }
                 >
@@ -264,7 +581,7 @@ export const CampaignManagementInsightTable = ({
                         <div className="create-option-btn">
                             <button
                                 type="button"
-                                className="btn btn-secondary"
+                                className='modal-secondary-btn'
                                 onClick={() =>
                                     setDeleteModal({
                                         isOpen: false,
@@ -278,7 +595,7 @@ export const CampaignManagementInsightTable = ({
 
                             <button
                                 type="button"
-                                className="btn btn-main"
+                                className='modal-primary-btn'
                                 onClick={handleConfirmDelete}
                             >
                                 Delete
