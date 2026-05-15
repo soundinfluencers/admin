@@ -10,4 +10,4 @@ export const useInfluencersQuery = (params: TGetInfluencersListParams) => {
     staleTime: 0,
     placeholderData: keepPreviousData,
   });
-}
+};

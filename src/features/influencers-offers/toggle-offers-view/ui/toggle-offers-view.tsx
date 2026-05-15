@@ -7,11 +7,13 @@ import s from './toggle-offers-view.module.scss';
 interface ToggleOffersViewProps {
   mode: TOffersMode;
   onToggle: () => void;
+  isDisabled: boolean;
 }
 
 export const ToggleOffersView: React.FC<ToggleOffersViewProps> = ({
   mode,
   onToggle,
+  isDisabled,
 }) => {
   return (
     <button
@@ -19,6 +21,7 @@ export const ToggleOffersView: React.FC<ToggleOffersViewProps> = ({
       className={s.toggleBtn}
       onClick={onToggle}
       aria-label="Toggle offers view"
+      disabled={isDisabled}
     >
       <img
         className={s.toggleIcon}

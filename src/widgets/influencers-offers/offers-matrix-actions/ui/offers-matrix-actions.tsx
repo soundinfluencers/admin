@@ -9,22 +9,29 @@ import s from './offers-matrix-actions.module.scss';
 interface OffersMatrixActionsProps {
   mode: TOffersMode;
   onToggleOffersView: () => void;
+  isDisabled: boolean;
 }
 
 export const OffersMatrixActions: React.FC<OffersMatrixActionsProps> = ({
   mode,
   onToggleOffersView,
+  isDisabled,
 }) => {
   return (
     <div className={s.actions}>
-      <ExportXlsx/>
+      <ExportXlsx
+        isDisabled={isDisabled}
+      />
 
       <ToggleOffersView
         mode={mode}
         onToggle={onToggleOffersView}
+        isDisabled={isDisabled}
       />
 
-      <PublishOffers/>
+      <PublishOffers
+        isDisabled={isDisabled}
+      />
     </div>
   )
 };

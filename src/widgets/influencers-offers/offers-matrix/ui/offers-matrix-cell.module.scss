@@ -1,0 +1,15 @@
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 36px;
+  width: 100%;
+
+  font-size: 12px;
+  color: var(--black-blue);
+}
+
+.connected {
+  background: rgba(75, 222, 192, 0.16);
+}

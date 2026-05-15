@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useUpdateClientMutation } from "@/entities/client/api/use-update-client-mutation.ts";
+import type { TClientDetailsEditableKey } from "@/features/clients/model/types.ts";
 import { toast } from "react-toastify";
 
 import s from './client-note-editor.module.scss';
@@ -7,9 +8,10 @@ import s from './client-note-editor.module.scss';
 interface ClientNoteEditorProps {
   clientId: string;
   initialValue: string | undefined;
+  fieldKey: TClientDetailsEditableKey;
 }
 
-export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, initialValue }) => {
+export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, initialValue, fieldKey }) => {
   const { mutate, isPending } = useUpdateClientMutation();
   const [draft, setDraft] = useState("");
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -34,7 +36,7 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
     setDraft("");
   }, []);
 
-  const handleSave = useCallback(() => {
+  const handleSave = () => {
     if (isPending) return;
 
     const nextValue = draft.trim();
@@ -49,12 +51,12 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
       {
         clientId,
         dto: {
-          internalNote: draft,
+          [fieldKey]: draft,
         },
       },
       {
         onSuccess: () => {
-          toast("Client note updated successfully", {
+          toast("Client updated successfully", {
             type: "success",
             position: "top-right",
             autoClose: 3000,
@@ -63,7 +65,7 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
         },
       },
     );
-  }, [draft, normalizedInitialValue, mutate, clientId, isPending, handleCloseEditor]);
+  };
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -91,7 +93,7 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
           className={s.textInput}
           type="text"
           value={draft}
-          placeholder="Enter client note..."
+          placeholder="Enter client field"
           onChange={(e) => setDraft(e.target.value)}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
