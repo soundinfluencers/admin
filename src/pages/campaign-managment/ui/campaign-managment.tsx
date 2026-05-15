@@ -136,17 +136,30 @@ export const CampaignManagment = () => {
         setSearchParams(nextParams);
     };
     useEffect(() => {
-        if (searchParams.get("mode")) return;
-
-        const nextParams = new URLSearchParams(searchParams);
-
         const normalizedStatus = String(status || statusParam || "").toLowerCase();
-        console.log(normalizedStatus,'normalizedStatus')
+        const currentMode = searchParams.get("mode");
+
+        if (!normalizedStatus) return;
+
+        // Proposal всегда только strategy
+        if (normalizedStatus === "proposal") {
+            if (currentMode === "strategy") return;
+
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set("mode", "strategy");
+            setSearchParams(nextParams, { replace: true });
+            return;
+        }
+
+        // Для остальных ставим дефолт только при первом заходе, если mode нет
+        if (currentMode) return;
+
         const defaultMode =
             normalizedStatus === "distributing" || normalizedStatus === "completed"
                 ? "insight"
                 : "strategy";
 
+        const nextParams = new URLSearchParams(searchParams);
         nextParams.set("mode", defaultMode);
         setSearchParams(nextParams, { replace: true });
     }, [searchParams, setSearchParams, status, statusParam]);

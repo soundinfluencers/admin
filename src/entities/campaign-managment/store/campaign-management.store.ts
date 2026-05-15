@@ -274,15 +274,18 @@ export const normalizeCampaignForEdit = (
 
 const getInitialView = ({
                             status,
-                            canEdit,
                         }: {
     status?: string;
     canEdit?: boolean;
 }): ViewMode => {
     const normalizedStatus = String(status ?? "").toLowerCase();
 
+    if (normalizedStatus === "distributing") {
+        return 0;
+    }
+
     if (normalizedStatus === "completed") {
-        return canEdit ? -1 : 1;
+        return 0;
     }
 
     return -1;
