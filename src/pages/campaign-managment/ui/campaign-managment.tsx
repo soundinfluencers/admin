@@ -1,4 +1,4 @@
-import {useEffect, useState, useCallback, useMemo, useRef} from "react";
+import {useEffect, useState, useCallback, useMemo} from "react";
 import { useSearchParams } from "react-router-dom";
 
 import styles from "./campaign-managment.module.scss";
