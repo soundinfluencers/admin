@@ -38,10 +38,16 @@ export const columns: ColumnDef<IRequest>[] = [
   {
     id: 'action',
     header: 'Action',
-    cell: ({ row }) => (
-      <ReviewRequest
-        to={REQUEST_DETAILS_ROUTE_MAP[row.original.requestType](row.original.requestId)}
-      />
-    ),
+    cell: ({ row }) => {
+      if (row.original.isRequestClosed) {
+        return "Reviewed";
+      }
+
+      return (
+        <ReviewRequest
+          to={REQUEST_DETAILS_ROUTE_MAP[row.original.requestType](row.original.requestId)}
+        />
+      );
+    },
   },
 ];

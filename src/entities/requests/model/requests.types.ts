@@ -1,4 +1,5 @@
 export type TUserType = "client" | "influencer";
+
 export type TRequestType =
   | "NEW_CLIENT_REQUEST"
   | "NEW_INFLUENCER_REQUEST"
@@ -14,6 +15,7 @@ export interface IRequest {
   date: string;
   firstName: string;
   userType: TUserType;
+  isRequestClosed: boolean;
 }
 
 export interface IGetListRequestsRequest {

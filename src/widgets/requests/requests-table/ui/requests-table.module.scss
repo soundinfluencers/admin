@@ -70,14 +70,21 @@
 }
 
 .row {
-  padding-block: 4px;
+  min-height: 50px;
   border-bottom: 1px solid var(--blue);
+
+  @include breakpoints.tablet {
+    min-height: 46px;
+  }
 }
 
 .headerCell,
 .cell {
   min-width: 0;
   padding: 8px;
+
+  display: flex;
+  align-items: center;
 }
 
 .headerCell {

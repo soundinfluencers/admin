@@ -3,9 +3,9 @@ import { useGetNewClientRequestQuery } from "@/entities/requests/client-requests
 import { UpdateNewClient } from "@/features/requests/update-new-client";
 import { PageTitle } from "@/widgets/page-title";
 import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { NewClientMetaCard } from "@/widgets/requests/new-client-meta-card";
 
 import s from './new-client-request-page.module.scss';
-import { NewClientMetaCard } from "@/widgets/requests/new-client-meta-card";
 
 export const NewClientRequestPage = () => {
   const { requestId } = useParams();
