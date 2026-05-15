@@ -39,6 +39,7 @@ import {
 import {Modal} from "@/shared/ui/modal/modal.tsx";
 import {addAdminProposalOption} from "@/entities/campaign-managment/api/add-option.ts";
 import {getCampaignBudget} from "@/entities/campaign-managment/model/campaign-budget.helpers.ts";
+import {getDefaultModeByStatus, type PageMode} from "@/pages/campaign-managment/model/get-default-mode.ts";
 
 
 export const CampaignManagment = () => {
@@ -47,8 +48,23 @@ export const CampaignManagment = () => {
     const campaignId = searchParams.get("id");
     const statusParam = searchParams.get("status") as CampaignStatus | null;
     const optionIndex = Number(searchParams.get("optionIndex") ?? "0");
-    const modeParam = searchParams.get("mode");
-    const insightMode = modeParam === "insight"
+    const modeKey = `${campaignId ?? ""}:${statusParam ?? ""}:${optionIndex}`;
+
+    const [modeState, setModeState] = useState<{
+        key: string;
+        mode: PageMode;
+    }>(() => ({
+        key: modeKey,
+        mode: getDefaultModeByStatus(statusParam),
+    }));
+
+    const pageMode =
+        modeState.key === modeKey
+            ? modeState.mode
+            : getDefaultModeByStatus(statusParam);
+
+    const insightMode = pageMode === "insight";
+
 
     const initCampaign = useCampaignManagementStore((s) => s.initCampaign);
     const view = useCampaignManagementStore((s) => s.view);
@@ -136,48 +152,30 @@ export const CampaignManagment = () => {
         setSearchParams(nextParams);
     };
     useEffect(() => {
-        const normalizedStatus = String(status || statusParam || "").toLowerCase();
-        const currentMode = searchParams.get("mode");
-
-        if (!normalizedStatus) return;
-
-        // Proposal всегда только strategy
-        if (normalizedStatus === "proposal") {
-            if (currentMode === "strategy") return;
-
-            const nextParams = new URLSearchParams(searchParams);
-            nextParams.set("mode", "strategy");
-            setSearchParams(nextParams, { replace: true });
-            return;
-        }
-
-        // Для остальных ставим дефолт только при первом заходе, если mode нет
-        if (currentMode) return;
-
-        const defaultMode =
-            normalizedStatus === "distributing" || normalizedStatus === "completed"
-                ? "insight"
-                : "strategy";
-
-        const nextParams = new URLSearchParams(searchParams);
-        nextParams.set("mode", defaultMode);
-        setSearchParams(nextParams, { replace: true });
-    }, [searchParams, setSearchParams, status, statusParam]);
+        setModeState({
+            key: modeKey,
+            mode: getDefaultModeByStatus(statusParam),
+        });
+    }, [modeKey, statusParam]);
     useEffect(() => {
         if (!campaignId || !statusParam) return;
 
+        const normalizedStatusParam = String(statusParam).toLowerCase();
+
         const hasSameCampaign = editable?.campaignId === campaignId;
         const hasSameOption = activeOptionIndex === optionIndex;
+        const hasSameStatus = String(status || "").toLowerCase() === normalizedStatusParam;
 
-        if (hasSameCampaign && hasSameOption) return;
+        if (hasSameCampaign && hasSameOption && hasSameStatus) return;
 
-        loadCampaignByOption(optionIndex);
+        loadCampaignByOption(optionIndex, statusParam);
     }, [
         campaignId,
         statusParam,
         optionIndex,
         editable?.campaignId,
         activeOptionIndex,
+        status,
         loadCampaignByOption,
     ]);
 
@@ -277,11 +275,28 @@ export const CampaignManagment = () => {
         }
     };
     const handleToggleMode = useCallback(() => {
-        const nextParams = new URLSearchParams(searchParams);
-        nextParams.set("mode", insightMode ? "strategy" : "insight");
-        setSearchParams(nextParams);
+        const normalizedStatus = String(statusParam ?? "").toLowerCase();
 
-    }, [searchParams, setSearchParams, insightMode]);
+        if (normalizedStatus === "proposal") {
+            setModeState({
+                key: modeKey,
+                mode: "strategy",
+            });
+            return;
+        }
+
+        setModeState((prev) => {
+            const currentMode =
+                prev.key === modeKey
+                    ? prev.mode
+                    : getDefaultModeByStatus(statusParam);
+
+            return {
+                key: modeKey,
+                mode: currentMode === "insight" ? "strategy" : "insight",
+            };
+        });
+    }, [modeKey, statusParam]);
     const items = editable?.campaignContent ?? [];
     const networks = editable?.addedAccounts ?? [];
 
@@ -304,7 +319,7 @@ export const CampaignManagment = () => {
         }, 0);
     }, [networks]);
 
-    const isLockedStatus = status === "distributing" || status === "completed";
+    const isLockedStatus = status === "distributing" || status === "completed" || status === "distributing" || status === 'pending';
     const renderStrategyTables = () => (
         <>
             {grouped.main.networks.length > 0 && (
@@ -467,7 +482,7 @@ export const CampaignManagment = () => {
                         {isLockedStatus &&  <p>status: {status}</p>}
                     </div>
                     {status !== "proposal" && (
-                        <div className={styles.title__flex}>
+                        <div className={status !== "completed" ? styles.title__flex : styles.title__flexWidth}>
                             <InternalCost internalCost={editable?.internalCost || 0} />
 
                             {status !== "completed" && (

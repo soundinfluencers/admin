@@ -1,5 +1,6 @@
 //@ts-nocheck
-import styles from './campaign-management-bar.module.scss';
+import styles from "./campaign-management-bar.module.scss";
+
 import { StrategyBar } from "@/widgets/campaign-management/campaign-management-controls/ui/bars/strategy-bar.tsx";
 import { InsightBar } from "@/widgets/campaign-management/campaign-management-controls/ui/bars/insight-bar.tsx";
 import { OptionsSlider } from "@/widgets/campaign-management/campaign-management-controls/ui/option-slider/option-slider.tsx";
@@ -8,10 +9,12 @@ import type { ViewMode } from "@/entities/campaign-managment/model/campaign-mana
 import { ShareLink } from "@/widgets/campaign-management/campaign-management-controls/ui/share-link/share-link.tsx";
 import { ViewAudience } from "@/widgets/campaign-management/campaign-management-controls/ui/view-audience/view-audience.tsx";
 import { AddinitonalOption } from "@/widgets/campaign-management/campaign-management-controls/ui/additional-option/additional-options.tsx";
-import confirm from './assets/check-circle (2).svg'
-import reset from './assets/x.svg'
-import {ToggleTables} from "@/features/campaign-management-add-accounts/toggle-table/ui/toggle-table.tsx";
-import type {EditableCampaign} from "@/entities/campaign-managment/store/campaign-management.store.ts";
+import { ToggleTables } from "@/features/campaign-management-add-accounts/toggle-table/ui/toggle-table.tsx";
+import type { EditableCampaign } from "@/entities/campaign-managment/store/campaign-management.store.ts";
+
+import confirm from "./assets/check-circle (2).svg";
+import reset from "./assets/x.svg";
+
 type Props = {
     status?: string | null;
     view: ViewMode;
@@ -29,12 +32,13 @@ type Props = {
     socialMedia?: string;
     kind: string;
     insightMode: boolean;
-    setInsightMode: (value: boolean) => void;
+    setInsightMode: () => void;
     onAddOption?: () => void;
 };
 
-const STRATEGY_STATUSES = ["proposal", "pending",'under_review'] as const;
-const INSIGHT_STATUSES = ["completed", "distributing"] as const;
+const STRATEGY_STATUSES = ["proposal"] as const;
+const INSIGHT_STATUSES = ["completed", "distributing","pending", "under_review"] as const;
+
 export const CampaignManagementBar = ({
                                           status,
                                           view,
@@ -44,71 +48,119 @@ export const CampaignManagementBar = ({
                                           activeOption,
                                           onChangeOption,
                                           optionIndexes,
-    canEdit = false,handleSave,resetCampaign,
+                                          canEdit = false,
+                                          handleSave,
+                                          resetCampaign,
                                           campaignId,
                                           socialMedia,
-                                          kind,insightMode,setInsightMode,campaign,onAddOption
+                                          kind,
+                                          insightMode,
+                                          setInsightMode,
+                                          campaign,
+                                          onAddOption,
                                       }: Props) => {
-    const isStrategyBar = !!status && STRATEGY_STATUSES.includes(status as (typeof STRATEGY_STATUSES)[number]);
-    const isInsightBar = !!status && INSIGHT_STATUSES.includes(status as (typeof INSIGHT_STATUSES)[number]);
-    const isProposal = status === "proposal";
+    const normalizedStatus = String(status ?? "").toLowerCase();
 
-    const isLockedStatus = status === "distributing" || status === "completed";
+    const isProposal = normalizedStatus === "proposal";
+    const isLockedStatus = INSIGHT_STATUSES.includes(normalizedStatus);
+
+    const isStrategyBar = STRATEGY_STATUSES.includes(
+        normalizedStatus as (typeof STRATEGY_STATUSES)[number],
+    );
+
+    const isInsightBar = INSIGHT_STATUSES.includes(
+        normalizedStatus as (typeof INSIGHT_STATUSES)[number],
+    );
+
     const renderBar = () => {
-        if (isStrategyBar) return <StrategyBar status={status} isLockedStatus={isLockedStatus} campaign={campaign} />;
-        if (isInsightBar) return <InsightBar campaign={campaign} />;
+        if (isStrategyBar) {
+            return (
+                <StrategyBar
+                    status={normalizedStatus}
+                    isLockedStatus={isLockedStatus}
+                    campaign={campaign}
+                />
+            );
+        }
+
+        if (isInsightBar) {
+            return <InsightBar campaign={campaign} />;
+        }
+
         return null;
     };
 
     return (
         <div className={styles.bar}>
-
             {renderBar()}
 
             <div className={styles.barControls}>
-                {status === "proposal" ? (
+                {isProposal ? (
                     view === 0 || view === 1 ? (
-                       <div className={styles.controlsProposal}> <OptionsSlider optionIndexes={optionIndexes} activeOption={activeOption} onChangeOption={onChangeOption}   /></div>
+                        <div className={styles.controlsProposal}>
+                            <OptionsSlider
+                                optionIndexes={optionIndexes}
+                                activeOption={activeOption}
+                                onChangeOption={onChangeOption}
+                            />
+                        </div>
                     ) : (
                         <div className={`${styles.controlsProposal} ${styles.edit}`}>
                             <div className={styles.controlsProposal__left}>
                                 <AddinitonalOption onClick={onAddOption ?? (() => {})} />
-                                <OptionsSlider optionIndexes={optionIndexes} activeOption={activeOption} onChangeOption={onChangeOption} className={styles.nonEdit} />
+
+                                <OptionsSlider
+                                    optionIndexes={optionIndexes}
+                                    activeOption={activeOption}
+                                    onChangeOption={onChangeOption}
+                                    className={styles.nonEdit}
+                                />
                             </div>
 
                             <div className={styles.barSave}>
-                                <div className={styles.button} onClick={handleSave}>
+                                <button
+                                    type="button"
+                                    className={styles.button}
+                                    onClick={handleSave}
+                                >
                                     <img src={confirm} alt="" />
                                     Save
-                                </div>
+                                </button>
 
-                                <div className={styles.button} onClick={resetCampaign}>
+                                <button
+                                    type="button"
+                                    className={styles.button}
+                                    onClick={resetCampaign}
+                                >
                                     <img src={reset} alt="" />
                                     Reset
-                                </div>
+                                </button>
                             </div>
                         </div>
                     )
                 ) : null}
+
                 <div className={styles.tableControls}>
                     {isLockedStatus && (
                         <ToggleTables
                             flag={insightMode}
-                            onChange={() => setInsightMode(!insightMode)}
+                            onChange={setInsightMode}
                         />
                     )}
-                    {!isLockedStatus && status !== 'under_review' && <ViewAudience
-                        flag={changeView}
-                        onChange={() => setChangeView((prev) => !prev)}
-                    />}
+
+                    {!isLockedStatus && normalizedStatus !== "under_review" && (
+                        <ViewAudience
+                            flag={changeView}
+                            onChange={() => setChangeView((prev) => !prev)}
+                        />
+                    )}
 
                     <ViewChange
                         isProposal={isProposal}
                         setView={setView}
                         view={view}
                         canEdit={canEdit}
-                        />
-
+                    />
 
                     <ShareLink
                         campaignId={campaignId}
