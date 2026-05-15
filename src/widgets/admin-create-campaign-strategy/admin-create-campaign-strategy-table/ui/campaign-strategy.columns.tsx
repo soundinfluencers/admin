@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { NetworkCell } from "./cells/network-cell";

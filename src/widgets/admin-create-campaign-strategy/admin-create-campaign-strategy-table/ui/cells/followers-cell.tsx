@@ -1,5 +1,6 @@
 import React from "react";
-import type { StrategyRow } from "../../model/campaign-strategy.types";
+import type {StrategyRow} from "@/widgets/admin-create-campaign-strategy/model/campaign-strategy.types.ts";
+
 
 type Props = {
     row: StrategyRow;
