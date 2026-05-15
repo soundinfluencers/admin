@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { FilterNode } from "./filter-node";
 import styles from "./filter-panel.module.scss";
@@ -8,10 +8,10 @@ import type {
     CampaignFilterSection,
 } from "@/entities/admin-create-campaign/campaign-filter/model/campaign-filter.types";
 
-const DEFAULT_OPEN_IDS = ["social-platforms-1", "profile-type"];
-
 type Props = {
     section: CampaignFilterSection;
+    open: boolean;
+    onToggleSection: () => void;
     selectedIds: string[];
     onToggleFilter: (args: {
         item: CampaignFilterItem;
@@ -25,6 +25,8 @@ type Props = {
 
 export const FilterSectionView = ({
                                       section,
+                                      open,
+                                      onToggleSection,
                                       selectedIds,
                                       onToggleFilter,
                                       filterMethod,
@@ -33,10 +35,6 @@ export const FilterSectionView = ({
                                   }: Props) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const shouldScrollRef = useRef(false);
-
-    const [open, setOpen] = useState(() =>
-        DEFAULT_OPEN_IDS.includes(section.id),
-    );
 
     useEffect(() => {
         if (!open) return;
@@ -64,17 +62,14 @@ export const FilterSectionView = ({
         });
     }, [open, scrollContainerRef]);
 
-    const onToggleSection = () => {
-        setOpen((prev) => {
-            const next = !prev;
-            shouldScrollRef.current = next;
-            return next;
-        });
+    const handleToggleSection = () => {
+        shouldScrollRef.current = !open;
+        onToggleSection();
     };
 
     return (
         <div ref={rootRef} className={styles.dropdown}>
-            <div className={styles.dropdownHead} onClick={onToggleSection}>
+            <div className={styles.dropdownHead} onClick={handleToggleSection}>
                 <p>{section.title}</p>
 
                 <span

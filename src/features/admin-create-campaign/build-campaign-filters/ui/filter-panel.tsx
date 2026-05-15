@@ -25,6 +25,8 @@ type Props = {
     setFilterMethod: (value: CampaignFilterMethod) => void;
 };
 
+const DEFAULT_OPEN_IDS = ["social-platforms-1", "profile-type"];
+
 const hasVisibleFilterItems = (items?: CampaignFilterItem[]): boolean => {
     if (!items?.length) return false;
 
@@ -40,22 +42,16 @@ const hasVisibleFilterItems = (items?: CampaignFilterItem[]): boolean => {
 const removeEmptyChildren = (
     items: CampaignFilterItem[],
 ): CampaignFilterItem[] => {
-    return items
-        .map((item) => {
-            const children = item.children?.length
-                ? removeEmptyChildren(item.children)
-                : undefined;
+    return items.map((item) => {
+        const children = item.children?.length
+            ? removeEmptyChildren(item.children)
+            : undefined;
 
-            return {
-                ...item,
-                children,
-            };
-        })
-        .filter((item) => {
-            if (item.children?.length) return true;
-
-            return true;
-        });
+        return {
+            ...item,
+            children,
+        };
+    });
 };
 
 const normalizeVisibleSections = (
@@ -81,10 +77,24 @@ export const FilterPanel = ({
                             }: Props) => {
     const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
 
+    const [openSectionIds, setOpenSectionIds] = React.useState<string[]>(
+        DEFAULT_OPEN_IDS,
+    );
+
     const visibleSections = React.useMemo(
         () => normalizeVisibleSections(sections),
         [sections],
     );
+
+    const toggleSection = React.useCallback((sectionId: string) => {
+        setOpenSectionIds((prev) => {
+            if (prev.includes(sectionId)) {
+                return prev.filter((id) => id !== sectionId);
+            }
+
+            return [...prev, sectionId];
+        });
+    }, []);
 
     return (
         <div className={`${styles.sticky} ${isSmall ? styles.tableFilter : ""}`}>
@@ -104,6 +114,8 @@ export const FilterPanel = ({
                             <FilterSectionView
                                 key={section.id}
                                 section={section}
+                                open={openSectionIds.includes(section.id)}
+                                onToggleSection={() => toggleSection(section.id)}
                                 selectedIds={selectedIds}
                                 onToggleFilter={onToggleFilter}
                                 filterMethod={filterMethod}

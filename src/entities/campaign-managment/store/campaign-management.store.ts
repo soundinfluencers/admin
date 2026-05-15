@@ -280,11 +280,10 @@ const getInitialView = ({
 }): ViewMode => {
     const normalizedStatus = String(status ?? "").toLowerCase();
 
-    if (normalizedStatus === "distributing") {
-        return 0;
-    }
-
-    if (normalizedStatus === "completed") {
+    if (
+        normalizedStatus === "distributing" ||
+        normalizedStatus === "completed"
+    ) {
         return 0;
     }
 

@@ -1,5 +1,4 @@
 import React from "react";
-import { useSearchParams } from "react-router-dom";
 import styles from "./view-change.module.scss";
 import edit from "./assets/edit.svg";
 import proview from "./assets/Vector (15).svg";
@@ -19,8 +18,6 @@ export const ViewChange: React.FC<Props> = ({
                                                 isProposal,
                                                 canEdit,
                                             }) => {
-    const [searchParams, setSearchParams] = useSearchParams();
-
     const proposalTabs = [
         ...(canEdit
             ? [
@@ -58,29 +55,10 @@ export const ViewChange: React.FC<Props> = ({
 
     const tabs = isProposal ? proposalTabs : regularTabs;
 
-    React.useEffect(() => {
-        const viewParam = searchParams.get("view");
-
-        if (viewParam === null) {
-            return;
-        }
-
-        const parsed = Number(viewParam) as ViewMode;
-        const isValid = tabs.some((tab) => tab.value === parsed);
-
-        if (isValid && parsed !== view) {
-            setView(parsed);
-        }
-    }, [searchParams, setView, tabs, view]);
-
-    const active = typeof view === "number" ? view : 0;
+    const active = typeof view === "number" ? view : tabs[0]?.value ?? 0;
 
     const handleChangeView = (newView: ViewMode) => {
         setView(newView);
-
-        const nextParams = new URLSearchParams(searchParams);
-        nextParams.set("view", String(newView));
-        setSearchParams(nextParams);
     };
 
     return (
