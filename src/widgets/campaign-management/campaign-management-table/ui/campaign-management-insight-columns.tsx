@@ -23,9 +23,14 @@ import {
     getInsightColumns,
     type InsightColumnKey,
 } from "@/widgets/campaign-management/campaign-management-table/model/campaign-management-table.data.ts";
+
 import {
     getPromoStatusLabel,
 } from "@/widgets/campaign-management/campaign-management-table/model/campaign-management-table.helpers.ts";
+
+import {
+    getAccountKey,
+} from "@/entities/campaign-managment/store/campaign-management.store";
 
 const renderSortableHeader = (title: string, column: any) => {
     const sort = column.getIsSorted();
@@ -57,7 +62,9 @@ const renderSortableHeader = (title: string, column: any) => {
 type Params = {
     status?: string | null;
     canEdit?: boolean;
+    canContactInfluencer?: boolean;
     showCpm?: boolean;
+    recentlyAddedAccountKeys?: string[];
     onToggleCpm?: () => void;
     onDelete?: (row: CampaignManagementInsightRow) => void;
     onWhatsApp?: (row: CampaignManagementInsightRow) => void;
@@ -86,6 +93,7 @@ const STATUS_SORT_ORDER: Record<string, number> = {
 export const getCampaignManagementInsightColumns = ({
                                                         status,
                                                         canEdit,
+                                                        canContactInfluencer = false,
                                                         onDelete,
                                                         onWhatsApp,
                                                         onEmail,
@@ -93,7 +101,8 @@ export const getCampaignManagementInsightColumns = ({
                                                         onMetricChange,
                                                         onPay,
                                                         showCpm,
-                                                        onToggleCpm
+                                                        onToggleCpm,
+                                                        recentlyAddedAccountKeys = [],
                                                     }: Params): ColumnDef<CampaignManagementInsightRow>[] => {
     const keys = getInsightColumns({ status, canEdit, showCpm });
 
@@ -181,6 +190,7 @@ export const getCampaignManagementInsightColumns = ({
                 return <MetricCell value={roundedValue} canEdit={false} />;
             },
         },
+
         likes: {
             id: "likes",
             header: ({ column }) => renderSortableHeader(insightTitles.likes, column),
@@ -274,18 +284,30 @@ export const getCampaignManagementInsightColumns = ({
             ),
         },
 
-        action: {
-            id: "action",
-            header: insightTitles.action,
-            size: INSIGHT_COLUMN_WIDTHS.action,
-            cell: ({ row }) => (
-                <ActionInsight
-                    onDelete={() => onDelete?.(row.original)}
-                    onWhatsApp={() => onWhatsApp?.(row.original)}
-                    onEmail={() => onEmail?.(row.original)}
-                />
-            ),
-        },
+            action: {
+                id: "action",
+                header: insightTitles.action,
+                size: INSIGHT_COLUMN_WIDTHS.action,
+                cell: ({ row }) => {
+                    const accountKey = getAccountKey(row.original.account);
+                    const isRecentlyAdded = recentlyAddedAccountKeys.includes(String(accountKey));
+
+                    const onlyDelete = isRecentlyAdded || !canContactInfluencer;
+
+                    return (
+                        <ActionInsight
+                            onlyDelete={onlyDelete}
+                            onDelete={() => onDelete?.(row.original)}
+                            onWhatsApp={() => onWhatsApp?.(row.original)}
+                            onEmail={() => onEmail?.(row.original)}
+                            disabledDelete={!canEdit}
+                            disabledWhatsApp={!canEdit || !canContactInfluencer || isRecentlyAdded}
+                            disabledEmail={!canEdit || !canContactInfluencer || isRecentlyAdded}
+                        />
+                    );
+                },
+            },
+
     };
 
     return keys.map((key) => map[key]);

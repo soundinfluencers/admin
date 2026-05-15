@@ -19,6 +19,13 @@
       height: 22px;
     }
   }
+  input{
+    max-width: 50px !important;
+    all: unset;
+    &:focus-visible{
+      outline: none;
+    }
+  }
 }
 
 .barSection {
@@ -26,7 +33,13 @@
   justify-content: space-between;
   gap: 8px;
   margin-top: 24px;
-
+  input{
+    max-width: 50px !important;
+    all: unset;
+    &:focus-visible{
+      outline: none;
+    }
+  }
   @media screen and (max-width: 800px) {
     flex-wrap: wrap;
   }

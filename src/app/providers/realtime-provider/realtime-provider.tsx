@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
+
 import { useAuth } from "@/app/providers/auth-provider/use-auth.ts";
 import {
   RealtimeContext,
@@ -8,6 +9,7 @@ import {
 } from "@/app/providers/realtime-provider/realtime-context.ts";
 
 const SOCKET_CLIENT_ID_KEY = "soundinfluencers-admin:socket-client-id";
+const WHATSAPP_SUCCESS_TOAST_ID = "whatsapp-success-once";
 
 function getSocketClientId(): string {
   const existingClientId = sessionStorage.getItem(SOCKET_CLIENT_ID_KEY);
@@ -18,26 +20,33 @@ function getSocketClientId(): string {
 
   const clientId = crypto.randomUUID();
   sessionStorage.setItem(SOCKET_CLIENT_ID_KEY, clientId);
+
   return clientId;
 }
 
 export function RealtimeProvider({ children }: { children: ReactNode }) {
   const { accessToken, status } = useAuth();
+
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [clientId, setClientId] = useState<string | null>(null);
   const [lastWhatsappStatus, setLastWhatsappStatus] =
-    useState<WhatsappMessageStatusUpdate | null>(null);
+      useState<WhatsappMessageStatusUpdate | null>(null);
+
+  const hasShownWhatsappSuccessRef = useRef(false);
 
   useEffect(() => {
     if (status !== "authenticated" || !accessToken) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsConnected(false);
       setSocket(null);
+      setClientId(null);
+      setLastWhatsappStatus(null);
+      hasShownWhatsappSuccessRef.current = false;
       return;
     }
 
     const nextClientId = getSocketClientId();
+
     const nextSocket = io(import.meta.env.VITE_SERVER, {
       path: "/socket.io",
       auth: {
@@ -59,17 +68,19 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     });
 
     nextSocket.on(
-      "whatsappMessageStatusUpdate",
-      (payload: WhatsappMessageStatusUpdate) => {
-        setLastWhatsappStatus(payload);
+        "whatsappMessageStatusUpdate",
+        (payload: WhatsappMessageStatusUpdate) => {
+          setLastWhatsappStatus(payload);
 
-        if (payload.status === "failed") {
-          toast.error(payload.error ?? "WhatsApp message failed");
-          return;
-        }
+          if (payload.status !== "sent") return;
+          if (hasShownWhatsappSuccessRef.current) return;
 
-        toast.info(`WhatsApp status: ${payload.status}`);
-      },
+          hasShownWhatsappSuccessRef.current = true;
+
+          toast.success("WhatsApp messages sent successfully", {
+            toastId: WHATSAPP_SUCCESS_TOAST_ID,
+          });
+        },
     );
 
     return () => {
@@ -80,18 +91,18 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   }, [accessToken, status]);
 
   const value = useMemo(
-    () => ({
-      socket,
-      isConnected,
-      clientId,
-      lastWhatsappStatus,
-    }),
-    [socket, isConnected, clientId, lastWhatsappStatus],
+      () => ({
+        socket,
+        isConnected,
+        clientId,
+        lastWhatsappStatus,
+      }),
+      [socket, isConnected, clientId, lastWhatsappStatus],
   );
 
   return (
-    <RealtimeContext.Provider value={value}>
-      {children}
-    </RealtimeContext.Provider>
+      <RealtimeContext.Provider value={value}>
+        {children}
+      </RealtimeContext.Provider>
   );
 }

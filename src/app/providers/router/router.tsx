@@ -15,12 +15,17 @@ import { InfluencerDetailsPage } from "@/pages/influencers/influencer-details-pa
 import { CreateInfluencerAccountPage } from "@/pages/influencers/create-influencer-account-page";
 import { EditInfluencerAccountPage } from "@/pages/influencers/edit-influencer-account-page";
 import { CampaignManagment } from "@/pages/campaign-managment";
-import { CampaignManagmentAddAccounts } from "@/pages/campaign-managment-add-accounts";
 import { InfluencerHistoryPage } from "@/pages/influencer-history/influencer-history-page";
 import { InfluencerHistoryDetailsPage } from "@/pages/influencer-history/influencer-history-details-page";
 import { InfluencerInvoicesPage } from "@/pages/influencer-invoices-page";
 import { ClientsInvoicesPage } from "@/pages/clients-invoices-page";
 import { PaymentHistoryPage } from "@/pages/payment-history-page";
+import {AdminCreateCampaignPage} from "@/pages/admin-create-campaign/ui/admin-create-campaign-page.tsx";
+import {AdminCreateCampaignPostContentPage} from "@/pages/admin-create-campaign-post-content";
+import {
+  AdminCreateCampaignStrategyPage
+} from "@/pages/admin-create-campaign-strategy/ui/admin-create-campaign-strategy-page.tsx";
+
 import { InfluencersOffersPage } from "@/pages/influencers-offers-page";
 import { NewClientRequestPage, RequestsPage } from "@/pages/requests-pages";
 
@@ -67,7 +72,10 @@ export const ROUTER = createBrowserRouter([
                     path: "campaign-management",
                     children: [
                       { index: true, element: <CampaignManagment/> },
-                      { path: "add-account", element: <CampaignManagmentAddAccounts/> },
+                      {
+                        path: "add-account",
+                        element: <AdminCreateCampaignPage />,
+                      }
                     ],
                   },
                 ],
@@ -76,22 +84,13 @@ export const ROUTER = createBrowserRouter([
               {
                 path: "dashboard/create-new-campaign",
                 children: [
+                  { index: true, element: <AdminCreateCampaignPage /> },
                   {
-                    index: true, element:
-                      <div style={{
-                        textAlign: "center",
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        gap: 20,
-                        paddingBlock: 150,
-                      }}>
-                        <h1 style={{ fontSize: 40 }}>🚧 This page is under development</h1>
-                        <p style={{ fontSize: 20, color: "#666" }}>
-                          We're working hard to bring this feature to life.<br/>
-                          It will be available very soon.
-                        </p>
-                      </div>,
+                    path: "content",
+                    children: [
+                      { index: true, element: <AdminCreateCampaignPostContentPage /> },
+                      { path: "strategy", element: <AdminCreateCampaignStrategyPage /> },
+                    ],
                   },
                 ],
               },

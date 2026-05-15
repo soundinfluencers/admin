@@ -38,6 +38,8 @@ import {
 } from "@/widgets/campaign-management/campaign-management-controls/ui/internal-cost/ui/internal-cost.tsx";
 import {Modal} from "@/shared/ui/modal/modal.tsx";
 import {addAdminProposalOption} from "@/entities/campaign-managment/api/add-option.ts";
+import {getCampaignBudget} from "@/entities/campaign-managment/model/campaign-budget.helpers.ts";
+
 
 export const CampaignManagment = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -69,6 +71,8 @@ export const CampaignManagment = () => {
     const kind = getCampaignKindByStatus(resolvedStatus);
     const [isCampaignLoading, setIsCampaignLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    console.log(editable,'editable')
     const isInitialLoading = isCampaignLoading || !editable || editable.campaignId !== campaignId || activeOptionIndex !== optionIndex;
     const handleOpenAddOptionModal = () => {
         setOptionModal(true);
@@ -123,6 +127,7 @@ export const CampaignManagment = () => {
             loadCampaignByOption,
         ],
     );
+
     const handleOptionChange = (nextOptionIndex: number) => {
         if (nextOptionIndex === activeOptionIndex) return;
 
@@ -132,11 +137,19 @@ export const CampaignManagment = () => {
     };
     useEffect(() => {
         if (searchParams.get("mode")) return;
-        const nextParams = new URLSearchParams(searchParams);
-        nextParams.set("mode", "strategy");
-        setSearchParams(nextParams, { replace: true });
 
-    }, [searchParams, setSearchParams]);
+        const nextParams = new URLSearchParams(searchParams);
+
+        const normalizedStatus = String(status || statusParam || "").toLowerCase();
+        console.log(normalizedStatus,'normalizedStatus')
+        const defaultMode =
+            normalizedStatus === "distributing" || normalizedStatus === "completed"
+                ? "insight"
+                : "strategy";
+
+        nextParams.set("mode", defaultMode);
+        setSearchParams(nextParams, { replace: true });
+    }, [searchParams, setSearchParams, status, statusParam]);
     useEffect(() => {
         if (!campaignId || !statusParam) return;
 
@@ -189,12 +202,13 @@ export const CampaignManagment = () => {
 
         const allOptions = Array.isArray(existingOptions) ? existingOptions : [0];
         const nextOptionIndex = allOptions.length ? Math.max(...allOptions) + 1 : 0;
-
+        const currentBudget = getCampaignBudget(editable);
         const body = inheritCurrentOption
             ? {
                 campaignName: editable.campaignName,
                 socialMedia: editable.socialMedia,
-                campaignPrice: editable.price,
+                price: currentBudget,
+                campaignPrice: currentBudget,
                 addedAccounts: editable.addedAccounts.map((acc) => ({
                     socialAccountId: acc.socialAccountId,
                     influencerId: acc.influencerId,
@@ -359,22 +373,29 @@ export const CampaignManagment = () => {
         </div>
     );
 
-    const renderInsightTable = () => (
-        <>
-            <h3>Campaign Insights</h3>
-            <CampaignManagementInsightTable
-                networks={networks}
-                totals={insightTotals}
-                canEdit={isEditable()}
-                canManageAccounts={canManageAccounts()}
-                campaignId={campaignId ?? ""}
-                statusParam={status || statusParam}
-                optionIndex={optionIndex}
-                totalPrice={insightTotalPrice}
-                loadCampaignByOption={loadCampaignByOption}
-            />
-        </>
-    );
+    const renderInsightTable = () => {
+        const canContactInfluencer =
+            String(status || statusParam || "").toLowerCase() === "distributing";
+
+        return (
+            <>
+                <h3>Campaign Insights</h3>
+
+                <CampaignManagementInsightTable
+                    networks={networks}
+                    totals={insightTotals}
+                    canEdit={isEditable()}
+                    canManageAccounts={canManageAccounts()}
+                    canContactInfluencer={canContactInfluencer}
+                    campaignId={campaignId ?? ""}
+                    statusParam={status || statusParam}
+                    optionIndex={optionIndex}
+                    totalPrice={insightTotalPrice}
+                    loadCampaignByOption={loadCampaignByOption}
+                />
+            </>
+        );
+    };
     const renderInsightCards = () => (
         <div className={`${styles.wrapperCard} ${styles.liveView}`}>
             {networks.map((account) => (
@@ -432,14 +453,17 @@ export const CampaignManagment = () => {
                         {campaignName && <h2 className={styles.title}>{campaignName}</h2>}
                         {isLockedStatus &&  <p>status: {status}</p>}
                     </div>
-                    {status !== 'proposal' && (
+                    {status !== "proposal" && (
                         <div className={styles.title__flex}>
-                            <InternalCost internalCost={editable?.internalCost || 0}/>
-                            <SaveReset
-                                onSave={handleSave}
-                                onReset={resetEditableToOriginal}
-                                isSaving={isSaving}
-                            />
+                            <InternalCost internalCost={editable?.internalCost || 0} />
+
+                            {status !== "completed" && (
+                                <SaveReset
+                                    onSave={handleSave}
+                                    onReset={resetEditableToOriginal}
+                                    isSaving={isSaving}
+                                />
+                            )}
                         </div>
                     )}
                 </div>
@@ -484,7 +508,7 @@ export const CampaignManagment = () => {
                         <div className="create-option-btn">
                             <button
                                 type="button"
-                                className="btn btn-secondary"
+                                className='modal-secondary-btn'
                                 onClick={() => handleAddOption(false)}
                             >
                                 No
@@ -492,7 +516,7 @@ export const CampaignManagment = () => {
 
                             <button
                                 type="button"
-                                className="btn btn-main"
+                                className='modal-primary-btn'
                                 onClick={() => handleAddOption(true)}
                             >
                                 Yes

@@ -1,0 +1,1 @@
+export {AdminCreateCampaignPage} from './ui/admin-create-campaign-page.tsx'

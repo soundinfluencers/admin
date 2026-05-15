@@ -2,17 +2,24 @@
 
 import React from "react";
 
-
 import { buildCampaignManagementRows } from "../model/build-campaign-management-rows";
 import type {
     CampaignAddedAccount,
-    CampaignContentItem, TableGroup
+    CampaignContentItem,
+    TableGroup,
 } from "@/entities/campaign-managment/model/campaign.managment.ts";
+
 import {
-    getCampaignManagementColumns
+    getCampaignManagementColumns,
 } from "@/widgets/campaign-management/campaign-management-table/ui/campaign-management-columns.tsx";
-import {TableCampaign} from "@/widgets/campaign-management/campaign-management-table/ui/table-campaign-management/ui/tableStrategy.tsx";
-import {useCampaignManagementStore} from "@/entities/campaign-managment/store/campaign-management.store.ts";
+
+import {
+    TableCampaign,
+} from "@/widgets/campaign-management/campaign-management-table/ui/table-campaign-management/ui/tableStrategy.tsx";
+
+import {
+    useCampaignManagementStore,
+} from "@/entities/campaign-managment/store/campaign-management.store.ts";
 
 type Props = {
     items: CampaignContentItem[];
@@ -31,8 +38,18 @@ export const CampaignManagementTable = ({
                                             group,
                                             changeView,
                                             canEdit,
-                                            canManageAccounts
+                                            canManageAccounts,
                                         }: Props) => {
+    const status = useCampaignManagementStore((state) => state.status);
+
+    const recentlyAddedAccountKeys = useCampaignManagementStore(
+        (state) => state.recentlyAddedAccountKeys,
+    );
+
+    const deletingAccountKey = useCampaignManagementStore(
+        (state) => state.deletingAccountKey,
+    );
+
     const rows = React.useMemo(
         () =>
             buildCampaignManagementRows({
@@ -52,8 +69,9 @@ export const CampaignManagementTable = ({
                 group,
                 changeView,
                 canEdit,
+                status,
             }),
-        [group, changeView, canEdit],
+        [group, changeView, canEdit, status],
     );
 
     const totalFollowers = React.useMemo(() => {
@@ -68,12 +86,6 @@ export const CampaignManagementTable = ({
         }, 0);
     }, [networks]);
 
-    const recentlyAddedAccountKeys = useCampaignManagementStore(
-        (state) => state.recentlyAddedAccountKeys,
-    );
-    const deletingAccountKey = useCampaignManagementStore(
-        (state) => state.deletingAccountKey,
-    );
     return (
         <div className="tableBase">
             <TableCampaign

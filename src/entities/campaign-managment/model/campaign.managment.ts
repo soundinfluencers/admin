@@ -9,6 +9,7 @@ export type SocialMediaGroup = 'main' | 'music' | "press"
 //
 // }
 export interface CampaignContentItem {
+    profileType: "creator" | "community" | undefined;
     _id: Id;
     socialMedia: SocialMedia;
     socialMediaGroup: SocialMediaGroup;

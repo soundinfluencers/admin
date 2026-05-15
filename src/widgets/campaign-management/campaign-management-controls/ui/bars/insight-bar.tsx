@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import styles from "./bar.module.scss";
 
 import edit from "./assets/edit-3.png";
@@ -15,6 +17,7 @@ import {
     type CurrencyCode,
 } from "@/features/campaign-management-add-accounts/currency-dropdown/ui/currency-dropdown.tsx";
 import { useCampaignManagementStore } from "@/entities/campaign-managment/store/campaign-management.store.ts";
+import { getCampaignBudget } from "@/entities/campaign-managment/model/campaign-budget.helpers.ts";
 
 type Props = {
     campaign: EditableCampaign | null;
@@ -28,20 +31,6 @@ const getResultCPM = (cpm: number) => {
     return "Low Average";
 };
 
-const getCPM = (cpm: number) => {
-    if (cpm < 3) return "0 to 3€";
-    if (cpm < 5) return "3€ to 5€";
-    if (cpm < 9) return "5€ to 9€";
-    if (cpm < 12) return "9€ to 12€";
-    if (cpm < 16) return "12€ to 16€";
-    if (cpm < 20) return "16€ to 20€";
-    if (cpm < 25) return "20€ to 25€";
-    if (cpm < 30) return "25€ to 30€";
-    if (cpm < 35) return "30€ to 35€";
-    if (cpm < 40) return "35€ to 40€";
-    return ">40€";
-};
-
 const currencySymbolMap: Record<CurrencyCode, string> = {
     EUR: "€",
     USD: "$",
@@ -52,18 +41,22 @@ export const InsightBar = ({ campaign }: Props) => {
     const setDisplayCurrency = useCampaignManagementStore((s) => s.setDisplayCurrency);
     const setIsPriceHidden = useCampaignManagementStore((s) => s.setIsPriceHidden);
     const setIsCpmAndResultHidden = useCampaignManagementStore((s) => s.setIsCpmAndResultHidden);
+    const setCampaignPrice = useCampaignManagementStore((s) => s.setCampaignPrice);
+    const canEdit = useCampaignManagementStore((s) => s.isEditable());
 
     const currency = (campaign?.displayCurrency as CurrencyCode) || "EUR";
     const currencySymbol = currencySymbolMap[currency];
 
-    const cpm = getCPM(Number(campaign?.cpm ?? 0));
     const resultCPM = getResultCPM(Number(campaign?.cpm ?? 0));
+    const budget = getCampaignBudget(campaign);
 
-    const budget =
-        campaign?.addedAccounts?.reduce(
-            (sum, item) => sum + Number(item.publicPrice ?? 0),
-            0,
-        ) ?? 0;
+    const [budgetInput, setBudgetInput] = useState(
+        budget > 0 ? String(budget) : "",
+    );
+
+    useEffect(() => {
+        setBudgetInput(budget > 0 ? String(budget) : "");
+    }, [budget]);
 
     const posts = campaign?.addedAccounts?.length ?? 0;
     const videos = campaign?.campaignContent?.length ?? 0;
@@ -77,6 +70,29 @@ export const InsightBar = ({ campaign }: Props) => {
 
     const isPriceHidden = Boolean(campaign?.isPriceHidden);
     const isCpmHidden = Boolean(campaign?.isCpmAndResultHidden);
+
+    const handleBudgetChange = (value: string) => {
+        const normalized = value.replace(",", ".");
+
+        if (normalized === "") {
+            setBudgetInput("");
+            setCampaignPrice(0);
+            return;
+        }
+
+        if (!/^\d*\.?\d*$/.test(normalized)) {
+            return;
+        }
+
+        const cleaned = normalized.replace(/^0+(?=\d)/, "");
+
+        setBudgetInput(cleaned);
+
+        const next = Number(cleaned);
+        setCampaignPrice(Number.isNaN(next) ? 0 : next);
+    };
+
+    const inputWidth = `${Math.max(budgetInput.length || 1, 2)}ch`;
 
     return (
         <div className={styles.barSection}>
@@ -96,7 +112,22 @@ export const InsightBar = ({ campaign }: Props) => {
                             <p>
                                 Budget:{" "}
                                 <span>
-                                    {isPriceHidden ? "••••" : `${budget}${currencySymbol}`}
+                                    {isPriceHidden ? (
+                                        "••••"
+                                    ) : canEdit ? (
+                                        <span className={styles.barEditableInline}>
+                                            <input
+                                                type="text"
+                                                inputMode="decimal"
+                                                value={budgetInput}
+                                                style={{ width: inputWidth }}
+                                                placeholder="0"
+                                                onChange={(e) => handleBudgetChange(e.target.value)}
+                                            />
+                                        </span>
+                                    ) : (
+                                        `${budget}${currencySymbol}`
+                                    )}
                                 </span>
                             </p>
 
@@ -167,7 +198,10 @@ export const InsightBar = ({ campaign }: Props) => {
                     <div className={styles.barSectionInfoLeftSection}>
                         <div className={styles.eye}>
                             <p>
-                                CPM: <span>{isCpmHidden ? "••••" : cpm}</span>
+                                CPM:{" "}
+                                <span>
+                                    {isCpmHidden ? "••••" : Number(campaign?.cpm ?? 0).toFixed(2)}
+                                </span>
                             </p>
 
                             <EyeHide
@@ -179,8 +213,7 @@ export const InsightBar = ({ campaign }: Props) => {
                         </div>
 
                         <p>
-                            Average Instagram CPM:{" "}
-                            <span>5€ to 12€</span>
+                            Average Instagram CPM: <span>5€ to 12€</span>
                         </p>
 
                         <p>

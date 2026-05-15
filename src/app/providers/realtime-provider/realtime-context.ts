@@ -18,5 +18,5 @@ export type RealtimeContextType = {
 };
 
 export const RealtimeContext = createContext<RealtimeContextType | undefined>(
-  undefined,
+    undefined,
 );
