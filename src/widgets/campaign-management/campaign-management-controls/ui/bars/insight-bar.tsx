@@ -114,8 +114,7 @@ export const InsightBar = ({ campaign }: Props) => {
                                 <span>
                                     {isPriceHidden ? (
                                         "••••"
-                                    ) : canEdit ? (
-                                        <span className={styles.barEditableInline}>
+                                    ) :  <span className={styles.barEditableInline}>
                                             <input
                                                 type="text"
                                                 inputMode="decimal"
@@ -124,10 +123,7 @@ export const InsightBar = ({ campaign }: Props) => {
                                                 placeholder="0"
                                                 onChange={(e) => handleBudgetChange(e.target.value)}
                                             />
-                                        </span>
-                                    ) : (
-                                        `${budget}${currencySymbol}`
-                                    )}
+                                        </span>}
                                 </span>
                             </p>
 
