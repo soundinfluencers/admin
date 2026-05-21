@@ -31,7 +31,7 @@ export const InfluencerHistoryTableAccountCell: React.FC<InfluencerHistoryTableA
         width={20}
         height={20}
       />
-      <span>{displayValue}</span>
+      <span className={s.text}>{displayValue}</span>
     </div>
   )
 };

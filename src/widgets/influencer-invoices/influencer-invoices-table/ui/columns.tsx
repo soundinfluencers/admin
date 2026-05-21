@@ -58,7 +58,12 @@ export const INFLUENCERS_INVOICES_COLUMNS: ColumnDef<IInvoiceTableRowDto>[] = [
           width={20}
           height={20}
         />
-        {row.original.username}
+        <span
+          className={s.text}
+          title={row.original.username}
+        >
+          {row.original.username}
+        </span>
       </BaseTableCell>
     ),
   },

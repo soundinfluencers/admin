@@ -30,7 +30,6 @@ export const STATIC_COMPANY_INFO = [
   | { type: "contact"; icon: string; label: string; value: string }
   )[];
 
-
 export const STATIC_PAYMENT_METHODS = {
   bankTransfer: {
     title: "Bank Transfer",
