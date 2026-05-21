@@ -10,6 +10,7 @@ import styles from "./table.module.scss";
 import React from "react";
 import { Link } from "react-router-dom";
 import plus from "@/widgets/campaign-management/campaign-management-table/ui/table-campaign-management/ui/assets/plus.svg";
+import {formatFollowers} from "@/entities/campaign-managment/model/campaign-management.helpers.ts";
 
 interface InsightTotals {
     followers?: number;
@@ -150,7 +151,7 @@ export function TableCampaignInsight<TData>({
                                             ))}
 
                                         {columnId === "followers" && (
-                                            <span>{totals?.followers ?? 0}</span>
+                                            <span>{formatFollowers(totals?.followers ?? 0)}</span>
                                         )}
                                         {columnId === "impressions" && (
                                             <span>{totals?.impressions ?? 0}</span>

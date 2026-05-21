@@ -111,10 +111,19 @@ export const downloadBlob = (blob: Blob, filename: string) => {
 export const getPDF = async (id: string) => {
     try {
         const res = await getPdfFile(id);
+
         downloadBlob(res.data as Blob, `campaign-${id}.pdf`);
-        toast.success("PDF created succesfully!");
-    } catch (error) {
+        toast.success("PDF created successfully!");
+    } catch (error: any) {
         console.error(error);
+
+        if (error.code === "ECONNABORTED") {
+            toast.error("PDF generation took too long");
+        } else {
+            toast.error("Failed to create PDF");
+        }
+
+        throw error;
     }
 };
 export const formatCampaignDate = (

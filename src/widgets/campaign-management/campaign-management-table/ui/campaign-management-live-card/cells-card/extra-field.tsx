@@ -62,22 +62,6 @@ export const ExtraFieldsCard: React.FC<Props> = ({
                 </div>
             )}
 
-            <div className="live-view-card__fill-data">
-                <h3>Additional brief</h3>
-                <div className="fill-input">
-                    {canEdit && contentId ? (
-                        <input
-                            value={mergedItem?.additionalBrief ?? ""}
-                            onChange={(e) =>
-                                setContentField(contentId, "additionalBrief", e.target.value)
-                            }
-                            placeholder="Additional brief"
-                        />
-                    ) : (
-                        <p>{mergedItem?.additionalBrief || "—"}</p>
-                    )}
-                </div>
-            </div>
         </>
     );
 };

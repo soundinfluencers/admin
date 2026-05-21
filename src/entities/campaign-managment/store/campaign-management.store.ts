@@ -284,7 +284,7 @@ const getInitialView = ({
         normalizedStatus === "distributing" ||
         normalizedStatus === "completed"
     ) {
-        return 0;
+        return -1;
     }
 
     return -1;
@@ -499,7 +499,7 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
         recentlyAddedAccountKeys: [],
         status: "",
         canEdit: false,
-        view: 0,
+        view: -1,
         changeView: false,
         activeOptionIndex: null,
         deletingAccountKey: null,

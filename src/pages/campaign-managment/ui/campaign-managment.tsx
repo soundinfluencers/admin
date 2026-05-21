@@ -88,7 +88,9 @@ export const CampaignManagment = () => {
     const [isCampaignLoading, setIsCampaignLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
-    console.log(editable,'editable')
+    const editablePrice = useCampaignManagementStore(
+        (state) => Number(state.editable?.price ?? 0),
+    );
     const isInitialLoading = isCampaignLoading || !editable || editable.campaignId !== campaignId || activeOptionIndex !== optionIndex;
     const handleOpenAddOptionModal = () => {
         setOptionModal(true);
@@ -129,19 +131,12 @@ export const CampaignManagment = () => {
 
             const nextParams = new URLSearchParams(searchParams);
             nextParams.set("status", nextStatus);
-            setSearchParams(nextParams);
+            nextParams.set("optionIndex", "0");
+            nextParams.set("view", "-1");
 
-            resetCampaignState();
-            await loadCampaignByOption(optionIndex, nextStatus);
+            setSearchParams(nextParams, { replace: true });
         },
-        [
-            campaignId,
-            searchParams,
-            optionIndex,
-            setSearchParams,
-            resetCampaignState,
-            loadCampaignByOption,
-        ],
+        [campaignId, searchParams, setSearchParams],
     );
 
     const handleOptionChange = (nextOptionIndex: number) => {
@@ -313,11 +308,11 @@ export const CampaignManagment = () => {
         shares: Number(editable?.totalShares ?? 0),
     };
 
-    const insightTotalPrice = useMemo(() => {
-        return networks.reduce((sum, account) => {
-            return sum + Number(account.publicPrice ?? 0);
-        }, 0);
-    }, [networks]);
+    // const insightTotalPrice = useMemo(() => {
+    //     return networks.reduce((sum, account) => {
+    //         return sum + Number(account.publicPrice ?? 0);
+    //     }, 0);
+    // }, [networks]);
 
     const isLockedStatus = status === "distributing" || status === "completed" || status === "distributing" || status === 'pending';
     const renderStrategyTables = () => (
@@ -333,6 +328,7 @@ export const CampaignManagment = () => {
                         changeView={changeView}
                         canEdit={isEditable()}
                         canManageAccounts={canManageAccounts()}
+                        totalPrice={editablePrice}
                     />
                 </>
             )}
@@ -348,6 +344,7 @@ export const CampaignManagment = () => {
                         changeView={changeView}
                         canEdit={isEditable()}
                         canManageAccounts={canManageAccounts()}
+                        totalPrice={editablePrice}
                     />
                 </>
             )}
@@ -363,6 +360,7 @@ export const CampaignManagment = () => {
                         changeView={changeView}
                         canEdit={isEditable()}
                         canManageAccounts={canManageAccounts()}
+                        totalPrice={editablePrice}
                     />
                 </>
             )}
@@ -418,7 +416,7 @@ export const CampaignManagment = () => {
                     campaignId={campaignId ?? ""}
                     statusParam={status || statusParam}
                     optionIndex={optionIndex}
-                    totalPrice={insightTotalPrice}
+                    totalPrice={editablePrice}
                     loadCampaignByOption={loadCampaignByOption}
                 />
             </>

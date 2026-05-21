@@ -29,6 +29,7 @@ type Props = {
     changeView: boolean;
     canEdit: boolean;
     canManageAccounts: boolean;
+    totalPrice: number
 };
 
 export const CampaignManagementTable = ({
@@ -39,6 +40,7 @@ export const CampaignManagementTable = ({
                                             changeView,
                                             canEdit,
                                             canManageAccounts,
+    totalPrice,
                                         }: Props) => {
     const status = useCampaignManagementStore((state) => state.status);
 
@@ -80,11 +82,11 @@ export const CampaignManagementTable = ({
         }, 0);
     }, [networks]);
 
-    const totalPrice = React.useMemo(() => {
-        return networks.reduce((sum, account) => {
-            return sum + Number(account.publicPrice ?? 0);
-        }, 0);
-    }, [networks]);
+    // const totalPrice = React.useMemo(() => {
+    //     return networks.reduce((sum, account) => {
+    //         return sum + Number(account.publicPrice ?? 0);
+    //     }, 0);
+    // }, [networks]);
 
     return (
         <div className="tableBase">

@@ -12,6 +12,7 @@ import styles from "./table.module.scss";
 import plus from './assets/plus.svg'
 import {Link, useSearchParams} from "react-router-dom";
 import type {CampaignStatus} from "@/entities/campaign-managment/model/campaign.managment.ts";
+import {formatFollowers} from "@/entities/campaign-managment/model/campaign-management.helpers.ts";
 interface TableProps<TData> {
     data: TData[];
     columns: ColumnDef<TData>[];
@@ -150,7 +151,7 @@ export function TableCampaign<TData>({
                                             <span>Price: {totalPrice}€</span>
                                         ))}
 
-                                    {index === 1 && <span>{totalFollowers}</span>}
+                                    {index === 1 &&   <span>{formatFollowers(totalFollowers)}</span>}
                                 </td>
                             ))}
                         </tr>
