@@ -35,7 +35,7 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
 
         <InvoiceRow
           label="Selected Payment Method:"
-          value={paymentMethodLabel.toUpperCase()}
+          value={paymentMethodLabel}
           labelWeight="medium"
         />
 
