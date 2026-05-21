@@ -21,7 +21,7 @@ export const normalizeInvoiceToPreview = (
       contactName: invoice.fullName,
     },
     billTo: {
-      companyName: invoiceRow.username.toUpperCase(),
+      companyName: "Techno TV LTD",
       chamberOfCommerce: "10458319",
       email: "admin@soundinfluencers.com",
       phoneNumber: "+44 7537 129190",
