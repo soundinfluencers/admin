@@ -9,6 +9,7 @@ import { PAYMENT_METHOD_LABELS } from "@/shared/libs/normalize/payment-method.no
 import type { IInvoiceDetails } from "@/entities/invoices/model/influencer-invoices.types.ts";
 
 import s from './invoice-preview.module.scss';
+import type { TPaymentMethod } from "@/shared/types/types.ts";
 
 interface InvoicePreviewProps {
   invoiceDetails: IInvoiceDetails;
@@ -18,8 +19,9 @@ export const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   invoiceDetails,
 }) => {
 
-  const paymentMethodLabel =
-    PAYMENT_METHOD_LABELS[invoiceDetails.selectedPaymentMethod];
+  const paymentMethodKey = invoiceDetails.selectedPaymentMethod.toLowerCase() as TPaymentMethod;
+
+  const paymentMethodLabel = PAYMENT_METHOD_LABELS[paymentMethodKey];
 
   return (
     <div className={s.layout}>

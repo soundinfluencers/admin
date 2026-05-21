@@ -32,7 +32,7 @@ export const normalizeInvoiceToPreview = (
       total: invoice.amount,
       subtotal: invoice.amount,
       balanceDue: invoice.amount,
-      currency: paymentDetails.bankAccountCurrency ?? "EUR",
+      currency: paymentDetails?.bankAccountCurrency ?? "EUR",
     },
     selectedPaymentMethod: invoiceRow.paymentMethod,
     paymentTerms: "Within 7 business days",
@@ -48,14 +48,14 @@ export const normalizeInvoiceToPreview = (
   return {
     ...baseInvoice,
     bankDetails: {
-      bankName: paymentDetails.bankName ?? "",
-      beneficiary: paymentDetails.beneficiary ?? "",
-      beneficiaryAddress: paymentDetails.beneficiaryAddress ?? "",
-      bankCountry: paymentDetails.bankCountry,
-      sortCode: paymentDetails.sortCode,
-      accountNumber: paymentDetails.accountNumber,
-      iban: paymentDetails.iban,
-      swiftBicCode: paymentDetails.swiftBicCode,
+      bankName: paymentDetails?.bankName ?? "",
+      beneficiary: paymentDetails?.beneficiary ?? "",
+      beneficiaryAddress: paymentDetails?.beneficiaryAddress ?? "",
+      bankCountry: paymentDetails?.bankCountry ?? "",
+      sortCode: paymentDetails?.sortCode ?? "",
+      accountNumber: paymentDetails?.accountNumber ?? "",
+      iban: paymentDetails?.iban ?? "",
+      swiftBicCode: paymentDetails?.swiftBicCode ?? "",
     },
   };
 };
