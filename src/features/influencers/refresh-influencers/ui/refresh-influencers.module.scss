@@ -10,3 +10,14 @@
     height: 16px;
   }
 }
+
+.rotate {
+  animation: spin 1.45s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

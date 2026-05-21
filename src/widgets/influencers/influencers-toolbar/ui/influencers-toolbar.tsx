@@ -120,7 +120,7 @@ export const InfluencersToolbar: React.FC<InfluencersToolbarProps> = ({
           Import .XLSX
         </button>
 
-        <RefreshInfluencers className={s.action} />
+        <RefreshInfluencers className={s.action} socialMedia={platform}/>
       </div>
 
       {isModalOpen && (
