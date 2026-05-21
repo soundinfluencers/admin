@@ -5,7 +5,7 @@ import type { TCurrency, TPaymentMethod } from "@/shared/types/types.ts";
 export type TInvoiceStatus = "submitted" | "paid";
 
 export interface IPaymentDetailsDto {
-  bankAccountCurrency: TCurrency;
+  bankAccountCurrency?: TCurrency;
   bankCountry?: string;
   bankName?: string;
   beneficiary?: string;
@@ -58,9 +58,9 @@ export interface IInvoiceSummaryDetails {
 }
 
 export interface IInvoiceBankDetails {
-  bankName: string;
-  beneficiary: string;
-  beneficiaryAddress: string;
+  bankName?: string;
+  beneficiary?: string;
+  beneficiaryAddress?: string;
   bankCountry?: string;
   sortCode?: string;
   accountNumber?: string;
