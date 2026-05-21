@@ -1,6 +1,6 @@
 import { $api } from '@/app/api/http.ts';
 import type {
-  IInfluencersListResponse, IUpdateSocialAccountListResponse,
+  IInfluencersListResponse, IScrapperUpdateParams, IUpdateSocialAccountListResponse,
   TGetInfluencersListParams, UploadInfluencersListXlsxParams,
 } from "@/entities/influencers/model/influencers-list.types.ts";
 import type {
@@ -144,4 +144,12 @@ export const uploadInfluencersXlsx = async ({
   await $api.post(`/admin/influencers/${socialMedia}/xlsx`, formData);
 
   console.log('Successfully uploaded XLSX file');
+};
+
+export const scrapperUploadInfluencer = async (dto: IScrapperUpdateParams) => {
+  console.log(`Triggering scrapper upload for social media: ${dto.socialMedia} with client ID: ${dto.clientId}`);
+
+  await $api.patch(`/scrapers/account-details/all`, dto);
+
+  console.log('Successfully triggered scrapper upload');
 };

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import {RealtimeContext} from "@/app/providers/realtime-provider/realtime-context.ts";
+import { RealtimeContext } from "@/app/providers/realtime-provider/realtime-context.ts";
 
 export function useRealtime() {
   const context = useContext(RealtimeContext);
