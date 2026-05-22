@@ -69,7 +69,7 @@ export const buildCampaignManagementShareLink = ({
                                                      id,
                                                      kind,
                                                      socialMedia,
-                                                     origin = "https://test.soundinfluencers.com",
+                                                     origin = "https://go.soundinfluencers.com",
                                                  }: {
     id: string;
     kind: ShareLinkKind;

@@ -47,3 +47,17 @@ export const updateAllPostDetails = async ({
 
     return res.data?.data ?? res.data;
 };
+
+export const sendPromoEmail = async ({
+                                         campaignId,
+                                         promoId,
+                                     }: {
+    campaignId: string;
+    promoId: string;
+}) => {
+    const res = await $api.post(
+        `/admin/campaigns/mail/${campaignId}/${promoId}`,
+    );
+
+    return res.data;
+};

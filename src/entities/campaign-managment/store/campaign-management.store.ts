@@ -343,7 +343,7 @@ const buildBasePayload = (editable: EditableCampaign) => {
     return {
         campaignName: editable.campaignName,
 
-        // оставляю оба поля, чтобы не словить баг из-за разного backend-контракта
+
         price: finalBudget,
         campaignPrice: finalBudget,
         isBudgetManual: Boolean(editable.isBudgetManual),

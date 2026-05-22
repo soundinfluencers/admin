@@ -12,10 +12,10 @@ export const ToggleTables: React.FC<Props> = ({ onChange, flag }) => {
         <button
             type="button"
             onClick={onChange}
-            className={`${styles.toggleTablesBtn} ${flag ? styles.active : ""}`}
+            className={`${styles.toggleTablesBtn} ${!flag ? styles.active : ""}`}
         >
             <img src={repeat} alt="" />
-            <p>{flag ? "Campaign Insights" : "Campaign Strategy"}</p>
+            <p>{flag ? "Campaign Strategy" : "Campaign Insights"}</p>
         </button>
     );
 };

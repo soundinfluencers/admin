@@ -284,29 +284,29 @@ export const getCampaignManagementInsightColumns = ({
             ),
         },
 
-            action: {
-                id: "action",
-                header: insightTitles.action,
-                size: INSIGHT_COLUMN_WIDTHS.action,
-                cell: ({ row }) => {
-                    const accountKey = getAccountKey(row.original.account);
-                    const isRecentlyAdded = recentlyAddedAccountKeys.includes(String(accountKey));
+        action: {
+            id: "action",
+            header: insightTitles.action,
+            size: INSIGHT_COLUMN_WIDTHS.action,
+            cell: ({ row }) => {
+                const accountKey = getAccountKey(row.original.account);
+                const isRecentlyAdded = recentlyAddedAccountKeys.includes(String(accountKey));
 
-                    const onlyDelete = isRecentlyAdded || !canContactInfluencer;
+                const onlyDelete = isRecentlyAdded || !canContactInfluencer;
 
-                    return (
-                        <ActionInsight
-                            onlyDelete={onlyDelete}
-                            onDelete={() => onDelete?.(row.original)}
-                            onWhatsApp={() => onWhatsApp?.(row.original)}
-                            onEmail={() => onEmail?.(row.original)}
-                            disabledDelete={!canEdit}
-                            disabledWhatsApp={!canEdit || !canContactInfluencer || isRecentlyAdded}
-                            disabledEmail={!canEdit || !canContactInfluencer || isRecentlyAdded}
-                        />
-                    );
-                },
+                return (
+                    <ActionInsight
+                        onlyDelete={onlyDelete}
+                        onDelete={() => onDelete?.(row.original)}
+                        onWhatsApp={() => onWhatsApp?.(row.original)}
+                        onEmail={() => onEmail?.(row.original)}
+                        disabledDelete={!canEdit}
+                        disabledWhatsApp={!canEdit || !canContactInfluencer || isRecentlyAdded}
+                        disabledEmail={!canEdit || !canContactInfluencer || isRecentlyAdded}
+                    />
+                );
             },
+        },
 
     };
 

@@ -123,14 +123,36 @@
   height: 38px;
   width: 100%;
   border-top: 1px solid var(--blue);
-  .influencerButton{
-    background: linear-gradient(107.52deg, #bce8ff 3.56%, #daf4fff0 50.39%, #bfd8ffe4 79.14%, #a4bcffd9);
+
+  .footerCell {
+    border-top: 1px solid var(--blue) !important;
+    border-left: 1px solid var(--gradient) !important;
+
+    &:first-child {
+      border-left: 0 !important;
+    }
   }
-  .iconWrapper{
+
+  .footerNoBorderCell {
+    border: none !important;
+  }
+
+  .influencerButton {
+    background: linear-gradient(
+                    107.52deg,
+                    #bce8ff 3.56%,
+                    #daf4fff0 50.39%,
+                    #bfd8ffe4 79.14%,
+                    #a4bcffd9
+    );
+  }
+
+  .iconWrapper {
     display: flex;
     align-items: center;
     gap: 4px;
-    img{
+
+    img {
       width: 24px;
       height: 24px;
     }

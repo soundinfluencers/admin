@@ -18,7 +18,7 @@ type Props = {
 
 export const StrategyBar = ({ campaign, isLockedStatus, status }: Props) => {
     const setCampaignPrice = useCampaignManagementStore((s) => s.setCampaignPrice);
-    const canEdit = useCampaignManagementStore((s) => s.isEditable());
+
 
     const budget = getCampaignBudget(campaign);
 

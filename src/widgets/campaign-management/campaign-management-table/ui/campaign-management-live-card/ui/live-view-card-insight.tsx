@@ -50,20 +50,24 @@ export const LiveViewCardInsight: React.FC<LiveViewCardProps> = ({
                 onClick={(e) => {
                     e.stopPropagation();
 
+                    if (!item.postLink) return;
+
                     window.open(
-                        item.taggedLink as string,
+                        item.postLink,
                         "_blank",
                         "noopener,noreferrer",
                     );
                 }}
-                className="live-view-cardInsight__fill-data">
-                <img
-                    src={getSocialMediaIcon(item.socialMedia as any)}
-                    alt=""
-                />{" "}
-                <div className="fill-input">
+                className="live-view-cardInsight__fill-data"
+            >
+                <img src={getSocialMediaIcon(item.socialMedia as any)} alt="" />
+
+                <div
+                    className="fill-input"
+                    style={{ cursor: item.postLink ? "pointer" : "default" }}
+                >
                     <img src={link} alt="" />
-                    <p>{item.postLink ?? "no post link"}</p>
+                    <p>{item.postLink || "—"}</p>
                 </div>
             </div>
             <div className="live-view-cardInsight__fill-data">

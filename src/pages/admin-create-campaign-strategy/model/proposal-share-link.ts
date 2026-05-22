@@ -1,7 +1,7 @@
 import React from "react";
 import { toast } from "react-toastify";
 
-const PROPOSAL_ORIGIN = "https://go.soundinfluencers.com/";
+const PROPOSAL_ORIGIN = "https://go.soundinfluencers.com";
 
 export const buildProposalUrl = (campaignId: string) => {
     const id = encodeURIComponent(campaignId);

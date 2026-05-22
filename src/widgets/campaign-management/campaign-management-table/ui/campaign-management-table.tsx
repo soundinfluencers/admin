@@ -29,7 +29,8 @@ type Props = {
     changeView: boolean;
     canEdit: boolean;
     canManageAccounts: boolean;
-    totalPrice: number
+    totalPrice: number | null;
+    currency?: string
 };
 
 export const CampaignManagementTable = ({
@@ -40,7 +41,7 @@ export const CampaignManagementTable = ({
                                             changeView,
                                             canEdit,
                                             canManageAccounts,
-    totalPrice,
+    totalPrice,currency
                                         }: Props) => {
     const status = useCampaignManagementStore((state) => state.status);
 
@@ -93,6 +94,7 @@ export const CampaignManagementTable = ({
             <TableCampaign
                 canEdit={canEdit}
                 data={rows}
+                currency={currency}
                 totalFollowers={totalFollowers}
                 totalPrice={totalPrice}
                 columns={columns}

@@ -1,4 +1,4 @@
-import {useEffect, useState, useCallback, useMemo} from "react";
+import {useEffect, useState, useCallback} from "react";
 import { useSearchParams } from "react-router-dom";
 
 import styles from "./campaign-managment.module.scss";
@@ -49,7 +49,12 @@ export const CampaignManagment = () => {
     const statusParam = searchParams.get("status") as CampaignStatus | null;
     const optionIndex = Number(searchParams.get("optionIndex") ?? "0");
     const modeKey = `${campaignId ?? ""}:${statusParam ?? ""}:${optionIndex}`;
+    const viewParam = searchParams.get("view");
 
+    const normalizedViewParam =
+        viewParam === "-1" || viewParam === "0" || viewParam === "1"
+            ? (Number(viewParam) as ViewMode)
+            : null;
     const [modeState, setModeState] = useState<{
         key: string;
         mode: PageMode;
@@ -81,7 +86,7 @@ export const CampaignManagment = () => {
     const existingOptions = useCampaignManagementStore((s) => s.existingOptions);
     const status = useCampaignManagementStore((s) => s.status);
     const canEdit = useCampaignManagementStore((s) => s.canEdit);
-    const resetCampaignState = useCampaignManagementStore((s) => s.resetCampaign);
+
     const [optionModal, setOptionModal] = useState(false);
     const resolvedStatus = status || statusParam;
     const kind = getCampaignKindByStatus(resolvedStatus);
@@ -173,7 +178,12 @@ export const CampaignManagment = () => {
         status,
         loadCampaignByOption,
     ]);
+    useEffect(() => {
+        if (normalizedViewParam === null) return;
+        if (view === normalizedViewParam) return;
 
+        setView(normalizedViewParam);
+    }, [normalizedViewParam, view, setView]);
     const handleSave = async () => {
         if (!campaignId || !status) return;
         const requestStatus: CampaignStatus =
@@ -313,7 +323,17 @@ export const CampaignManagment = () => {
     //         return sum + Number(account.publicPrice ?? 0);
     //     }, 0);
     // }, [networks]);
+    const handleSetView = useCallback(
+        (nextView: ViewMode) => {
+            setView(nextView);
 
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set("view", String(nextView));
+
+            setSearchParams(nextParams, { replace: true });
+        },
+        [setView, searchParams, setSearchParams],
+    );
     const isLockedStatus = status === "distributing" || status === "completed" || status === "distributing" || status === 'pending';
     const renderStrategyTables = () => (
         <>
@@ -327,8 +347,9 @@ export const CampaignManagment = () => {
                         group="main"
                         changeView={changeView}
                         canEdit={isEditable()}
+                        currency={editable?.isPriceHidden ? '' : editable?.displayCurrency || '' }
                         canManageAccounts={canManageAccounts()}
-                        totalPrice={editablePrice}
+                        totalPrice={editable?.isPriceHidden ? null : editablePrice}
                     />
                 </>
             )}
@@ -343,8 +364,9 @@ export const CampaignManagment = () => {
                         group="music"
                         changeView={changeView}
                         canEdit={isEditable()}
+                        currency={editable?.isPriceHidden ? '' : editable?.displayCurrency || '' }
                         canManageAccounts={canManageAccounts()}
-                        totalPrice={editablePrice}
+                        totalPrice={editable?.isPriceHidden ? null : editablePrice}
                     />
                 </>
             )}
@@ -359,8 +381,9 @@ export const CampaignManagment = () => {
                         group="press"
                         changeView={changeView}
                         canEdit={isEditable()}
+                        currency={editable?.isPriceHidden ? '' : editable?.displayCurrency || '' }
                         canManageAccounts={canManageAccounts()}
-                        totalPrice={editablePrice}
+                        totalPrice={editable?.isPriceHidden ? null : editablePrice}
                     />
                 </>
             )}
@@ -416,8 +439,9 @@ export const CampaignManagment = () => {
                     campaignId={campaignId ?? ""}
                     statusParam={status || statusParam}
                     optionIndex={optionIndex}
-                    totalPrice={editablePrice}
+                    totalPrice={editable?.isPriceHidden ? null : editablePrice}
                     loadCampaignByOption={loadCampaignByOption}
+                    currency={editable?.isPriceHidden ? '' : editable?.displayCurrency || '' }
                 />
             </>
         );
@@ -497,7 +521,7 @@ export const CampaignManagment = () => {
                 <CampaignManagementBar
                     status={status || statusParam}
                     view={view as ViewMode}
-                    setView={setView}
+                    setView={handleSetView}
                     changeView={changeView}
                     setChangeView={setChangeView}
                     canEdit={canEdit}
