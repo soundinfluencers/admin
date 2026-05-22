@@ -14,6 +14,7 @@ type UpdateAllPostDetailsBody = {
 export const getPdfFile = async (campaignId: string) => {
     return await $api.get(`/campaigns/${campaignId}/pdf`, {
         responseType: "blob",
+        timeout: 15000,
     });
 };
 
@@ -45,4 +46,18 @@ export const updateAllPostDetails = async ({
     });
 
     return res.data?.data ?? res.data;
+};
+
+export const sendPromoEmail = async ({
+                                         campaignId,
+                                         promoId,
+                                     }: {
+    campaignId: string;
+    promoId: string;
+}) => {
+    const res = await $api.post(
+        `/admin/campaigns/mail/${campaignId}/${promoId}`,
+    );
+
+    return res.data;
 };

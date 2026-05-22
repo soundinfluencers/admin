@@ -74,7 +74,6 @@ export const Menu = ({
             await getPDF(campaignId);
         } catch (error) {
             console.error("Failed to download PDF", error);
-            toast.error("Failed to download PDF");
         } finally {
             setIsPdfLoading(false);
         }

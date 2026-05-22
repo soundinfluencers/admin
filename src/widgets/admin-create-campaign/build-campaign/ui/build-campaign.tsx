@@ -19,8 +19,7 @@ export const BuildCampaign = () => {
     const [searchParams] = useSearchParams();
 
     const campaignId = searchParams.get("id") ?? "";
-    const status = searchParams.get("status") ?? "";
-    const optionIndex = Number(searchParams.get("optionIndex") ?? "0");
+
     const isAttachMode = Boolean(campaignId);
 
     const {
@@ -74,9 +73,7 @@ export const BuildCampaign = () => {
                         : "Build your custom campaign"}
                 </h2>
                 <p>
-                    {isAttachMode
-                        ? `Campaign ${campaignId} · ${status} · option ${optionIndex + 1}`
-                        : "Handpick networks, genres, and budgets to tailor your campaign"}
+                    Handpick networks, genres, and budgets to tailor your campaign
                 </p>
             </div>
 

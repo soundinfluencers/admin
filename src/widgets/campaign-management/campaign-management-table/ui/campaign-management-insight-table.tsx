@@ -18,7 +18,7 @@ import type {
     CampaignManagementInsightRow,
 } from "@/widgets/campaign-management/campaign-management-table/model/campaign-management-table.types.ts";
 import {Modal} from "@/shared/ui/modal/modal.tsx";
-import {payPromoCampaign} from "@/entities/campaign-managment/api/campaign-controls.api.ts";
+import {payPromoCampaign, sendPromoEmail} from "@/entities/campaign-managment/api/campaign-controls.api.ts";
 import {toast} from "react-toastify";
 import {uploadCampaignFile} from "@/entities/campaign-managment/api/upload-campaign-file.ts";
 import {CircleLoader} from "@/shared/ui/circle-loader/circle-loader.tsx";
@@ -46,11 +46,12 @@ type Props = {
     campaignId: string;
     statusParam?: string | null;
     optionIndex: number;
-    totalPrice?: number;
+    totalPrice?: number | null;
     loadCampaignByOption?: (
         nextOptionIndex: number,
         nextStatus?: CampaignStatus,
     ) => Promise<void>;
+    currency: string;
 };
 
 export const CampaignManagementInsightTable = ({
@@ -62,7 +63,7 @@ export const CampaignManagementInsightTable = ({
                                                    statusParam,
                                                    optionIndex,
                                                    totalPrice,
-                                                   loadCampaignByOption,canContactInfluencer
+                                                   loadCampaignByOption,canContactInfluencer,currency
                                                }: Props) => {
     const { clientId,isConnected } = useRealtime();
     const realtimeClientId = clientId;
@@ -220,6 +221,25 @@ export const CampaignManagementInsightTable = ({
         },
         [],
     );
+    const handleSendEmail = React.useCallback(
+        async (row: CampaignManagementInsightRow) => {
+            const promoId = row.account.addedAccountsId;
+            if (!campaignId || !promoId) return;
+
+            try {
+                await sendPromoEmail({
+                    campaignId,
+                    promoId,
+                });
+
+                toast.success("Email sent");
+            } catch (error) {
+                console.error("Failed to send email", error);
+                toast.error("Failed to send email");
+            }
+        },
+        [campaignId],
+    );
     const handleOpenDeleteModal = React.useCallback(
         (row: CampaignManagementInsightRow) => {
             setDeleteModal({
@@ -336,6 +356,7 @@ export const CampaignManagementInsightTable = ({
                 recentlyAddedAccountKeys,
                 onDelete: handleOpenDeleteModal,
                 onWhatsApp: handleOpenWhatsAppModal,
+                onEmail: handleSendEmail,
                 onEditLink: handleOpenLinkModal,
                 onMetricChange: (row, field, value) => {
                     setAccountInsightField(getAccountKey(row.account), field, value);
@@ -351,12 +372,12 @@ export const CampaignManagementInsightTable = ({
             recentlyAddedAccountKeys,
             handleOpenDeleteModal,
             handleOpenWhatsAppModal,
+            handleSendEmail,
             handleOpenLinkModal,
             setAccountInsightField,
             handlePayPromo,
         ],
     );
-
     return (
         <div className="tableBase">
             <TableCampaignInsight
@@ -371,6 +392,7 @@ export const CampaignManagementInsightTable = ({
                 optionIndex={optionIndex}
                 getRowKey={(row) => row.accountKey}
                 totalPrice={totalPrice}
+                currency={currency}
             />
 
             {linkModal.isOpen && (

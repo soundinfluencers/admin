@@ -12,6 +12,7 @@ import styles from "./table.module.scss";
 import plus from './assets/plus.svg'
 import {Link, useSearchParams} from "react-router-dom";
 import type {CampaignStatus} from "@/entities/campaign-managment/model/campaign.managment.ts";
+import {getCurrencySymbol} from "@/entities/campaign-managment-add-accounts/model/add-accounts.types.ts";
 interface TableProps<TData> {
     data: TData[];
     columns: ColumnDef<TData>[];
@@ -26,6 +27,7 @@ interface TableProps<TData> {
     getRowKey?: (row: TData) => string;
     highlightedRowKeys?: string[];
     deletingRowKey?: string | null;
+    currency?: string;
 }
 
 export function TableCampaign<TData>({
@@ -41,7 +43,7 @@ export function TableCampaign<TData>({
                                          getRowKey,
                                          highlightedRowKeys = [],
                                          deletingRowKey = null,
-                                         canManageAccounts
+                                         canManageAccounts,currency
                                      }: TableProps<TData>) {
     "use no memo";
     const [searchParams] = useSearchParams();
@@ -147,10 +149,10 @@ export function TableCampaign<TData>({
                                                 Add influencer
                                             </Link>
                                         ) : (
-                                            <span>Price: {totalPrice}€</span>
+                                            <span>Price: {totalPrice}{getCurrencySymbol(currency)}</span>
                                         ))}
 
-                                    {index === 1 && <span>{totalFollowers}</span>}
+                                    {index === 1 &&   <span>{totalFollowers ?? 0}</span>}
                                 </td>
                             ))}
                         </tr>

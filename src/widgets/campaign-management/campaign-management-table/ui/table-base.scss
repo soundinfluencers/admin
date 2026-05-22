@@ -653,6 +653,19 @@
   z-index: 50;
   max-width: 250px;
 }
+.hidden-text-user {
+  font-size: 14px;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: 0.2s ease;
+
+  display: block;
+  &:hover {
+    transition: 0.2s ease;
+  }
+}
 .hidden-text {
   font-size: 13px;
   max-width: 110px;

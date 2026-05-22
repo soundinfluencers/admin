@@ -6,5 +6,5 @@ type Props = {
 };
 
 export const FollowersTableCell = ({ row }: Props) => {
-    return <p>{row.account.followers}</p>;
+    return <p className='followers'>{row.account.followers}</p>;
 };
