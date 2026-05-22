@@ -31,21 +31,16 @@ const getResultCPM = (cpm: number) => {
     return "Low Average";
 };
 
-// const currencySymbolMap: Record<CurrencyCode, string> = {
-//     EUR: "€",
-//     USD: "$",
-//     GBP: "£",
-// };
 
 export const InsightBar = ({ campaign }: Props) => {
     const setDisplayCurrency = useCampaignManagementStore((s) => s.setDisplayCurrency);
     const setIsPriceHidden = useCampaignManagementStore((s) => s.setIsPriceHidden);
     const setIsCpmAndResultHidden = useCampaignManagementStore((s) => s.setIsCpmAndResultHidden);
     const setCampaignPrice = useCampaignManagementStore((s) => s.setCampaignPrice);
-    // const canEdit = useCampaignManagementStore((s) => s.isEditable());
+
 
     const currency = (campaign?.displayCurrency as CurrencyCode) || "EUR";
-    // const currencySymbol = currencySymbolMap[currency];
+
 
     const resultCPM = getResultCPM(Number(campaign?.cpm ?? 0));
     const budget = getCampaignBudget(campaign);
@@ -213,7 +208,7 @@ export const InsightBar = ({ campaign }: Props) => {
                         </p>
 
                         <p>
-                            Result: <span>{resultCPM}</span>
+                            Result: {isCpmHidden ? "••••" : <span>{resultCPM}</span>}
                         </p>
                     </div>
                 </div>

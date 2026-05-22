@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode, useCallback } from "react";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
 
@@ -7,9 +7,16 @@ import {
   RealtimeContext,
   type WhatsappMessageStatusUpdate,
 } from "@/app/providers/realtime-provider/realtime-context.ts";
+import type {
+  ActiveAccountAccountsUpdate, NotificationFinishedRefreshingAccounts,
+  RefreshAccountStatusUpdate,
+} from "@/app/providers/realtime-provider/realtime.types.ts";
+import { useQueryClient } from "@tanstack/react-query";
+import { influencersQueryKeys } from "@/entities/influencers/api/influencers.query-keys.ts";
 
 const SOCKET_CLIENT_ID_KEY = "soundinfluencers-admin:socket-client-id";
 const WHATSAPP_SUCCESS_TOAST_ID = "whatsapp-success-once";
+// const SCRAPPER_ACCOUNTS_FINISHED_TOAST_ID = "scrapper-accounts-finished-toast";
 
 function getSocketClientId(): string {
   const existingClientId = sessionStorage.getItem(SOCKET_CLIENT_ID_KEY);
@@ -24,16 +31,35 @@ function getSocketClientId(): string {
   return clientId;
 }
 
+// function isSuccessStatusCode(statusCode: number) {
+//   return statusCode >= 200 && statusCode < 300;
+// }
+
 export function RealtimeProvider({ children }: { children: ReactNode }) {
   const { accessToken, status } = useAuth();
+  const queryClient = useQueryClient();
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [clientId, setClientId] = useState<string | null>(null);
   const [lastWhatsappStatus, setLastWhatsappStatus] =
-      useState<WhatsappMessageStatusUpdate | null>(null);
-
+    useState<WhatsappMessageStatusUpdate | null>(null);
   const hasShownWhatsappSuccessRef = useRef(false);
+
+  const [
+    activeAccountAccountsUpdates,
+    setActiveAccountAccountsUpdates,
+  ] = useState<ActiveAccountAccountsUpdate[]>([]);
+
+  const [
+    lastRefreshAccountStatus,
+    setLastRefreshAccountStatus,
+  ] = useState<RefreshAccountStatusUpdate | null>(null);
+
+  const [
+    lastFinishedRefreshingAccountsNotification,
+    setLastFinishedRefreshingAccountsNotification,
+  ] = useState<NotificationFinishedRefreshingAccounts | null>(null);
 
   useEffect(() => {
     if (status !== "authenticated" || !accessToken) {
@@ -42,6 +68,11 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       setClientId(null);
       setLastWhatsappStatus(null);
       hasShownWhatsappSuccessRef.current = false;
+
+      setActiveAccountAccountsUpdates([]);
+      setLastRefreshAccountStatus(null);
+      setLastFinishedRefreshingAccountsNotification(null);
+
       return;
     }
 
@@ -68,41 +99,149 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     });
 
     nextSocket.on(
-        "whatsappMessageStatusUpdate",
-        (payload: WhatsappMessageStatusUpdate) => {
-          setLastWhatsappStatus(payload);
+      "whatsappMessageStatusUpdate",
+      (payload: WhatsappMessageStatusUpdate) => {
+        setLastWhatsappStatus(payload);
 
-          if (payload.status !== "sent") return;
-          if (hasShownWhatsappSuccessRef.current) return;
+        if (payload.status !== "sent") return;
+        if (hasShownWhatsappSuccessRef.current) return;
 
-          hasShownWhatsappSuccessRef.current = true;
+        hasShownWhatsappSuccessRef.current = true;
 
-          toast.success("WhatsApp messages sent successfully", {
-            toastId: WHATSAPP_SUCCESS_TOAST_ID,
-          });
-        },
+        toast.success("WhatsApp messages sent successfully", {
+          toastId: WHATSAPP_SUCCESS_TOAST_ID,
+        });
+      },
     );
+
+    const handleActiveAccountAccountsUpdates = (
+      payload: ActiveAccountAccountsUpdate[],
+    ) => {
+      console.log("Received activeAccountAccountsUpdates:", payload);
+      setActiveAccountAccountsUpdates(payload);
+    };
+
+    const handleRefreshAccountStatusUpdate = (
+      payload: RefreshAccountStatusUpdate,
+    ) => {
+      setLastRefreshAccountStatus(payload);
+
+      /**
+       * обновлять cache через queryClient.setQueryData,
+       * сразу менять followers/logo/engagementRate в таблице.
+       */
+    };
+
+    const handleNotificationFinishedRefreshingAccounts = (
+      payload: NotificationFinishedRefreshingAccounts,
+    ) => {
+      setLastFinishedRefreshingAccountsNotification(payload);
+
+      setActiveAccountAccountsUpdates((prev) =>
+        prev.filter((item) => item.socialMedia !== payload.socialMedia),
+      );
+
+      toast.dismiss(`scrapper-accounts-started:${payload.socialMedia}`);
+
+      const isSuccess = payload.statusCode >= 200 && payload.statusCode < 300;
+
+      if (isSuccess) {
+        toast.success(`${payload.socialMedia} accounts update finished`, {
+          toastId: `scrapper-accounts-finished:${payload.socialMedia}`,
+        });
+
+        void queryClient.invalidateQueries({
+          queryKey: influencersQueryKeys.lists(),
+        });
+
+        return;
+      }
+
+      toast.error(`${payload.socialMedia} accounts update failed`, {
+        toastId: `scrapper-accounts-failed:${payload.socialMedia}`,
+      });
+    };
+
+    nextSocket.on(
+      "activeAccountAccountsUpdates",
+      handleActiveAccountAccountsUpdates,
+    );
+
+    nextSocket.on(
+      "refreshAccountStatusUpdate",
+      handleRefreshAccountStatusUpdate,
+    );
+
+    nextSocket.on(
+      "notificationFinishedRefreshingAccounts",
+      handleNotificationFinishedRefreshingAccounts,
+    );
+
 
     return () => {
       nextSocket.disconnect();
       setIsConnected(false);
       setSocket(null);
+
+      nextSocket.off(
+        "activeAccountAccountsUpdates",
+        handleActiveAccountAccountsUpdates,
+      );
+
+      nextSocket.off(
+        "refreshAccountStatusUpdate",
+        handleRefreshAccountStatusUpdate,
+      );
+
+      nextSocket.off(
+        "notificationFinishedRefreshingAccounts",
+        handleNotificationFinishedRefreshingAccounts,
+      );
+
     };
-  }, [accessToken, status]);
+  }, [accessToken, queryClient, status]);
+
+  const isAccountAccountsUpdating = useCallback(
+    (params: {
+      socialMedia?: string;
+      accountId?: string;
+      influencerId?: string;
+    }) => {
+      return activeAccountAccountsUpdates.some((item) => {
+        const socialMediaMatched =
+          !params.socialMedia || item.socialMedia === params.socialMedia;
+
+        const accountMatched =
+          !params.accountId || item.accountId === params.accountId;
+
+        const influencerMatched =
+          !params.influencerId || item.influencerId === params.influencerId;
+
+        return socialMediaMatched && accountMatched && influencerMatched;
+      });
+    },
+    [activeAccountAccountsUpdates],
+  );
 
   const value = useMemo(
-      () => ({
-        socket,
-        isConnected,
-        clientId,
-        lastWhatsappStatus,
-      }),
-      [socket, isConnected, clientId, lastWhatsappStatus],
+    () => ({
+      socket,
+      isConnected,
+      clientId,
+      lastWhatsappStatus,
+
+      activeAccountAccountsUpdates,
+      lastRefreshAccountStatus,
+      lastFinishedRefreshingAccountsNotification,
+
+      isAccountAccountsUpdating,
+    }),
+    [socket, isConnected, clientId, lastWhatsappStatus, activeAccountAccountsUpdates, lastRefreshAccountStatus, lastFinishedRefreshingAccountsNotification, isAccountAccountsUpdating],
   );
 
   return (
-      <RealtimeContext.Provider value={value}>
-        {children}
-      </RealtimeContext.Provider>
+    <RealtimeContext.Provider value={value}>
+      {children}
+    </RealtimeContext.Provider>
   );
 }

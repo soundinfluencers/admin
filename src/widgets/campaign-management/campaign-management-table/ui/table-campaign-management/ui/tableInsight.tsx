@@ -11,6 +11,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import plus from "@/widgets/campaign-management/campaign-management-table/ui/table-campaign-management/ui/assets/plus.svg";
 
+import {getCurrencySymbol} from "@/entities/campaign-managment-add-accounts/model/add-accounts.types.ts";
+
 interface InsightTotals {
     followers?: number;
     impressions?: number;
@@ -32,7 +34,8 @@ interface TableInsightProps<TData> {
     campaignId?: string;
     statusParam?: string | null;
     optionIndex?: number;
-    totalPrice?: number
+    totalPrice?: number | null;
+    currency?: string;
 }
 
 export function TableCampaignInsight<TData>({
@@ -47,7 +50,7 @@ export function TableCampaignInsight<TData>({
                                                 campaignId = "",
                                                 statusParam = null,
                                                 optionIndex = 0,
-                                                totalPrice
+                                                totalPrice,currency
                                             }: TableInsightProps<TData>) {
     "use no memo";
 
@@ -129,11 +132,19 @@ export function TableCampaignInsight<TData>({
                         <tr>
                             {table.getFlatHeaders().map((header, index) => {
                                 const columnId = header.id;
+                                const withoutBorder = index === 2 || index === 3;
 
                                 return (
                                     <td
                                         key={header.id}
-                                        className={`${styles.td} ${styles.noBorder} ${canManageAccounts && index === 0 ? styles.influencerButton : ""}`}
+                                        className={[
+                                            !withoutBorder ? styles.td : "",
+                                            !withoutBorder ? styles.footerCell : "",
+                                            withoutBorder ? styles.footerNoBorderCell : "",
+                                            canManageAccounts && index === 0 ? styles.influencerButton : "",
+                                        ]
+                                            .filter(Boolean)
+                                            .join(" ")}
                                         style={{ width: header.getSize() }}
                                     >
                                         {columnId === "network" &&
@@ -146,27 +157,18 @@ export function TableCampaignInsight<TData>({
                                                     Add influencer
                                                 </Link>
                                             ) : (
-                                                <span>Price: {totalPrice}€</span>
+                                                <span>
+                                Price: {totalPrice}
+                                                    {getCurrencySymbol(currency)}
+                            </span>
                                             ))}
 
-                                        {columnId === "followers" && (
-                                            <span>{totals?.followers ?? 0}</span>
-                                        )}
-                                        {columnId === "impressions" && (
-                                            <span>{totals?.impressions ?? 0}</span>
-                                        )}
-                                        {columnId === "likes" && (
-                                            <span>{totals?.likes ?? 0}</span>
-                                        )}
-                                        {columnId === "comments" && (
-                                            <span>{totals?.comments ?? 0}</span>
-                                        )}
-                                        {columnId === "saves" && (
-                                            <span>{totals?.saves ?? 0}</span>
-                                        )}
-                                        {columnId === "shares" && (
-                                            <span>{totals?.shares ?? 0}</span>
-                                        )}
+                                        {columnId === "followers" && <span>{totals?.followers ?? 0}</span>}
+                                        {columnId === "impressions" && <span>{totals?.impressions ?? 0}</span>}
+                                        {columnId === "likes" && <span>{totals?.likes ?? 0}</span>}
+                                        {columnId === "comments" && <span>{totals?.comments ?? 0}</span>}
+                                        {columnId === "saves" && <span>{totals?.saves ?? 0}</span>}
+                                        {columnId === "shares" && <span>{totals?.shares ?? 0}</span>}
                                     </td>
                                 );
                             })}

@@ -42,3 +42,9 @@ export interface UploadInfluencersListXlsxParams {
   file: File;
   socialMedia: TSocialMediaValue;
 }
+
+// scrapper influencer update
+export interface IScrapperUpdateParams {
+  socialMedia: TSocialMediaValue;
+  clientId: string;
+}

@@ -497,11 +497,11 @@ export const MUSIC_GENRES_COMMUNITY: NestedOption[] = [
     label: "Techno",
     children: [
       {
-        value: "Melodic, Minimal",
+        value: "Melodic, minimal",
         label: "Melodic, Minimal",
       },
       {
-        value: "Hard, Peak",
+        value: "Hard, peak",
         label: "Hard, Peak",
       },
     ],
@@ -511,7 +511,7 @@ export const MUSIC_GENRES_COMMUNITY: NestedOption[] = [
     label: "House",
     children: [
       {
-        value: "Tech House",
+        value: "Tech house",
         label: "Tech House",
       },
       {
@@ -519,17 +519,17 @@ export const MUSIC_GENRES_COMMUNITY: NestedOption[] = [
         label: "Melodic",
       },
       {
-        value: "Afro House",
+        value: "Afro house",
         label: "Afro House",
       },
     ],
   },
   {
-    value: "EDM",
+    value: "Edm",
     label: "EDM",
   },
   {
-    value: "D&B",
+    value: "D&b",
     label: "D&B",
   },
   {
@@ -537,7 +537,7 @@ export const MUSIC_GENRES_COMMUNITY: NestedOption[] = [
     label: "Bass",
   },
   {
-    value: "Psy, Trance",
+    value: "Psy, trance",
     label: "Psy, Trance",
   },
   {

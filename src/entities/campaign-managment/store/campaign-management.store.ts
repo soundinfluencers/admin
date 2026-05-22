@@ -284,7 +284,7 @@ const getInitialView = ({
         normalizedStatus === "distributing" ||
         normalizedStatus === "completed"
     ) {
-        return 0;
+        return -1;
     }
 
     return -1;
@@ -343,7 +343,7 @@ const buildBasePayload = (editable: EditableCampaign) => {
     return {
         campaignName: editable.campaignName,
 
-        // оставляю оба поля, чтобы не словить баг из-за разного backend-контракта
+
         price: finalBudget,
         campaignPrice: finalBudget,
         isBudgetManual: Boolean(editable.isBudgetManual),
@@ -499,7 +499,7 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
         recentlyAddedAccountKeys: [],
         status: "",
         canEdit: false,
-        view: 0,
+        view: -1,
         changeView: false,
         activeOptionIndex: null,
         deletingAccountKey: null,
