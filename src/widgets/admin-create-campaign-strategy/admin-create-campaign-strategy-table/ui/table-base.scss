@@ -475,6 +475,7 @@
       .trash {
         position: absolute;
         right: 2px;
+
       }
       span {
         display: flex;
@@ -600,7 +601,7 @@
   min-height: 36px;
 
   p {
-    font-weight: 400;
+    font-weight: 300;
     font-style: Regular;
     font-size: 14px;
     leading-trim: NONE;
@@ -646,7 +647,8 @@
   max-width: 250px !important;
 }
 .desc-li {
-  max-width: 210px !important;
+  font-weight: 300;
+  max-width: 163px !important;
 }
 .tagged-link {
   text-decoration: underline;

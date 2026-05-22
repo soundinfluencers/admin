@@ -268,7 +268,13 @@
       border-right: 1px solid rgba(185, 208, 255, 1);
     }
   }
-
+  .desc-li-card{
+    max-width: 270px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: 0.2s ease;
+  }
   .username_row {
     display: flex;
     align-items: center;
@@ -630,7 +636,7 @@
   min-height: 36px;
 
   p {
-    font-weight: 400;
+    font-weight: 300;
     font-style: Regular;
     font-size: 14px;
     leading-trim: NONE;
@@ -666,6 +672,7 @@
     transition: 0.2s ease;
   }
 }
+
 .hidden-text {
   font-size: 13px;
   max-width: 110px;
@@ -685,11 +692,15 @@
   max-width: 100% !important;
   flex: 1 1 auto;
 }
+.edit-desc{
+  max-width: 130px !important;
+}
 .desc {
+
   max-width: 250px !important;
 }
 .desc-li {
-  max-width: 210px !important;
+  max-width: 163px !important;
 }
 .tagged-link {
   text-decoration: underline;

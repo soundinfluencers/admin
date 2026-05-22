@@ -1,12 +1,14 @@
 import React from "react";
 import styles from "./option-slider.module.scss";
 import chevron from "@/assets/icons/chevron-right.svg";
+import x from "@/assets/icons/x (2).svg";
 
 type Props = {
     className?: string;
     activeOption: number;
     optionIndexes: number[] | undefined;
     onChangeOption: (optionIndex: number) => void;
+    onDeleteOption?: (optionIndex: number) => void;
 };
 
 export function OptionsSlider({
@@ -14,12 +16,15 @@ export function OptionsSlider({
                                   optionIndexes,
                                   activeOption,
                                   onChangeOption,
+                                  onDeleteOption,
                               }: Props) {
     const scrollerRef = React.useRef<HTMLUListElement | null>(null);
 
     const [canScroll, setCanScroll] = React.useState(false);
     const [atStart, setAtStart] = React.useState(true);
     const [atEnd, setAtEnd] = React.useState(false);
+
+    const canDeleteOption = Number(optionIndexes?.length ?? 0) > 1;
 
     const update = React.useCallback(() => {
         const el = scrollerRef.current;
@@ -38,7 +43,7 @@ export function OptionsSlider({
         if (!el) return;
 
         const onScroll = () => update();
-        el.addEventListener("scroll", onScroll, { passive: true });
+        el.addEventListener("scroll", onScroll, {passive: true});
 
         const ro = new ResizeObserver(() => update());
         ro.observe(el);
@@ -69,7 +74,7 @@ export function OptionsSlider({
                     disabled={atStart}
                     aria-label="Scroll left"
                 >
-                    <img className={styles.arrowIconLeft} src={chevron} alt="" />
+                    <img className={styles.arrowIconLeft} src={chevron} alt=""/>
                 </button>
             )}
 
@@ -77,14 +82,30 @@ export function OptionsSlider({
                 {optionIndexes?.map((idx) => (
                     <li
                         key={idx}
-                        className={
-                            `${activeOption === idx
-                                ? `${styles.optionItem} ${styles.activeOption}`
-                                : styles.optionItem} ${className ?? ""}`
-                        }
+                        className={[
+                            styles.optionItem,
+                            activeOption === idx ? styles.activeOption : "",
+                            className ?? "",
+                        ]
+                            .filter(Boolean)
+                            .join(" ")}
                         onClick={() => onChangeOption(idx)}
                     >
-                        Option {idx + 1}
+                        <span>Option {idx + 1}</span>
+
+                        {canDeleteOption && onDeleteOption && (
+                            <button
+                                type="button"
+                                className={styles.deleteOption}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDeleteOption(idx);
+                                }}
+                                aria-label={`Delete option ${idx + 1}`}
+                            >
+                                <img src={x} alt=""/>
+                            </button>
+                        )}
                     </li>
                 ))}
             </ul>
@@ -97,7 +118,7 @@ export function OptionsSlider({
                     disabled={atEnd}
                     aria-label="Scroll right"
                 >
-                    <img className={styles.arrowIcon} src={chevron} alt="" />
+                    <img className={styles.arrowIcon} src={chevron} alt=""/>
                 </button>
             )}
         </div>

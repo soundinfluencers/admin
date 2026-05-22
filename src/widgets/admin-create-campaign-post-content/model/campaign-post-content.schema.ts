@@ -49,9 +49,19 @@ const taggedUserSchema = z
     .refine(
         (value) => {
             if (value === "") return true;
-            return /^@[a-zA-Z0-9._]{1,30}$/.test(value);
+
+            const tags = value
+                .split(/[\s,]+/)
+                .map((tag) => tag.trim())
+                .filter(Boolean);
+
+            if (!tags.length) return true;
+
+            return tags.every((tag) => /^@[a-zA-Z0-9._]{1,30}$/.test(tag));
         },
-        { message: "Tagged user must start with @" },
+        {
+            message: "Each tagged user must start with @",
+        },
     );
 
 export const campaignPostContentDescriptionSchema = z.object({

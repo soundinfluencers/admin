@@ -73,13 +73,16 @@
 }
 
 .optionItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex: 0 0 auto;
   list-style: none;
   padding: 10px 16px;
   border: 1px solid rgba(185, 208, 255, 1);
   border-radius: 8px;
   background: #fff;
-  cursor: pointer;
+cursor: pointer;
   user-select: none;
 &.nonEdit{
   padding: 8px !important;
@@ -87,6 +90,5 @@
 }
 
 .activeOption {
-  border-color: rgba(120, 160, 255, 1);
-  background: rgba(185, 208, 255, 0.15);
+  background: linear-gradient(107.52deg, #bce8ff 3.56%, rgba(218, 244, 255, 0.94) 50.39%, rgba(191, 216, 255, 0.895) 79.14%, rgba(164, 188, 255, 0.85) 100%);
 }

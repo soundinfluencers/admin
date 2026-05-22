@@ -34,6 +34,7 @@ type Props = {
     insightMode: boolean;
     setInsightMode: () => void;
     onAddOption?: () => void;
+    onDeleteOption?: (optionIndex: number) => void;
 };
 
 const STRATEGY_STATUSES = ["proposal"] as const;
@@ -57,7 +58,7 @@ export const CampaignManagementBar = ({
                                           insightMode,
                                           setInsightMode,
                                           campaign,
-                                          onAddOption,
+                                          onAddOption,onDeleteOption
                                       }: Props) => {
     const normalizedStatus = String(status ?? "").toLowerCase();
 
@@ -110,6 +111,7 @@ export const CampaignManagementBar = ({
                                 <AddinitonalOption onClick={onAddOption ?? (() => {})} />
 
                                 <OptionsSlider
+                                    onDeleteOption={onDeleteOption}
                                     optionIndexes={optionIndexes}
                                     activeOption={activeOption}
                                     onChangeOption={onChangeOption}
