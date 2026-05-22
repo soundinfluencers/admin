@@ -1,4 +1,4 @@
-import {useEffect, useState, useCallback} from "react";
+import {useEffect, useState, useCallback, useMemo} from "react";
 import { useSearchParams } from "react-router-dom";
 
 import styles from "./campaign-managment.module.scss";
@@ -40,6 +40,12 @@ import {Modal} from "@/shared/ui/modal/modal.tsx";
 import {addAdminProposalOption} from "@/entities/campaign-managment/api/add-option.ts";
 import {getCampaignBudget} from "@/entities/campaign-managment/model/campaign-budget.helpers.ts";
 import {getDefaultModeByStatus, type PageMode} from "@/pages/campaign-managment/model/get-default-mode.ts";
+import {
+    buildAccountsByContentId,
+    filterContentWithAccounts, getNetworksForContentItem
+} from "@/widgets/campaign-management/campaign-management-table/model/live-view-content.helpers";
+import {deleteAdminProposalOption} from "@/entities/campaign-managment/api/delete-option.ts";
+import {getNextActiveOptionAfterDelete} from "@/pages/campaign-managment/model/campaign-management.helpers.ts";
 
 
 export const CampaignManagment = () => {
@@ -62,7 +68,63 @@ export const CampaignManagment = () => {
         key: modeKey,
         mode: getDefaultModeByStatus(statusParam),
     }));
+    const [deleteOptionModal, setDeleteOptionModal] = useState<{
+        isOpen: boolean;
+        optionIndex: number | null;
+    }>({
+        isOpen: false,
+        optionIndex: null,
+    });
+    const handleOpenDeleteOptionModal = (nextOptionIndex: number) => {
+        setDeleteOptionModal({
+            isOpen: true,
+            optionIndex: nextOptionIndex,
+        });
+    };
+    const handleConfirmDeleteOption = async () => {
+        if (!campaignId || deleteOptionModal.optionIndex === null) return;
 
+        const deleteIndex = deleteOptionModal.optionIndex;
+        const currentOptions = Array.isArray(existingOptions) ? existingOptions : [0];
+
+        if (currentOptions.length <= 1) {
+            toast.error("You cannot delete the last option");
+            return;
+        }
+
+        const nextActiveOption = getNextActiveOptionAfterDelete({
+            activeOption: optionIndex,
+            deletedOption: deleteIndex,
+            optionsCount: currentOptions.length,
+        });
+
+        try {
+            setIsSaving(true);
+
+            await deleteAdminProposalOption({
+                campaignId,
+                optionIndex: deleteIndex,
+            });
+
+            setDeleteOptionModal({
+                isOpen: false,
+                optionIndex: null,
+            });
+
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set("optionIndex", String(nextActiveOption));
+            setSearchParams(nextParams, { replace: true });
+
+            await loadCampaignByOption(nextActiveOption);
+
+            toast.success("Option deleted successfully");
+        } catch (error) {
+            console.error("Failed to delete option", error);
+            toast.error("Failed to delete option");
+        } finally {
+            setIsSaving(false);
+        }
+    };
     const pageMode =
         modeState.key === modeKey
             ? modeState.mode
@@ -309,6 +371,24 @@ export const CampaignManagment = () => {
         networks,
         items,
     });
+    const accountsByContentId = useMemo(
+        () => buildAccountsByContentId(networks),
+        [networks],
+    );
+
+    const visibleGroupedItems = useMemo(
+        () => ({
+            main: filterContentWithAccounts(grouped.main.items, accountsByContentId),
+            music: filterContentWithAccounts(grouped.music.items, accountsByContentId),
+            press: filterContentWithAccounts(grouped.press.items, accountsByContentId),
+        }),
+        [grouped.main.items, grouped.music.items, grouped.press.items, accountsByContentId],
+    );
+
+    const getItemNetworks = useCallback(
+        (item: any) => getNetworksForContentItem(item, accountsByContentId),
+        [accountsByContentId],
+    );
     const insightTotals = {
         followers: Number(editable?.totalFollowers ?? 0),
         impressions: Number(editable?.totalImpressions ?? 0),
@@ -392,30 +472,29 @@ export const CampaignManagment = () => {
 
     const renderStrategyCards = () => (
         <div className={`${styles.wrapperCard} ${styles.liveView}`}>
-            {grouped.main.items.map((item) => (
+            {visibleGroupedItems.main.map((item) => (
                 <LiveViewCard
                     key={item._id}
                     item={item}
-                    networks={grouped.main.networks}
-                    canEdit={isEditable()}
-
-                />
-            ))}
-
-            {grouped.music.items.map((item) => (
-                <LiveViewCard
-                    key={item._id}
-                    item={item}
-                    networks={grouped.music.networks}
+                    networks={getItemNetworks(item)}
                     canEdit={isEditable()}
                 />
             ))}
 
-            {grouped.press.items.map((item) => (
+            {visibleGroupedItems.music.map((item) => (
                 <LiveViewCard
                     key={item._id}
                     item={item}
-                    networks={grouped.press.networks}
+                    networks={getItemNetworks(item)}
+                    canEdit={isEditable()}
+                />
+            ))}
+
+            {visibleGroupedItems.press.map((item) => (
+                <LiveViewCard
+                    key={item._id}
+                    item={item}
+                    networks={getItemNetworks(item)}
                     canEdit={isEditable()}
                 />
             ))}
@@ -531,6 +610,7 @@ export const CampaignManagment = () => {
                     activeOption={optionIndex}
                     onChangeOption={handleOptionChange}
                     onAddOption={handleOpenAddOptionModal}
+                    onDeleteOption={handleOpenDeleteOptionModal}
                     campaignId={campaignId ?? ""}
                     socialMedia={editable?.socialMedia}
                     kind={kind}
@@ -570,6 +650,50 @@ export const CampaignManagment = () => {
                                 onClick={() => handleAddOption(true)}
                             >
                                 Yes
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+            {deleteOptionModal.isOpen && (
+                <Modal
+                    onClose={() =>
+                        setDeleteOptionModal({
+                            isOpen: false,
+                            optionIndex: null,
+                        })
+                    }
+                >
+                    <div className="create-option">
+                        <h2>Delete option</h2>
+
+                        <p>
+                            Do you want to delete Option{" "}
+                            {(deleteOptionModal.optionIndex ?? 0) + 1}?
+                        </p>
+
+                        <div className="create-option-btn">
+                            <button
+                                type="button"
+                                className="modal-secondary-btn"
+                                onClick={() =>
+                                    setDeleteOptionModal({
+                                        isOpen: false,
+                                        optionIndex: null,
+                                    })
+                                }
+                                disabled={isSaving}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                className="modal-primary-btn"
+                                onClick={handleConfirmDeleteOption}
+                                disabled={isSaving}
+                            >
+                                {isSaving ? "Deleting..." : "Delete"}
                             </button>
                         </div>
                     </div>

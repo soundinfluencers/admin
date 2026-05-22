@@ -37,6 +37,8 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
                                                                     selectedIdx,
                                                                     setSelectedIdx,
                                                                 }) => {
+    const clickTimerRef = React.useRef<number | null>(null);
+
     const addContentDescription = useCampaignManagementStore(
         (s) => s.addContentDescription,
     );
@@ -54,6 +56,19 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
     const [deleteId, setDeleteId] = React.useState<string | null>(null);
 
     React.useEffect(() => {
+        return () => {
+            if (clickTimerRef.current) {
+                window.clearTimeout(clickTimerRef.current);
+            }
+        };
+    }, []);
+
+    React.useEffect(() => {
+        if (clickTimerRef.current) {
+            window.clearTimeout(clickTimerRef.current);
+            clickTimerRef.current = null;
+        }
+
         setEditId(null);
         setEditText("");
         setIsAdding(false);
@@ -70,61 +85,153 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
 
     const selectDescription = React.useCallback(
         (idx: number) => {
+            if (editId !== null || deleteId !== null || isAdding) return;
+
             setSelectedIdx(idx);
             onClose();
         },
-        [setSelectedIdx, onClose],
+        [editId, deleteId, isAdding, setSelectedIdx, onClose],
     );
 
-    const commitAdd = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!contentId) return;
+    const startEdit = React.useCallback(
+        (e: React.MouseEvent, descId: string, text: string) => {
+            e.preventDefault();
+            e.stopPropagation();
 
-        const trimmed = newText.trim();
-        if (!trimmed) {
+            if (!canEdit) return;
+
+            setDeleteId(null);
+            setIsAdding(false);
+            setEditId(descId);
+            setEditText(text ?? "");
+        },
+        [canEdit],
+    );
+
+    const handleItemClick = React.useCallback(
+        (idx: number) => {
+            if (clickTimerRef.current) {
+                window.clearTimeout(clickTimerRef.current);
+            }
+
+            clickTimerRef.current = window.setTimeout(() => {
+                selectDescription(idx);
+                clickTimerRef.current = null;
+            }, 220);
+        },
+        [selectDescription],
+    );
+
+    const handleItemDoubleClick = React.useCallback(
+        (e: React.MouseEvent, descId: string, text: string) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (clickTimerRef.current) {
+                window.clearTimeout(clickTimerRef.current);
+                clickTimerRef.current = null;
+            }
+
+            startEdit(e, descId, text);
+        },
+        [startEdit],
+    );
+
+    const cancelEdit = React.useCallback(() => {
+        setEditId(null);
+        setEditText("");
+    }, []);
+
+    const commitEdit = React.useCallback(
+        (descId: string) => {
+            if (!contentId) return;
+
+            const trimmed = editText.trim();
+
+            if (!trimmed) {
+                cancelEdit();
+                return;
+            }
+
+            updateContentDescription(contentId, descId, trimmed);
+            cancelEdit();
+        },
+        [contentId, editText, updateContentDescription, cancelEdit],
+    );
+
+    const commitAdd = React.useCallback(
+        (e?: React.MouseEvent) => {
+            e?.stopPropagation();
+
+            if (!contentId) return;
+
+            const trimmed = newText.trim();
+
+            if (!trimmed) {
+                setIsAdding(false);
+                setNewText("");
+                return;
+            }
+
+            addContentDescription(contentId, trimmed);
+            setSelectedIdx(descriptions.length);
+
             setIsAdding(false);
             setNewText("");
-            return;
-        }
+        },
+        [
+            contentId,
+            newText,
+            addContentDescription,
+            setSelectedIdx,
+            descriptions.length,
+        ],
+    );
 
-        addContentDescription(contentId, trimmed);
-        setSelectedIdx(descriptions.length);
-        setIsAdding(false);
-        setNewText("");
-    };
+    const confirmDelete = React.useCallback(
+        (e: React.MouseEvent) => {
+            e.stopPropagation();
 
-    const confirmDelete = (e: React.MouseEvent) => {
+            if (!contentId || !deleteId) return;
+
+            const deleteIndex = descriptions.findIndex(
+                (item) => String(item._id) === String(deleteId),
+            );
+
+            removeContentDescription(contentId, deleteId);
+
+            let nextSelectedIdx = selectedIdx;
+
+            if (selectedIdx === deleteIndex) {
+                nextSelectedIdx = Math.max(0, deleteIndex - 1);
+            } else if (selectedIdx > deleteIndex) {
+                nextSelectedIdx = selectedIdx - 1;
+            }
+
+            setSelectedIdx(nextSelectedIdx);
+
+            if (editId === deleteId) {
+                cancelEdit();
+            }
+
+            setDeleteId(null);
+        },
+        [
+            contentId,
+            deleteId,
+            descriptions,
+            removeContentDescription,
+            selectedIdx,
+            setSelectedIdx,
+            editId,
+            cancelEdit,
+        ],
+    );
+
+    const cancelDelete = React.useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!contentId || !deleteId) return;
-
-        const deleteIndex = descriptions.findIndex(
-            (item) => String(item._id) === String(deleteId),
-        );
-
-        removeContentDescription(contentId, deleteId);
-
-        let nextSelectedIdx = selectedIdx;
-
-        if (selectedIdx === deleteIndex) {
-            nextSelectedIdx = Math.max(0, deleteIndex - 1);
-        } else if (selectedIdx > deleteIndex) {
-            nextSelectedIdx = selectedIdx - 1;
-        }
-
-        setSelectedIdx(nextSelectedIdx);
-
-        if (editId === deleteId) {
-            setEditId(null);
-            setEditText("");
-        }
-
         setDeleteId(null);
-    };
-
-    const cancelDelete = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setDeleteId(null);
-    };
+    }, []);
 
     if (!contentId) {
         return (
@@ -168,7 +275,11 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
                     </div>
                 }
             >
-                <div className="post-description-block" onClick={stop}>
+                <div
+                    className="post-description-block"
+                    onClick={stop}
+                    onMouseDown={stop}
+                >
                     <ul className="dropdown-list">
                         {descriptions.map((desc, idx) => {
                             const descId = String(desc?._id ?? "");
@@ -177,14 +288,24 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
                                 <li
                                     key={descId || idx}
                                     className="desc-li"
-                                    onClick={() => selectDescription(idx)}
+                                    onClick={() => handleItemClick(idx)}
+                                    onDoubleClick={(e) =>
+                                        handleItemDoubleClick(
+                                            e,
+                                            descId,
+                                            desc.description ?? "",
+                                        )
+                                    }
                                 >
                                     <span className={selectedIdx === idx ? "active" : ""}>
                                         {idx + 1}
                                     </span>
 
                                     {!canEdit ? (
-                                        <p className="hidden-text desc-li" title={desc.description}>
+                                        <p
+                                            className="hidden-text desc-li"
+                                            title={desc.description}
+                                        >
                                             {desc.description}
                                         </p>
                                     ) : editId === descId ? (
@@ -193,22 +314,25 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
                                             autoFocus
                                             value={editText}
                                             onClick={stop}
+                                            onMouseDown={stop}
                                             onChange={(e) => setEditText(e.target.value)}
-                                            onBlur={() => {
-                                                updateContentDescription(contentId, descId, editText);
-                                                setEditId(null);
-                                                setEditText("");
+                                            onBlur={() => commitEdit(descId)}
+                                            onKeyDown={(e) => {
+                                                e.stopPropagation();
+
+                                                if (e.key === "Enter") {
+                                                    commitEdit(descId);
+                                                }
+
+                                                if (e.key === "Escape") {
+                                                    cancelEdit();
+                                                }
                                             }}
                                         />
                                     ) : (
                                         <p
                                             className="hidden-text desc-li"
                                             title={desc.description}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setEditId(descId);
-                                                setEditText(desc.description ?? "");
-                                            }}
                                         >
                                             {desc.description}
                                         </p>
@@ -237,6 +361,16 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
                                                 alt=""
                                                 onClick={(e) => {
                                                     e.stopPropagation();
+
+                                                    if (clickTimerRef.current) {
+                                                        window.clearTimeout(
+                                                            clickTimerRef.current,
+                                                        );
+                                                        clickTimerRef.current = null;
+                                                    }
+
+                                                    setEditId(null);
+                                                    setEditText("");
                                                     setDeleteId(descId);
                                                 }}
                                             />
@@ -249,6 +383,7 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
                             <li
                                 className="desc-li"
                                 onClick={stop}
+                                onMouseDown={stop}
                                 style={{ cursor: "default" }}
                             >
                                 <span>{descriptions.length + 1}</span>
@@ -259,6 +394,19 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
                                     placeholder={`New ${title.toLowerCase()}...`}
                                     onChange={(e) => setNewText(e.target.value)}
                                     onClick={stop}
+                                    onMouseDown={stop}
+                                    onKeyDown={(e) => {
+                                        e.stopPropagation();
+
+                                        if (e.key === "Enter") {
+                                            commitAdd();
+                                        }
+
+                                        if (e.key === "Escape") {
+                                            setIsAdding(false);
+                                            setNewText("");
+                                        }
+                                    }}
                                 />
 
                                 <div className="confirm-delete" onClick={stop}>
@@ -288,6 +436,14 @@ export const LiveDescriptionsEditorDropdown: React.FC<Props> = ({
                             className="add-desc"
                             onClick={(e) => {
                                 e.stopPropagation();
+
+                                if (clickTimerRef.current) {
+                                    window.clearTimeout(clickTimerRef.current);
+                                    clickTimerRef.current = null;
+                                }
+
+                                setEditId(null);
+                                setDeleteId(null);
                                 setIsAdding(true);
                                 setNewText("");
                             }}
