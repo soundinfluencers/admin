@@ -151,8 +151,8 @@ export const TABLE_COLUMN_WIDTHS: Record<
     default: {
         readonly: {
             main: {
-                network: 208,
-                followers: 96,
+                network: 200,
+                followers: 105,
                 date: 98,
                 content: 141,
                 description: 299,
@@ -180,8 +180,8 @@ export const TABLE_COLUMN_WIDTHS: Record<
 
         editable: {
             main: {
-                network: 208,
-                followers: 96,
+                network: 200,
+                followers: 100,
                 date: 98,
                 content: 141,
                 description: 220,
@@ -206,7 +206,7 @@ export const TABLE_COLUMN_WIDTHS: Record<
                 artworkLink: 220,
                 pressLink: 220,
                 brief: 260,
-                action: 66,
+                action: 70,
             },
         },
     },
@@ -214,8 +214,8 @@ export const TABLE_COLUMN_WIDTHS: Record<
     changeView: {
         readonly: {
             main: {
-                network: 185,
-                followers: 96,
+                network: 170,
+                followers: 100,
                 genres: 283,
                 countries: 277,
                 content: 180,
@@ -237,8 +237,8 @@ export const TABLE_COLUMN_WIDTHS: Record<
 
         editable: {
             main: {
-                network: 185,
-                followers: 96,
+                network: 170,
+                followers: 100,
                 genres: 283,
                 countries: 277,
                 content: 180,
@@ -301,11 +301,11 @@ export const insightTitles: Record<InsightColumnKey, string> = {
 };
 
 export const INSIGHT_COLUMN_WIDTHS: Record<InsightColumnKey, number> = {
-    network: 180,
-    followers: 109,
+    network: 170,
+    followers: 105,
     postlink: 101,
     screenshot: 101,
-    impressions: 103,
+    impressions: 117,
     cpm: 103,
     likes: 90,
     comments: 103,

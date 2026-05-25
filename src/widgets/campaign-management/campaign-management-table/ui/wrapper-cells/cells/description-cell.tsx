@@ -56,14 +56,10 @@ export const DescriptionCell = React.memo(function DescriptionCell({
         [setSelectedPd, onOpenChange, isLocked],
     );
 
-    /**
-     * Главное:
-     * completed/closed => показываем только выбранный description.
-     * Никакого dropdown, даже если descriptions.length > 1.
-     */
+
     if (isLocked || descriptions.length <= 1) {
         return (
-            <div className="no-edit">
+            <div className={group === "press" ? "" : "no-edit"}>
                 {group === "press" || field === "artworkLink" ? (
                     selectedText ? (
                         <Link to={normalizeLink(selectedText)} target="_blank">

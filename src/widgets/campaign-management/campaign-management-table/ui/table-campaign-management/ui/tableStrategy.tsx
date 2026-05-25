@@ -38,7 +38,7 @@ export function TableCampaign<TData>({
                                          emptyText = "No data available",
                                          canEdit = false,
                                          totalPrice = 0,
-                                         totalFollowers = 0,
+                                         totalFollowers,
                                          optionIndex = 0,
                                          getRowKey,
                                          highlightedRowKeys = [],
@@ -84,10 +84,13 @@ export function TableCampaign<TData>({
                                         <div className={styles.headCell}>
                                             {header.isPlaceholder
                                                 ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext(),
-                                                )}
+                                                : <p>
+                                                    {flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext(),
+                                                    )}
+                                                </p>
+                                            }
                                         </div>
                                     </th>
                                 ))}
@@ -152,7 +155,7 @@ export function TableCampaign<TData>({
                                             <span>Price: {totalPrice}{getCurrencySymbol(currency)}</span>
                                         ))}
 
-                                    {index === 1 &&   <span>{totalFollowers ?? 0}</span>}
+                                    {index === 1 &&   <span>{totalFollowers}</span>}
                                 </td>
                             ))}
                         </tr>

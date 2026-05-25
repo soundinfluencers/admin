@@ -52,6 +52,10 @@
   background: var(--light-blue);
   border-bottom: 1px solid var(--blue);
   padding: 0 12px !important;
+  min-height: 36px;
+  height: 36px;
+  vertical-align: middle;
+
   &:not(:first-child) {
     border-left: 1px solid var(--blue);
   }
@@ -61,11 +65,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 36px;
+  height: auto;
 
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
-  line-height: normal;
+  line-height: 16px;
+  text-align: center;
+
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  p {
+    margin: 0;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 16px;
+  }
 
   @include breakpoints.tablet {
     font-size: 14px;
@@ -77,7 +96,9 @@
 
 .td {
   transition: background-color 0.2s ease, color 0.2s ease;
-
+  span{
+    font-size: 15px !important;
+  }
   &:not(:first-child) {
     border-left: 1px solid var(--gradient);
   }
