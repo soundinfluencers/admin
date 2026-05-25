@@ -9,6 +9,7 @@ export const PressContentCell: React.FC<Props> = ({ value }) => {
 
     return (
         <a
+            className='hidden-text tagged-link'
             href={value}
             target="_blank"
             rel="noreferrer"

@@ -76,12 +76,13 @@ export const CampaignManagementTable = ({
             }),
         [group, changeView, canEdit, status],
     );
-
     const totalFollowers = React.useMemo(() => {
+        if (group === "press") return null;
+
         return networks.reduce((sum, account) => {
             return sum + Number(account.followers ?? 0);
         }, 0);
-    }, [networks]);
+    }, [networks, group]);
 
     // const totalPrice = React.useMemo(() => {
     //     return networks.reduce((sum, account) => {
@@ -102,7 +103,7 @@ export const CampaignManagementTable = ({
                 isFetching={false}
                 emptyText="No influencers found"
                 optionIndex={optionIndex}
-                highlightedRowKeys={recentlyAddedAccountKeys}
+                highlightedRowKeys={[]}
                 deletingRowKey={deletingAccountKey}
                 getRowKey={(row) => String((row as { accountKey: string }).accountKey)}
             />

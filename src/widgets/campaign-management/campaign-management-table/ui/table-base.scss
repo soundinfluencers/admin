@@ -340,6 +340,7 @@
   }
 
   .isDate {
+    max-width: 65px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -660,7 +661,7 @@
   max-width: 250px;
 }
 .hidden-text-user {
-  font-size: 14px;
+  font-size: 15px;
   max-width: 120px;
   white-space: nowrap;
   overflow: hidden;

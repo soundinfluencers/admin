@@ -89,10 +89,13 @@ export function TableCampaignInsight<TData>({
                                         <div className={styles.headCell}>
                                             {header.isPlaceholder
                                                 ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext(),
-                                                )}
+                                                : <p>
+                                                    {flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext(),
+                                                    )}
+                                                </p>
+                                            }
                                         </div>
                                     </th>
                                 ))}
