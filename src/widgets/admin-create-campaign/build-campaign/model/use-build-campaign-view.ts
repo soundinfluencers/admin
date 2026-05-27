@@ -20,6 +20,9 @@ import {useDebouncedValue} from "@/widgets/admin-create-campaign/build-campaign/
 import {
     usePromoAccountsByFiltersQuery, useSearchPromoAccountsQuery
 } from "@/entities/admin-create-campaign/promo-accounts/api/promo-account.queries.ts";
+import {
+    useCampaignBuilderStore
+} from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.store.ts";
 
 const DEFAULT_PROMO_CARDS_LIMIT = 24;
 
@@ -71,7 +74,9 @@ export const useBuildCampaignView = () => {
     const [limit, setLimit] = React.useState(DEFAULT_PROMO_CARDS_LIMIT);
     const [isSmall, setIsSmall] = React.useState(false);
     const [isLoadingMore, setIsLoadingMore] = React.useState(false);
-
+    const setSelectedCurrencyToStore = useCampaignBuilderStore(
+        (s) => s.actions.setSelectedCurrency,
+    );
     const {
         search,
         setSearch,
@@ -97,7 +102,9 @@ export const useBuildCampaignView = () => {
         selectedFilterIds,
         setSelectedFilterIds,
     } = useBuildCampaignParams();
-
+    React.useEffect(() => {
+        setSelectedCurrencyToStore(selectedCurrency?.key ?? "€");
+    }, [selectedCurrency, setSelectedCurrencyToStore]);
     const [initialSections, setInitialSections] = React.useState<
         CampaignFilterSection[]
     >([]);

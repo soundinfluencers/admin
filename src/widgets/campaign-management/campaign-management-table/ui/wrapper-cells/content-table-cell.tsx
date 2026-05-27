@@ -47,6 +47,11 @@ export const ContentTableCell: React.FC<Props> = ({
     const isCompleted = normalizedStatus === "completed";
     const canChangeContent = canEdit && !isCompleted;
 
+    const selectedCampaignContentItem =
+        row.account?.selectedCampaignContentItem ??
+        row.selectedCampaignContentItem ??
+        null;
+
     const setSelectedContent = React.useCallback(
         (nextIndex: number | ((prev: number) => number)) => {
             if (isCompleted) return;
@@ -57,9 +62,19 @@ export const ContentTableCell: React.FC<Props> = ({
                     : nextIndex;
 
             const nextItem = row.platformItems?.[resolvedIndex];
-            const nextDesc = nextItem?.descriptions?.[0];
 
             if (!nextItem) return;
+
+            const currentDescriptionId =
+                selectedCampaignContentItem?.descriptionId;
+
+            const sameDescription = nextItem?.descriptions?.find((desc: any) => {
+                return String(desc?._id) === String(currentDescriptionId);
+            });
+
+            const fallbackDescription = nextItem?.descriptions?.[0];
+
+            const nextDesc = sameDescription ?? fallbackDescription;
 
             setAccountSelectedContent(row.accountKey, {
                 campaignContentItemId: String(nextItem._id ?? ""),
@@ -71,6 +86,7 @@ export const ContentTableCell: React.FC<Props> = ({
             row.selectedContentIndex,
             row.platformItems,
             row.accountKey,
+            selectedCampaignContentItem,
             setAccountSelectedContent,
         ],
     );
@@ -144,6 +160,7 @@ export const ContentTableCell: React.FC<Props> = ({
             media0={row.selectedItem?.mediaCache?.items?.[0]}
             group={row.group}
             status={normalizedStatus}
+            canEdit={false}
         />
     );
 };

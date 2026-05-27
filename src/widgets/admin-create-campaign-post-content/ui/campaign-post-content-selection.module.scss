@@ -127,6 +127,9 @@
 
   .groupSection{
     .groupBody{
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       margin-top: 8px;
       margin-left: 32px;
     }
@@ -224,6 +227,7 @@
     font-size: 20px;
     line-height: 100%;
     margin: 0;
+    text-align: end;
 
     @media (max-width: 500px) {
       font-size: 16px;

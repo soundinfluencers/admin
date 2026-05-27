@@ -11,6 +11,7 @@ type Props = {
     accounts: CampaignPostContentAccount[];
     totalPrice: number;
     onEditSelection: () => void;
+    currency?: string;
 };
 
 type SelectionGroup = {
@@ -22,14 +23,15 @@ type SelectionGroup = {
 
 const formatPrice = (value?: number | string) => {
     if (value === undefined || value === null || value === "") return "";
-    return `${value}€`;
+    return `${value}`;
 };
 
 export const CampaignPostContentSelection: React.FC<Props> = ({
                                                                   accounts,
                                                                   totalPrice,
-                                                                  onEditSelection,
+                                                                  onEditSelection,currency
                                                               }) => {
+    console.log(accounts)
     const groups: SelectionGroup[] = [
         {
             key: "instagram-creators",
@@ -133,7 +135,7 @@ export const CampaignPostContentSelection: React.FC<Props> = ({
                 </div>
 
                 <div className={styles.accountPrice}>
-                    <span>{formatPrice(item.price)}</span>
+                    <span>{formatPrice(item.price)}{currency}</span>
                 </div>
             </div>
         );
@@ -176,7 +178,7 @@ export const CampaignPostContentSelection: React.FC<Props> = ({
             </div>
 
             <div className={styles.selectionFooter}>
-                <h2>Total price: {totalPrice}€</h2>
+                <h2>Total price: {totalPrice}{currency}</h2>
             </div>
         </aside>
     );

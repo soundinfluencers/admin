@@ -17,6 +17,9 @@ import type {
 } from "../model/campaign-post-content.types";
 import {getSocialMediaIconPostContent} from "@/shared/libs/get-social-media-icon.ts";
 import type {TSocialMedia} from "@/shared/types/types.ts";
+import {
+    useCampaignBuilderStore
+} from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.store.ts";
 
 type Props = {
     accounts: CampaignPostContentAccount[];
@@ -46,6 +49,7 @@ export const CampaignPostContentPage: React.FC<Props> = ({
         defaultBlocks,
         defaultCampaignContent,
     });
+    const selectedCurrency = useCampaignBuilderStore((s) => s.selectedCurrency);
 
     const mainBlocks = vm.blocks.filter((item) => item.group === "main");
     const musicBlocks = vm.blocks.filter((item) => item.group === "music");
@@ -322,6 +326,7 @@ export const CampaignPostContentPage: React.FC<Props> = ({
                     </div>
 
                     <CampaignPostContentSelection
+                        currency={selectedCurrency}
                         accounts={accounts}
                         totalPrice={totalPrice}
                         onEditSelection={() => navigate(-1)}
