@@ -7,7 +7,6 @@ import type {
 } from "@/features/influencers/influencer-account-link-editor/model/influencer-account-link-editor.schema.ts";
 import type { TSocialMediaValue } from "@/entities/influencers/model/influencers.constants.ts";
 
-import close from "@/assets/icons/x.svg";
 import s from './influencer-account-link-editor.module.scss';
 
 interface EditInfluencerAccountLinkProps {
@@ -47,8 +46,7 @@ export const InfluencerAccountLinkEditor: React.FC<EditInfluencerAccountLinkProp
   } = methods;
 
   return (
-    <Modal onClose={onClose}>
-
+    <Modal onClose={onClose} isShownCloseButton>
       <Form
         className={s.editor}
         methods={methods}
@@ -80,23 +78,7 @@ export const InfluencerAccountLinkEditor: React.FC<EditInfluencerAccountLinkProp
             {isPending ? 'Save...' : 'Save new link'}
           </Button>
         </div>
-
       </Form>
-
-      <button
-        className={s.closeBtn}
-        onClick={onClose}
-        type="button"
-        aria-label="Close modal"
-      >
-        <img
-          className={s.closeIcon}
-          src={close}
-          alt="Close modal"
-          width={24}
-          height={24}
-        />
-      </button>
     </Modal>
   );
 };

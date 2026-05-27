@@ -14,13 +14,15 @@
   line-height: normal;
   font-weight: 400;
 
-  color: var(--black);
+  >span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    user-select: none;
+  }
 
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  user-select: none;
+  color: var(--black);
 
   @include breakpoints.tablet {
     gap: 8px;

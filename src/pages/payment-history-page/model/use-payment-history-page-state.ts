@@ -25,11 +25,22 @@ export const usePaymentHistoryPageState = () => {
   const [searchValue, setSearchValue] = useState(query);
   const debouncedSearchValue = useDebounce(searchValue, 400);
 
-  const normalizedSearch = debouncedSearchValue.trim();
-
   useEffect(() => {
+    const normalizedSearch = debouncedSearchValue.trim();
+    const normalizedQuery = query.trim();
+
+    if (normalizedSearch === normalizedQuery) return;
+
     void setQuery(normalizedSearch, { history: "replace" });
-  }, [debouncedSearchValue, normalizedSearch, setQuery]);
+  }, [debouncedSearchValue, query, setQuery]);
+
+  // Sync local input value when query changes externally (e.g. browser back/forward)
+  useEffect(() => {
+    if (query.trim() !== searchValue.trim()) {
+      setSearchValue(query);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
   const queryParams: Omit<
     TGetPaymentHistoryParams,
@@ -37,7 +48,7 @@ export const usePaymentHistoryPageState = () => {
   > = {
     campaignsTake: 10,
     accountsTake: 10,
-    search: normalizedSearch || undefined,
+    search: query.trim() || undefined,
     socialMedia: undefined,
     effectiveStatus: undefined,
   };

@@ -18,8 +18,21 @@ export const useInfluencersHistoryPageState = () => {
   const debouncedSearchValue = useDebounce(searchValue, 400);
 
   useEffect(() => {
-    void setQuery(debouncedSearchValue.trim(), { history: "replace" });
-  }, [debouncedSearchValue, setQuery]);
+    const normalizedSearch = debouncedSearchValue.trim();
+    const normalizedQuery = query.trim();
+
+    if (normalizedSearch === normalizedQuery) return;
+
+    void setQuery(normalizedSearch, { history: "replace" });
+  }, [debouncedSearchValue, query, setQuery]);
+
+  // Sync local input value when query changes externally (e.g. browser back/forward)
+  useEffect(() => {
+    if (query.trim() !== searchValue.trim()) {
+      setSearchValue(query);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);

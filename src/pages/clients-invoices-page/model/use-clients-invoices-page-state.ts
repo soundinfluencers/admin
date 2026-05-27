@@ -36,6 +36,14 @@ export const useClientsInvoicesPageState = () => {
     }
   }, [debouncedSearchValue, query, page, setPage, setQuery]);
 
+  // Sync local input value when query changes externally (e.g. browser back/forward)
+  useEffect(() => {
+    if (query.trim() !== searchValue.trim()) {
+      setSearchValue(query);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
   };

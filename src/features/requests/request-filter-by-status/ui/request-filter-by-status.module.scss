@@ -1,0 +1,62 @@
+@use "@/app/styles/utils/mixins" as mixins;
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.root {
+  display: flex;
+  overflow: hidden;
+  align-self: stretch;
+
+  border: 1px solid var(--gradient);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.item {
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  padding: 8px 16px;
+  gap: 8px;
+
+  @include breakpoints.tablet {
+    padding: 5px 8px;
+  }
+}
+
+.item + .item {
+  border-left: 1px solid var(--gradient);
+}
+
+.filter {
+  @include mixins.reset-button;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: var(--text-md);
+  color: var(--light-gray-20);
+
+  transition: color var(--transition-base);
+
+  @include mixins.hover {
+    color: var(--black-blue);
+  }
+}
+
+.indicator {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--blue);
+  transform: scale(0);
+  transition: transform var(--transition-fast);
+  will-change: transform;
+}
+
+.active {
+  transform: scale(1);
+  color: var(--black-blue);
+}

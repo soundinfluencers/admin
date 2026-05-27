@@ -20,14 +20,13 @@ import { InfluencerHistoryDetailsPage } from "@/pages/influencer-history/influen
 import { InfluencerInvoicesPage } from "@/pages/influencer-invoices-page";
 import { ClientsInvoicesPage } from "@/pages/clients-invoices-page";
 import { PaymentHistoryPage } from "@/pages/payment-history-page";
-import {AdminCreateCampaignPage} from "@/pages/admin-create-campaign/ui/admin-create-campaign-page.tsx";
-import {AdminCreateCampaignPostContentPage} from "@/pages/admin-create-campaign-post-content";
+import { AdminCreateCampaignPage } from "@/pages/admin-create-campaign/ui/admin-create-campaign-page.tsx";
+import { AdminCreateCampaignPostContentPage } from "@/pages/admin-create-campaign-post-content";
 import {
-  AdminCreateCampaignStrategyPage
+  AdminCreateCampaignStrategyPage,
 } from "@/pages/admin-create-campaign-strategy/ui/admin-create-campaign-strategy-page.tsx";
-
 import { InfluencersOffersPage } from "@/pages/influencers-offers-page";
-import { NewClientRequestPage, RequestsPage } from "@/pages/requests-pages";
+import { RequestsPage } from "@/pages/requests-page";
 
 export const ROUTER = createBrowserRouter([
   {
@@ -74,8 +73,8 @@ export const ROUTER = createBrowserRouter([
                       { index: true, element: <CampaignManagment/> },
                       {
                         path: "add-account",
-                        element: <AdminCreateCampaignPage />,
-                      }
+                        element: <AdminCreateCampaignPage/>,
+                      },
                     ],
                   },
                 ],
@@ -84,12 +83,12 @@ export const ROUTER = createBrowserRouter([
               {
                 path: "dashboard/create-new-campaign",
                 children: [
-                  { index: true, element: <AdminCreateCampaignPage /> },
+                  { index: true, element: <AdminCreateCampaignPage/> },
                   {
                     path: "content",
                     children: [
-                      { index: true, element: <AdminCreateCampaignPostContentPage /> },
-                      { path: "strategy", element: <AdminCreateCampaignStrategyPage /> },
+                      { index: true, element: <AdminCreateCampaignPostContentPage/> },
+                      { path: "strategy", element: <AdminCreateCampaignStrategyPage/> },
                     ],
                   },
                 ],
@@ -108,10 +107,6 @@ export const ROUTER = createBrowserRouter([
                   {
                     index: true, element: <RequestsPage/>,
                   },
-                  {
-                    path: 'new-client/:requestId',
-                    element: <NewClientRequestPage/>
-                  }
                 ],
               },
 
@@ -140,7 +135,7 @@ export const ROUTER = createBrowserRouter([
                 path: "dashboard/payments-history",
                 children: [
                   {
-                    index: true, element: <PaymentHistoryPage />,
+                    index: true, element: <PaymentHistoryPage/>,
                   },
                 ],
               },

@@ -20,12 +20,15 @@ export const useClientsPageState = () => {
   const debouncedSearchValue = useDebounce(searchValue, 400);
 
   useEffect(() => {
-    if (debouncedSearchValue !== query) {
-      void setQuery(debouncedSearchValue || "", { history: "replace" });
+    const normalizedSearch = debouncedSearchValue.trim();
+    const normalizedQuery = query.trim();
 
-      if (page !== 1) {
-        void setPage(1, { history: "replace" });
-      }
+    if (normalizedSearch === normalizedQuery) return;
+
+    void setQuery(normalizedSearch, { history: "replace" });
+
+    if (page !== 1) {
+      void setPage(1, { history: "replace" });
     }
   }, [
     debouncedSearchValue,
@@ -35,16 +38,20 @@ export const useClientsPageState = () => {
     setPage,
   ]);
 
+  // Sync local input value when query changes externally (e.g. browser back/forward)
   useEffect(() => {
-    setSearchValue(query);
+    if (query.trim() !== searchValue.trim()) {
+      setSearchValue(query);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
   };
 
-  const queryParams: TGetClientsParams = query
-    ? { limit, search: query }
+  const queryParams: TGetClientsParams = query.trim()
+    ? { limit, search: query.trim() }
     : { page, limit };
 
   return {
