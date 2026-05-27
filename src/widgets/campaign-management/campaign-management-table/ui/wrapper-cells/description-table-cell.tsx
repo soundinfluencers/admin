@@ -1,4 +1,5 @@
 // @ts-nocheck
+
 import React from "react";
 
 import type {
@@ -67,6 +68,7 @@ export const DescriptionTableCell: React.FC<Props> = ({
             if (isCompleted) return;
 
             const item = row.platformItems?.[row.selectedContentIndex];
+
             if (!item) return;
 
             setAccountSelectedContent(row.accountKey, {
@@ -110,6 +112,7 @@ export const DescriptionTableCell: React.FC<Props> = ({
             group={row.group}
             field={field}
             status={normalizedStatus}
+            canEdit={false}
         />
     );
 };

@@ -28,7 +28,7 @@ export const FooterSummary: React.FC = () => {
 
     const selectedCards = useCampaignManagementAddAccountsStore((s) => s.selectedCards);
     const clearSelectedCards = useCampaignManagementAddAccountsStore((s) => s.clearSelectedCards);
-
+    const selectedCurrency = useCampaignBuilderStore((s) => s.selectedCurrency);
     const editable = useCampaignManagementStore((s) => s.editable);
     const addAccounts = useCampaignManagementStore((s) => s.addAccounts);
     const addContentItem = useCampaignManagementStore((s) => s.addContentItem);
@@ -132,7 +132,7 @@ export const FooterSummary: React.FC = () => {
                 <img src={plus} alt="" />
 
                 <p>
-                    Total: <span className={styles.count}>{summaryTotalPrice}€</span>
+                    Total: <span className={styles.count}>{summaryTotalPrice}{selectedCurrency}</span>
                 </p>
             </div>
 

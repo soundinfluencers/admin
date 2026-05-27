@@ -301,14 +301,14 @@ export const insightTitles: Record<InsightColumnKey, string> = {
 };
 
 export const INSIGHT_COLUMN_WIDTHS: Record<InsightColumnKey, number> = {
-    network: 170,
+    network: 160,
     followers: 105,
     postlink: 101,
     screenshot: 101,
     impressions: 117,
     cpm: 103,
     likes: 90,
-    comments: 103,
+    comments: 113,
     saves: 90,
     shares: 90,
     status: 95,

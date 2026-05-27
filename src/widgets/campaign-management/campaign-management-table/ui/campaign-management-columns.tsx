@@ -120,10 +120,6 @@ export const getCampaignManagementColumns = ({
 
     const isCompleted = normalizedStatus === "completed";
 
-    /**
-     * В completed нельзя выбирать другие descriptions.
-     * Даже если canEdit=true, description/content selection должен быть read-only.
-     */
     const canEditDescription = canEdit && !isCompleted;
     const canEditContent = canEdit && !isCompleted;
 
@@ -152,7 +148,10 @@ export const getCampaignManagementColumns = ({
         ),
 
         date: createColumn("date", group, widths.date, ({ row }) => (
-            <DateTableCell row={row.original} canEdit={canEdit && !isCompleted} />
+            <DateTableCell
+                row={row.original}
+                canEdit={canEdit && !isCompleted}
+            />
         )),
 
         content: createColumn("content", group, widths.content, ({ row }) => (
