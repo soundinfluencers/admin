@@ -15,6 +15,7 @@ type Params = {
     accounts: Account[];
     content: ContentItem[];
     submittedAt?: string | Date | null;
+    currency?: string;
 };
 
 export const buildCampaignBarData = ({
@@ -22,6 +23,7 @@ export const buildCampaignBarData = ({
                                          accounts,
                                          content,
                                          submittedAt,
+                                         currency
                                      }: Params) => {
     const totalFollowers = accounts.reduce((sum, account) => {
         return sum + Number(account.followers ?? 0);
@@ -38,7 +40,7 @@ export const buildCampaignBarData = ({
 
     return {
         submittedLabel,
-        budgetLabel: `Budget: ${Number(totalPrice ?? 0)}€`,
+        budgetLabel: `Budget: ${Number(totalPrice ?? 0)}${currency}`,
         reachLabel: `Reach: ${formatFollowers(totalFollowers)} followers`,
         postsLabel: `Posts: ${postsCount}`,
         videosLabel: `Video: ${videosCount}`,

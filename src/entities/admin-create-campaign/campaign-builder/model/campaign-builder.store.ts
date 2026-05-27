@@ -11,6 +11,7 @@ const initialState = {
     selectedAccounts: [],
     campaignContent: [],
     totalPrice: 0,
+    selectedCurrency: "€",
     postContentDraft: null,
     blocksDraft: null,
 } satisfies Omit<CampaignBuilderStore, "actions">;
@@ -25,7 +26,7 @@ export const useCampaignBuilderStore = create<CampaignBuilderStore>()(
 
             actions: {
                 setCampaignName: (value) => set({ campaignName: value }),
-
+                setSelectedCurrency: (value) => set({ selectedCurrency: value }),
                 setSelectedPromoCardIds: (ids) => set({ selectedPromoCardIds: ids }),
 
                 togglePromoCardId: (id) =>
@@ -168,6 +169,7 @@ export const useCampaignBuilderStore = create<CampaignBuilderStore>()(
                 totalPrice: state.totalPrice,
                 postContentDraft: state.postContentDraft,
                 blocksDraft: state.blocksDraft,
+                selectedCurrency: state.selectedCurrency,
             }),
             version: 1,
         },

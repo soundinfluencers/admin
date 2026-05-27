@@ -35,6 +35,8 @@ export const AdminCreateCampaignStrategyPage = () => {
     const accounts = useCampaignBuilderStore((s) => s.selectedAccounts);
     const content = useCampaignBuilderStore((s) => s.campaignContent);
     const totalPrice = useCampaignBuilderStore((s) => s.totalPrice);
+    const selectedCurrency = useCampaignBuilderStore((s) => s.selectedCurrency);
+
     const reset = useCampaignBuilderStore((s) => s.actions.reset);
 
     const setAccountDateRequest = useCampaignBuilderStore(
@@ -84,6 +86,7 @@ export const AdminCreateCampaignStrategyPage = () => {
                 accounts,
                 content,
                 submittedAt: new Date(),
+                currency: selectedCurrency
             }),
         [totalPrice, accounts, content],
     );
@@ -166,6 +169,8 @@ export const AdminCreateCampaignStrategyPage = () => {
                                 totalPrice={totalPrice}
                                 actions={actions}
                                 insights={insights}
+                                currency={selectedCurrency}
+
                             />
                         )}
 
@@ -179,6 +184,8 @@ export const AdminCreateCampaignStrategyPage = () => {
                                 totalPrice={totalPrice}
                                 actions={actions}
                                 insights={insights}
+                                currency={selectedCurrency}
+
                             />
                         )}
 
@@ -192,6 +199,8 @@ export const AdminCreateCampaignStrategyPage = () => {
                                 totalPrice={totalPrice}
                                 actions={actions}
                                 insights={insights}
+                                currency={selectedCurrency}
+
                             />
                         )}
 
@@ -205,6 +214,8 @@ export const AdminCreateCampaignStrategyPage = () => {
                                 totalPrice={totalPrice}
                                 actions={actions}
                                 insights={insights}
+                                currency={selectedCurrency}
+
                             />
                         )}
 
@@ -218,6 +229,7 @@ export const AdminCreateCampaignStrategyPage = () => {
                                 totalPrice={totalPrice}
                                 actions={actions}
                                 insights={insights}
+                                currency={selectedCurrency}
                             />
                         )}
                     </div>

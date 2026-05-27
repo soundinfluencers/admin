@@ -48,6 +48,8 @@ export type CampaignBuilderState = {
     campaignContent: CampaignContentItem[];
     totalPrice: number;
 
+    selectedCurrency: string;
+
     postContentDraft: Record<string, unknown> | null;
     blocksDraft: any[] | null;
 };
@@ -65,7 +67,7 @@ export type CampaignBuilderActions = {
         accountId: string,
         selectedCampaignContentItem: SelectedCampaignContentRef,
     ) => void;
-
+    setSelectedCurrency: (value: string) => void;
     setAccountDateRequest: (accountId: string, dateRequest: string) => void;
 
     setCampaignContent: (items: CampaignContentItem[]) => void;

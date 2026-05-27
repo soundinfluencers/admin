@@ -18,6 +18,7 @@ type Props = {
 
     setSelectedPd: (v: number) => void;
     status?: string;
+    canEdit?: boolean;
 };
 
 export const DescriptionCell = React.memo(function DescriptionCell({
@@ -30,13 +31,16 @@ export const DescriptionCell = React.memo(function DescriptionCell({
                                                                        group,
                                                                        field,
                                                                        status,
+                                                                       canEdit = false,
                                                                    }: Props) {
     const descriptions = platformItems?.[selectedContent]?.descriptions ?? [];
 
     const normalizedStatus = String(status ?? "").toLowerCase();
+
     const isLocked =
         normalizedStatus === "closed" ||
-        normalizedStatus === "completed";
+        normalizedStatus === "completed" ||
+        !canEdit;
 
     const selectedDescription = descriptions?.[selectedPd] ?? null;
     const selectedText = String(selectedDescription?.description ?? "");
@@ -55,7 +59,6 @@ export const DescriptionCell = React.memo(function DescriptionCell({
         },
         [setSelectedPd, onOpenChange, isLocked],
     );
-
 
     if (isLocked || descriptions.length <= 1) {
         return (
