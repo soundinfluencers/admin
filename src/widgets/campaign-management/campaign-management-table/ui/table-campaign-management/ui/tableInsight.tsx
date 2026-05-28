@@ -1,185 +1,186 @@
 import {
-    type ColumnDef,
-    flexRender,
-    getCoreRowModel,
-    getSortedRowModel,
-    useReactTable,
-    type SortingState,
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type SortingState,
 } from "@tanstack/react-table";
 import styles from "./table.module.scss";
 import React from "react";
 import { Link } from "react-router-dom";
-import plus from "@/widgets/campaign-management/campaign-management-table/ui/table-campaign-management/ui/assets/plus.svg";
+import plus
+  from "@/widgets/campaign-management/campaign-management-table/ui/table-campaign-management/ui/assets/plus.svg";
 
-import {getCurrencySymbol} from "@/entities/campaign-managment-add-accounts/model/add-accounts.types.ts";
+import { getCurrencySymbol } from "@/entities/campaign-managment-add-accounts/model/add-accounts.types.ts";
 
 interface InsightTotals {
-    followers?: number;
-    impressions?: number;
-    likes?: number;
-    comments?: number;
-    saves?: number;
-    shares?: number;
+  followers?: number;
+  impressions?: number;
+  likes?: number;
+  comments?: number;
+  saves?: number;
+  shares?: number;
 }
 
 interface TableInsightProps<TData> {
-    data: TData[];
-    columns: ColumnDef<TData>[];
-    isManualPagination?: boolean;
-    isFetching?: boolean;
-    emptyText?: string;
-    getRowKey?: (row: TData) => string;
-    totals?: InsightTotals;
-    canManageAccounts?: boolean;
-    campaignId?: string;
-    statusParam?: string | null;
-    optionIndex?: number;
-    totalPrice?: number | null;
-    currency?: string;
+  data: TData[];
+  columns: ColumnDef<TData>[];
+  isManualPagination?: boolean;
+  isFetching?: boolean;
+  emptyText?: string;
+  getRowKey?: (row: TData) => string;
+  totals?: InsightTotals;
+  canManageAccounts?: boolean;
+  campaignId?: string;
+  statusParam?: string | null;
+  optionIndex?: number;
+  totalPrice?: number | null;
+  currency?: string;
 }
 
 export function TableCampaignInsight<TData>({
-                                                data,
-                                                columns,
-                                                isManualPagination = false,
-                                                isFetching = false,
-                                                emptyText = "No data available",
-                                                getRowKey,
-                                                totals,
-                                                canManageAccounts = false,
-                                                campaignId = "",
-                                                statusParam = null,
-                                                optionIndex = 0,
-                                                totalPrice,currency
-                                            }: TableInsightProps<TData>) {
-    "use no memo";
+  data,
+  columns,
+  isManualPagination = false,
+  isFetching = false,
+  emptyText = "No data available",
+  getRowKey,
+  totals,
+  canManageAccounts = false,
+  campaignId = "",
+  statusParam = null,
+  optionIndex = 0,
+  totalPrice, currency,
+}: TableInsightProps<TData>) {
+  "use no memo";
 
-    const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
-    const table = useReactTable({
-        data,
-        columns,
-        state: {
-            sorting,
-        },
-        onSortingChange: setSorting,
-        getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        manualPagination: isManualPagination,
-    });
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    manualPagination: isManualPagination,
+  });
 
-    const rows = table.getRowModel().rows;
+  const rows = table.getRowModel().rows;
 
-    return (
-        <div className={styles.tableWrapper}>
-            <div className={styles.scrollWrapper}>
-                <div className={styles.tableInner}>
-                    {isFetching && rows.length > 0 && <div className={styles.overlay} />}
+  return (
+    <div className={styles.tableWrapper}>
+      <div className={styles.scrollWrapper}>
+        <div className={styles.tableInner}>
+          {isFetching && rows.length > 0 && <div className={styles.overlay}/>}
 
-                    <table className={styles.table}>
-                        <thead>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <tr key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
-                                    <th
-                                        key={header.id}
-                                        className={styles.th}
-                                        style={{ width: header.getSize() }}
-                                    >
-                                        <div className={styles.headCell}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : <p>
-                                                    {flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext(),
-                                                    )}
-                                                </p>
-                                            }
-                                        </div>
-                                    </th>
-                                ))}
-                            </tr>
-                        ))}
-                        </thead>
+          <table className={styles.table}>
+            <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className={styles.th}
+                    style={{ width: header.getSize() }}
+                  >
+                    <div className={styles.headCell}>
+                      {header.isPlaceholder
+                        ? null
+                        : <p>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                        </p>
+                      }
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            ))}
+            </thead>
 
-                        <tbody className={styles.tbody}>
-                        {rows.length === 0 ? (
-                            <tr>
-                                <td colSpan={columns.length} className={styles.stateCell}>
-                                    {isFetching ? "Loading..." : emptyText}
-                                </td>
-                            </tr>
-                        ) : (
-                            rows.map((row) => {
-                                const rowData = row.original;
-                                const rowKey = getRowKey ? getRowKey(rowData) : "";
+            <tbody className={styles.tbody}>
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className={styles.stateCell}>
+                  {isFetching ? "Loading..." : emptyText}
+                </td>
+              </tr>
+            ) : (
+              rows.map((row) => {
+                const rowData = row.original;
+                const rowKey = getRowKey ? getRowKey(rowData) : "";
 
-                                return (
-                                    <tr key={rowKey || row.id} className={styles.tr}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <td key={cell.id} className={styles.td}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext(),
-                                                )}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                );
-                            })
+                return (
+                  <tr key={rowKey || row.id} className={styles.tr}>
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className={styles.td}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
                         )}
-                        </tbody>
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
+            )}
+            </tbody>
 
-                        <tfoot className={styles.footer}>
-                        <tr>
-                            {table.getFlatHeaders().map((header, index) => {
-                                const columnId = header.id;
-                                const withoutBorder = index === 2 || index === 3;
+            <tfoot className={styles.footer}>
+            <tr>
+              {table.getFlatHeaders().map((header, index) => {
+                const columnId = header.id;
+                const withoutBorder = index === 2 || index === 3;
 
-                                return (
-                                    <td
-                                        key={header.id}
-                                        className={[
-                                            !withoutBorder ? styles.td : "",
-                                            !withoutBorder ? styles.footerCell : "",
-                                            withoutBorder ? styles.footerNoBorderCell : "",
-                                            canManageAccounts && index === 0 ? styles.influencerButton : "",
-                                        ]
-                                            .filter(Boolean)
-                                            .join(" ")}
-                                        style={{ width: header.getSize() }}
-                                    >
-                                        {columnId === "network" &&
-                                            (canManageAccounts ? (
-                                                <Link
-                                                    to={`/dashboard/campaigns/campaign-management/add-account?id=${campaignId}&status=${statusParam}&optionIndex=${optionIndex}`}
-                                                    className={styles.iconWrapper}
-                                                >
-                                                    <img src={plus} alt="" />
-                                                    Add influencer
-                                                </Link>
-                                            ) : (
-                                                <span>
+                return (
+                  <td
+                    key={header.id}
+                    className={[
+                      !withoutBorder ? styles.td : "",
+                      !withoutBorder ? styles.footerCell : "",
+                      withoutBorder ? styles.footerNoBorderCell : "",
+                      canManageAccounts && index === 0 ? styles.influencerButton : "",
+                    ]
+                    .filter(Boolean)
+                    .join(" ")}
+                    style={{ width: header.getSize() }}
+                  >
+                    {columnId === "network" &&
+                      (canManageAccounts ? (
+                        <Link
+                          to={`/dashboard/campaigns/campaign-management/add-account?id=${campaignId}&status=${statusParam}&optionIndex=${optionIndex}`}
+                          className={styles.iconWrapper}
+                        >
+                          <img src={plus} alt=""/>
+                          Add influencer
+                        </Link>
+                      ) : (
+                        <span>
                                 Price: {totalPrice}
-                                                    {getCurrencySymbol(currency)}
+                          {getCurrencySymbol(currency)}
                             </span>
-                                            ))}
+                      ))}
 
-                                        {columnId === "followers" && <span>{totals?.followers ?? 0}</span>}
-                                        {columnId === "impressions" && <span>{totals?.impressions ?? 0}</span>}
-                                        {columnId === "likes" && <span>{totals?.likes ?? 0}</span>}
-                                        {columnId === "comments" && <span>{totals?.comments ?? 0}</span>}
-                                        {columnId === "saves" && <span>{totals?.saves ?? 0}</span>}
-                                        {columnId === "shares" && <span>{totals?.shares ?? 0}</span>}
-                                    </td>
-                                );
-                            })}
-                        </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
+                    {columnId === "followers" && <span>{totals?.followers ?? 0}</span>}
+                    {columnId === "impressions" && <span>{totals?.impressions ?? 0}</span>}
+                    {columnId === "likes" && <span>{totals?.likes ?? 0}</span>}
+                    {columnId === "comments" && <span>{totals?.comments ?? 0}</span>}
+                    {columnId === "saves" && <span>{totals?.saves ?? 0}</span>}
+                    {columnId === "shares" && <span>{totals?.shares ?? 0}</span>}
+                  </td>
+                );
+              })}
+            </tr>
+            </tfoot>
+          </table>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

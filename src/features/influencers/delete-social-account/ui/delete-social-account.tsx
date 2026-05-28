@@ -1,14 +1,13 @@
 import React from "react";
-import type { TSocialMediaValue } from "@/entities/influencers/model/influencers.constants.ts";
-
-import close from "@/assets/icons/x.svg";
-
-import s from './delete-social-account.module.scss';
+import { useNavigate } from "react-router-dom";
+import { useDeleteSocialAccountMutation } from "@/entities/influencers/api/use-delete-social-account-mutation.ts";
 import { Modal } from "@/shared/ui/modal/modal.tsx";
 import { Button } from "@/shared/ui";
-import { useDeleteSocialAccountMutation } from "@/entities/influencers/api/use-delete-social-account-mutation.ts";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+
+import type { TSocialMediaValue } from "@/entities/influencers/model/influencers.constants.ts";
+
+import s from './delete-social-account.module.scss';
 
 interface DeleteSocialAccountProps {
   influencerId: string;
@@ -45,7 +44,7 @@ export const DeleteSocialAccount: React.FC<DeleteSocialAccountProps> = ({
   };
 
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={onClose} isShownCloseButton>
 
       <div className={s.content}>
         <div className={s.header}>
@@ -74,21 +73,6 @@ export const DeleteSocialAccount: React.FC<DeleteSocialAccountProps> = ({
           </Button>
         </div>
       </div>
-
-      <button
-        className={s.closeBtn}
-        onClick={onClose}
-        type="button"
-        aria-label="Close modal"
-      >
-        <img
-          className={s.closeIcon}
-          src={close}
-          alt="Close modal"
-          width={24}
-          height={24}
-        />
-      </button>
     </Modal>
   );
 };

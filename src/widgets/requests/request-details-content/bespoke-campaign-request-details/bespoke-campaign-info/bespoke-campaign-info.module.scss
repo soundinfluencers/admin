@@ -1,0 +1,31 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+@use '@/app/styles/utils/variables' as variables;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 16px;
+
+  border-radius: variables.$radius-sm;
+  border: 1px solid #E5E7EB;
+  background: #F5FAFF;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  width: clamp(100px, 30vw, 127px);
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.item {
+  color: var(--navy-blue);
+}

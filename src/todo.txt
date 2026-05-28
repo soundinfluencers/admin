@@ -1,0 +1,8 @@
+1. Fix phone input for client details ✅
+2. Rebuild invoice document + invoice management system
+3. Simple rebuild Modal component ✅
+4. Rebuild table component + add base cell for table
+5. Add skeleton loaders for all pages
+
+Modal places:
+- invoice details

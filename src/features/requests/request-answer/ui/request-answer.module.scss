@@ -1,0 +1,60 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+@use '@/app/styles/utils/variables' as variables;
+
+.cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn {
+  width: 100%;
+  font-weight: 500;
+}
+
+.approve {
+  border: 1px solid #A4F4CF;
+  background: #ECFDF5;
+  color: #007A55;
+
+  &:not(:disabled) {
+    @include mixins.hover {
+      background: #CAEEDD;
+    }
+
+    &:active {
+      background: #effaf3;
+      color: #009a69;
+    }
+  }
+
+  &:disabled {
+    background-color: var(--disabled-button-1);
+    color: #b8b8b8;
+    border: 1px solid transparent;
+  }
+}
+
+.reject {
+  border: 1px solid #FFC9C9;
+  background: #FEF2F2;
+  color: #C10007;
+
+  &:not(:disabled) {
+    @include mixins.hover {
+      background: #F2D8D8;
+    }
+
+    &:active {
+      background: #FEF2F2;
+      color: #ff5257;
+    }
+  }
+
+  &:disabled {
+    background-color: var(--disabled-button-1);
+    color: #b8b8b8;
+    border: 1px solid transparent;
+  }
+}

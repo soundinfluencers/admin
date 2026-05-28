@@ -4,8 +4,6 @@ import { Modal } from "@/shared/ui/modal/modal.tsx";
 import { Button } from "@/shared/ui";
 import { toast } from "react-toastify";
 
-import close from '@/assets/icons/x.svg';
-
 import s from './import-xlsx.module.scss'
 
 interface ImportXlsxProps {
@@ -34,7 +32,7 @@ export const ImportXlsx: React.FC<ImportXlsxProps> = ({
   });
 
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={onClose} isShownCloseButton>
       <div className={s.dropzone} {...getRootProps()}>
         <div className={s.header}>
           <h2 className={s.title}>Drag and drop your .xlsx file here</h2>
@@ -54,15 +52,6 @@ export const ImportXlsx: React.FC<ImportXlsxProps> = ({
           <input {...getInputProps()} />
         </div>
       </div>
-      <button className={s.closeBtn} onClick={onClose}>
-        <img
-          className={s.closeIcon}
-          src={close}
-          alt="close"
-          width={24}
-          height={24}
-        />
-      </button>
     </Modal>
   )
 };

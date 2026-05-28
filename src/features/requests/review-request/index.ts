@@ -1,1 +1,1 @@
-export { ReviewRequest } from './ui/review-request';
+export { ReviewRequest } from './ui/review-request/review-request.tsx';

@@ -79,6 +79,13 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
     }
   }, [handleCloseEditor]);
 
+  const sanitize = useCallback((value: string): string => {
+    if (fieldKey === "phone") {
+      return value.replace(/[a-zA-Zа-яА-ЯёЁ]/g, "");
+    }
+    return value;
+  }, [fieldKey]);
+
   const displayValue = normalizedInitialValue.trim() ? normalizedInitialValue : "—";
 
   return (
@@ -94,7 +101,7 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
           type="text"
           value={draft}
           placeholder="Enter client field"
-          onChange={(e) => setDraft(e.target.value)}
+          onChange={(e) => setDraft(sanitize(e.target.value))}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
           disabled={isPending}

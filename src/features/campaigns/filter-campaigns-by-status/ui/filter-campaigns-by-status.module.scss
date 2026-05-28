@@ -53,6 +53,8 @@
 }
 
 .indicator {
+  position: relative;
+  top: 1px;
   display: inline-block;
   width: 6px;
   height: 6px;

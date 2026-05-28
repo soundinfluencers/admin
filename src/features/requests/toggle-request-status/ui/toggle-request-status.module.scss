@@ -1,0 +1,28 @@
+@use "@/app/styles/utils/mixins" as mixins;
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.toggleButton {
+  @include mixins.reset-button;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 24px;
+
+  border: 1px solid var(--white-gray-20);
+  border-radius: 8px;
+  background: var(--white);
+
+  font-size: 15px;
+
+  transition: background var(--transition-fast);
+
+  @include breakpoints.tablet {
+    padding: 6px 20px;
+    font-size: 14px;
+  }
+}
+
+.active {
+  background: var(--light-blue);
+}

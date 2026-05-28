@@ -1,0 +1,36 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.modal {
+  padding: 40px 16px;
+  align-items: flex-start;
+}
+
+.content {
+  width: min(700px, calc(100vw - 32px));
+  box-sizing: border-box;
+  max-height: calc(100vh - 80px);
+
+  padding: 32px;
+  background: var(--white);
+
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0;
+
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--blue);
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--white-gray-20);
+  }
+}

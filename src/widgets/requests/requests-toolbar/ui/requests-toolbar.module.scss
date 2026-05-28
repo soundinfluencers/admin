@@ -1,0 +1,47 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(200px, 640px) auto auto;
+  grid-template-areas: "search filters toggle";
+  column-gap: 24px;
+  row-gap: 16px;
+
+  @media screen and (max-width: 900px) {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "search toggle"
+      "filters filters";
+  }
+
+  @include breakpoints.tablet {
+    column-gap: 16px;
+  }
+}
+
+.input {
+  padding: 8px 16px 8px 48px;
+}
+
+.search {
+  grid-area: search;
+}
+
+.filters {
+  min-height: 40px;
+  flex: 1;
+  display: flex;
+  grid-area: filters;
+}
+
+.toggle {
+  min-width: 150px;
+  flex: 1;
+  display: flex;
+  grid-area: toggle;
+
+  @include breakpoints.tablet {
+    min-width: 140px;
+  }
+}

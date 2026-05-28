@@ -48,8 +48,12 @@ export const useInfluencersListPageState = () => {
     }
   }, [debouncedSearchValue, query, page, setPageQuery, setQuery]);
 
+  // Sync local input value when query changes externally (e.g. browser back/forward)
   useEffect(() => {
-    setSearchValue(query);
+    if (query.trim() !== searchValue.trim()) {
+      setSearchValue(query);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   const handlePlatformChange = (nextPlatform: TSocialMediaValue | null) => {

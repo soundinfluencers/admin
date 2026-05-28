@@ -13,27 +13,32 @@ interface ConfirmCampaignReportSentProps {
   className?: string;
 }
 
-export const ConfirmCampaignReportSent: React.FC<ConfirmCampaignReportSentProps> = ({ campaignId, status, className }) => {
+export const ConfirmCampaignReportSent: React.FC<ConfirmCampaignReportSentProps> = ({
+  campaignId,
+  status,
+  className,
+}) => {
   const { mutate, isPending } = useUpdateCampaignMutation();
 
   const handleClick = () => {
     mutate({
-      campaignId,
-      status,
-      dto: {
-        reportSent: true,
-      }
-    },
+        campaignId,
+        status,
+        dto: {
+          reportSent: true,
+        },
+      },
       {
         onSuccess: () => {
           toast("Campaign report marked as sent",
-            { type: "success",
+            {
+              type: "success",
               position: "top-right",
-              autoClose: 3000
-            }
+              autoClose: 3000,
+            },
           );
         },
-      }
+      },
     );
   };
 

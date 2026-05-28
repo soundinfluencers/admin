@@ -1,10 +1,14 @@
 @use '@/app/styles/utils/breakpoints' as breakpoints;
 
-.breadcrumbs {}
+.breadcrumbs {
+  @include breakpoints.mobile {
+    display: none;
+  }
+}
 
 .list {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   align-items: center;
 
   @include breakpoints.tablet {
@@ -14,7 +18,7 @@
 
 .item {
   display: flex;
-  gap: 8px;
+  gap: 4px;
   align-items: center;
 
   @include breakpoints.tablet {
@@ -23,22 +27,21 @@
 }
 
 .link {
+  font-size: 15px;
   @include breakpoints.tablet {
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 
 .current {
   user-select: none;
-
+  font-size: 15px;
   @include breakpoints.tablet {
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 
 .icon {
-  @include breakpoints.tablet {
-    width: 20px;
-    height: 20px;
-  }
+  width: 20px;
+  height: 20px;
 }

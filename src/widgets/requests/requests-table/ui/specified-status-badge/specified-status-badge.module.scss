@@ -1,0 +1,63 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.badge {
+  min-width: 125px;
+  margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+
+  border-radius: 8px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.label {
+  font-weight: 500;
+}
+
+.pending {
+  background: #FFFBEB;
+  border: 1px solid #FEE685;
+
+  .dot {
+    background: #FE9A00;
+  }
+
+  .label {
+    color: #BB4D00;
+  }
+}
+
+.approved {
+  background: #ECFDF5;
+  border: 1px solid #A4F4CF;
+
+  .dot {
+    background: #00BC7D;
+  }
+
+  .label {
+    color: #007A55;
+  }
+}
+
+.rejected {
+  background: #FEF2F2;
+  border: 1px solid #FFC9C9;
+
+  .dot {
+    background: #FB2C36;
+  }
+
+  .label {
+    color: #C10007;
+  }
+}
