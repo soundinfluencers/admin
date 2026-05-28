@@ -7,7 +7,7 @@ import {
     formatFollowers,
 } from "@/entities/campaign-managment/model/campaign-management.helpers.ts";
 import { getCampaignBudget } from "@/entities/campaign-managment/model/campaign-budget.helpers.ts";
-import { useCampaignManagementStore } from "@/entities/campaign-managment/store/campaign-management.store.ts";
+// import { useCampaignManagementStore } from "@/entities/campaign-managment/store/campaign-management.store.ts";
 import {getCurrencySymbol} from "@/entities/campaign-managment-add-accounts/model/add-accounts.types.ts";
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
 };
 
 export const StrategyBar = ({ campaign, isLockedStatus, status }: Props) => {
-    const setCampaignPrice = useCampaignManagementStore((s) => s.setCampaignPrice);
+    // const setCampaignPrice = useCampaignManagementStore((s) => s.setCampaignPrice);
 
 
     const budget = getCampaignBudget(campaign);
