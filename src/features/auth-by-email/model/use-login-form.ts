@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/app/providers/auth-provider/use-auth.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import  { loginFormSchema, type TLoginFormValues } from "@/features/auth-by-email/model/login-form.schema.ts";
+import { notifyApiError } from "@/app/api/errors/notify.ts";
 
 export const useLoginForm = () => {
   const { login } = useAuth();
@@ -28,6 +29,8 @@ export const useLoginForm = () => {
       });
 
       console.log("Login successful");
+    } catch (error) {
+      notifyApiError(error);
     } finally {
       setIsPending(false);
     }

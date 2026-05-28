@@ -1,20 +1,17 @@
 import React, { useState } from "react";
 import { RequestDetailsModal } from "../request-details-modal/request-details-modal.tsx";
 import type { IRequest } from "@/entities/requests";
-import type { TRequestType } from "@/entities/requests/model/requests.types.ts";
 
 import s from './review-request.module.scss';
 
 type TSelectedRequest = Pick<IRequest, 'requestId' | 'type'>;
 
 interface ReviewRequestProps {
-  requestId: string;
-  type: TRequestType;
+  request: IRequest;
 }
 
 export const ReviewRequest: React.FC<ReviewRequestProps> = ({
-  requestId,
-  type,
+  request,
 }) => {
   const [selectedRequest, setSelectedRequest] = useState<TSelectedRequest | null>(null);
 
@@ -23,11 +20,11 @@ export const ReviewRequest: React.FC<ReviewRequestProps> = ({
       <button
         type="button"
         className={s.reviewRequest}
-        aria-label={`Review request ${type}`}
+        aria-label={`Review request ${request.type}`}
         onClick={() => {
           setSelectedRequest({
-            requestId,
-            type,
+            requestId: request.requestId,
+            type: request.type,
           })
         }}
       >
@@ -36,8 +33,7 @@ export const ReviewRequest: React.FC<ReviewRequestProps> = ({
 
       {selectedRequest && (
         <RequestDetailsModal
-          requestId={selectedRequest.requestId}
-          requestType={selectedRequest.type}
+          request={request}
           onClose={() => setSelectedRequest(null)}
         />
       )}

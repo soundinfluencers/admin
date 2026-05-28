@@ -1,0 +1,26 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+@use '@/app/styles/utils/variables' as variables;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  width: clamp(89px, 30vw, 110px);
+
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.value {
+  color: var(--navy-blue);
+}

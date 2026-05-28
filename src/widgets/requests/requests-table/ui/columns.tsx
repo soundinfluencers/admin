@@ -86,8 +86,7 @@ export const columns: ColumnDef<IRequest>[] = [
       return (
         <BaseTableCell>
           <ReviewRequest
-            requestId={row.original.requestId}
-            type={row.original.type}
+            request={row.original}
           />
         </BaseTableCell>
       );

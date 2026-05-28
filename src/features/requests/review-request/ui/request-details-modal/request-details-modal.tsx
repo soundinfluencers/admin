@@ -1,25 +1,22 @@
 import React from "react";
-import { useGetDetailsRequestQuery } from "@/entities/requests";
+import { type IRequest, useGetDetailsRequestQuery } from "@/entities/requests";
 import { Modal } from "@/shared/ui/modal/modal.tsx";
 import { RequestDetailsContent } from "@/widgets/requests";
-import type { TRequestType } from "@/entities/requests/model/requests.types.ts";
 
 import s from './request-details-modal.module.scss';
 
 interface RequestDetailsModalProps {
-  requestId: string;
-  requestType: TRequestType;
+  request: IRequest;
   onClose: () => void;
 }
 
 export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
-  requestId,
-  requestType,
+  request,
   onClose,
 }) => {
   const { data, isPending, isError } = useGetDetailsRequestQuery({
-    requestId,
-    requestType,
+    requestId: request.requestId,
+    requestType: request.type,
   });
 
   return (
@@ -36,7 +33,11 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
       )}
 
       {!isPending && data && (
-        <RequestDetailsContent data={data} onCloseModal={onClose}/>
+        <RequestDetailsContent
+          data={data}
+          request={request}
+          onCloseModal={onClose}
+        />
       )}
     </Modal>
   );

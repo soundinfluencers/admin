@@ -1,3 +1,6 @@
+import type { TCurrency, TSocialMedia } from "@/shared/types/types.ts";
+import type { ISocialAccount } from "@/entities/influencers/model/social-account.types.ts";
+
 export const ADMIN_REQUEST_TYPES = [
   'NEW_CLIENT_REQUEST',
   'NEW_INFLUENCER_REQUEST',
@@ -53,6 +56,8 @@ export interface IGetListRequestsResponse {
 }
 
 //DETAILS REQUESTS
+
+//New client request details
 export interface INewClientRequestDetailsDto {
   requestId: string;
   group: TRequestFilterStatus;
@@ -69,6 +74,22 @@ export interface INewClientRequestDetailsDto {
   referralCode: string;
 }
 
+//Campaign request details
+export type TCampaignPaymentMethod =
+  | "bank_card"
+  | "paypal"
+  | "bank_transfer_uk"
+  | "bank_transfer_eu"
+  | "bank_transfer_international";
+
+export interface ICampaignItem {
+  socialMedia: Exclude<TSocialMedia, 'multipromo'>;
+  mainLink: string;
+  additionalBrief: string;
+  descriptions: string[];
+  accounts: string[];
+}
+
 export interface ICampaignRequestDetailsDto {
   requestId: string;
   group: TRequestFilterStatus;
@@ -77,55 +98,13 @@ export interface ICampaignRequestDetailsDto {
   clientId: string;
   firstName: string;
   lastName: string;
-  
+  email: string;
+  campaignName: string;
+  paymentMethod: TCampaignPaymentMethod;
+  items: ICampaignItem[];
 }
 
-//   "data": {
-//     "requestId": "6a15b08194f617ea9e21bea2",
-//     "group": "CAMPAIGN",
-//     "type": "CAMPAIGN_REQUEST",
-//     "date": "26.05.26",
-//     "clientId": "66a747a89c6e78a6cffb83b4",
-//     "firstName": "Eric",
-//     "lastName": "Ericovich",
-//     "email": "test@gmail.com",
-//     "campaignName": "awddaw",
-//     "paymentMethod": "bank_transfer_uk",
-//     "items": [
-//     {
-//       "socialMedia": "instagram",
-//       "mainLink": "awdawd",
-//       "additionalBrief": "",
-//       "descriptions": [
-//         "awda"
-//       ],
-//       "accounts": [
-//         "Techno Nation",
-//         "No Sleep Techno",
-//         "Techno Style",
-//         "Rave Girls Official",
-//         "Techno MOB",
-//         "Techno TV",
-//         "Traffic Mix",
-//         "Techno Music World",
-//         "Best Drops Ever",
-//         "BPM Culture",
-//         "Fiesta Techno",
-//         "Techno Philosophy",
-//         "Rave Is Here",
-//         "Your Techno",
-//         "Deep Tech House",
-//         "Sound of House Music",
-//         "Rave Tribes",
-//         "Techno Of Insta",
-//         "Techno is love",
-//         "Music Appeal",
-//         "Rave Residence",
-//         "Track ID Blog",
-//         "SUB:CULTURE"
-//       ]
-//     },
-
+// Bespoke campaign request
 export interface IBespokeCampaignRequestDetailsDto {
   requestId: string;
   group: TRequestFilterStatus;
@@ -144,14 +123,57 @@ export interface IBespokeCampaignRequestDetailsDto {
   extraBriefs: string;
 }
 
+// Change pric request
+export interface IPriceUpdateRequestDetailsDto {
+  requestId: string;
+  group: TRequestFilterStatus;
+  type: "PRICE_UPDATE_REQUEST";
+  date: string;
+  influencerId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  accountId: string;
+  username: string;
+  profileLink: string;
+  socialMedia: Exclude<TSocialMedia, 'multipromo'>;
+  currentPrice: number;
+  currentCurrency: TCurrency;
+  newPrice: number;
+  newCurrency: TCurrency;
+}
+
+// New influencer request
+export type TInfluencerAccount = Omit<ISocialAccount,
+  | "influencerId"
+  | "isHidden"
+  | "engagementRate"
+  | "averageViews"
+  | "publicPrice"
+>
+
+export interface INewInfluencerRequestDetailsDto {
+  requestId: string;
+  group: TRequestFilterStatus;
+  type: "NEW_INFLUENCER_REQUEST";
+  date: string;
+  influencerId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  accounts: TInfluencerAccount[];
+}
+
 export interface IAdminRequestDetailsByType {
   NEW_CLIENT_REQUEST: INewClientRequestDetailsDto;
-  NEW_INFLUENCER_REQUEST: any;
-  CAMPAIGN_REQUEST: any;
+  NEW_INFLUENCER_REQUEST: INewInfluencerRequestDetailsDto;
+  CAMPAIGN_REQUEST: ICampaignRequestDetailsDto;
   BESPOKE_CAMPAIGN_REQUEST: IBespokeCampaignRequestDetailsDto;
   PROPOSAL_CAMPAIGN_REQUEST: any;
   NEW_SOCIAL_ACCOUNT_REQUEST: any;
-  PRICE_UPDATE_REQUEST: any;
+  PRICE_UPDATE_REQUEST: IPriceUpdateRequestDetailsDto;
 }
 
 export type TAdminRequestDetails =

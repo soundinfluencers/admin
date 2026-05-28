@@ -1,37 +1,43 @@
 import React from "react";
 import { NewClientRequestDetails } from "./new-client-request-details/new-client-request-details.tsx";
 import { BespokeCampaignRequestDetails } from "./bespoke-campaign-request-details/bespoke-campaign-request-details.tsx";
-import type { TAdminRequestDetails } from "@/entities/requests/model/requests.types.ts";
+import { CampaignRequestDetails } from "./campaign-request-details/campaign-request-details.tsx";
+import { PriceChangeRequestDetails } from "./price-change-request-details/price-change-request-details.tsx";
+import { NewInfluencerRequestDetails } from "./new-influencer-request-details/ui/new-influencer-request-details.tsx";
+import type { IRequest, TAdminRequestDetails } from "@/entities/requests/model/requests.types.ts";
 
 interface RequestDetailsContentProps {
+  request: IRequest;
   data: TAdminRequestDetails;
   onCloseModal: () => void;
 }
 
 export const RequestDetailsContent: React.FC<RequestDetailsContentProps> = ({
+  request,
   data,
   onCloseModal,
 }) => {
   switch (data.type) {
     case 'NEW_CLIENT_REQUEST':
-      return <NewClientRequestDetails data={data} onCloseModal={onCloseModal}/>;
+      return <NewClientRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
 
-    // case 'NEW_INFLUENCER_REQUEST':
-    //   return <NewInfluencerRequestDetails data={data} />;
-    //
-    // case 'CAMPAIGN_REQUEST':
-    //   return <CampaignRequestDetails data={data} />;
-    //
+    case 'NEW_INFLUENCER_REQUEST':
+      return <NewInfluencerRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+
+    case 'CAMPAIGN_REQUEST':
+      return <CampaignRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+
     case 'BESPOKE_CAMPAIGN_REQUEST':
-      return <BespokeCampaignRequestDetails data={data} onCloseModal={onCloseModal}/>;
+      return <BespokeCampaignRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+
     // case 'PROPOSAL_CAMPAIGN_REQUEST':
-    //   return <ProposalCampaignRequestDetails data={data} />;
-    //
+    //   return <ProposalCampaignRequestDetails request={request} data={data} />;
+
     // case 'NEW_SOCIAL_ACCOUNT_REQUEST':
-    //   return <NewSocialAccountRequestDetails data={data} />;
-    //
-    // case 'PRICE_UPDATE_REQUEST':
-    //   return <PriceUpdateRequestDetails data={data} />;
+    //   return <NewSocialAccountRequestDetails request={request} data={data} />;
+
+    case 'PRICE_UPDATE_REQUEST':
+      return <PriceChangeRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
 
     default:
       return null;
