@@ -414,7 +414,7 @@ export const CampaignManagment = () => {
         },
         [setView, searchParams, setSearchParams],
     );
-    const isLockedStatus = status === "distributing" || status === "completed" || status === "distributing" || status === 'pending';
+    const isLockedStatus = status === "distributing" || status === "completed" || status === "distributing" || status === 'pending' || status === 'under_review';
     const renderStrategyTables = () => (
         <>
             {grouped.main.networks.length > 0 && (
