@@ -1,7 +1,7 @@
 import React from "react";
 import { Table } from "@/shared/ui";
 import { CLIENTS_INVOICES_COLUMNS } from "@/widgets/clients-invoices/clients-invoices-table/ui/columns.tsx";
-import type { IClientInvoiceTableRowDto } from "@/entities/invoices/model/clients-invoices.types.ts";
+import type { IClientInvoiceTableRowDto } from "@/entities/invoices/client-invoice/model/client-invoice.types.ts";
 
 interface ClientsInvoicesTableProps {
   data: IClientInvoiceTableRowDto[];

@@ -1,0 +1,52 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+
+  @include breakpoints.tablet {
+    font-size: 10px;
+  }
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(180deg, #EBECFF 0%, #DFF0FF 100%) border-box;
+
+  @include breakpoints.tablet {
+    padding: 8px;
+  }
+}
+
+.variants {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.bottom {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  @include breakpoints.mobile {
+    flex-direction: column;
+  }
+}

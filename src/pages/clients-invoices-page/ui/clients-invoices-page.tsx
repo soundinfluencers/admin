@@ -1,5 +1,5 @@
-import { useClientsInvoicesPageState } from "@/pages/clients-invoices-page/model/use-clients-invoices-page-state.ts";
-import { useClientsInvoicesQuery } from "@/pages/clients-invoices-page/model/use-clients-invoices-query.ts";
+import { useClientsInvoicesPageState } from "../model/use-clients-invoices-page-state.ts";
+import { useClientsInvoicesQuery } from "@/entities/invoices/client-invoice";
 
 import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";

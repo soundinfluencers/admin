@@ -1,0 +1,11 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.field {
+  font-size: 13px;
+  font-weight: 400;
+
+  @include breakpoints.tablet {
+    font-size: 10px;
+  }
+}
+

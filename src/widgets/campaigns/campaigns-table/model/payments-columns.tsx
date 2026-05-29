@@ -163,7 +163,7 @@ export const paymentsCampaignColumns: ColumnDef<ICampaign>[] = [
 
   {
     accessorKey: "invoiceId",
-    header: "Invoice Link",
+    header: "Invoice",
     size: 71,
     minSize: 71,
     maxSize: 71,

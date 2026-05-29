@@ -1,0 +1,83 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.from,
+.to {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  @include breakpoints.tablet {
+    gap: 4px;
+  }
+}
+
+.to {
+  align-items: flex-end;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.listTo {
+  align-items: flex-end;
+  text-align: end;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 400;
+
+  @include breakpoints.tablet {
+    font-size: 12px;
+  }
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--gray-dark);
+}
+
+.blockTitle {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--gray-dark);
+
+  @include breakpoints.tablet {
+    font-size: 11px;
+  }
+}
+
+.contacts {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.contactsRight {
+  flex-direction: row;
+}
+
+.contactLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.contact {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--gray-dark);
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  aspect-ratio: 1 / 1;
+}
+

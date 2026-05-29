@@ -1,7 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateInvoiceById } from "@/entities/invoices/api/update-invoice.ts";
-import { influencersInvoicesQueryKeys } from "@/entities/invoices/model/influencer-invoices.query-keys.ts";
-import type { IInfluencersInvoicesListPayload } from "@/entities/invoices/model/influencer-invoices.types.ts";
+import {
+  influencersInvoicesQueryKeys
+} from "@/entities/invoices/influencer-invoice/api/influencer-invoice.query-keys.ts";
+import type {
+  IInfluencersInvoicesListPayload
+} from "@/entities/invoices/influencer-invoice/model/influencer-invoice.types.ts";
 
 export const useUpdateInvoiceMutation = () => {
   const queryClient = useQueryClient();

@@ -1,0 +1,38 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.btn {
+  flex-shrink: 0;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(180deg, #EBECFF 0%, #DFF0FF 100%) border-box;
+
+  >span {
+    font-size: 14px;
+    @include breakpoints.mobile {
+      font-size: 13px;
+    }
+  }
+
+  opacity: 1;
+  transition: opacity var(--transition-base);
+
+  @include mixins.hover {
+    opacity: 0.8;
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  aspect-ratio: 1 / 1;
+}

@@ -5,7 +5,9 @@ import {
   parseAsString,
   useQueryState,
 } from "nuqs";
-import type { TGetInfluencersInvoicesParams } from "@/entities/invoices/model/influencer-invoices.types.ts";
+import type {
+  TGetInfluencersInvoicesParams
+} from "@/entities/invoices/influencer-invoice/model/influencer-invoice.types.ts";
 
 export const useInfluencerInvoicesPageState = () => {
   const LIMIT = 10;

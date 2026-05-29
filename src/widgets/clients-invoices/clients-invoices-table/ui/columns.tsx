@@ -1,9 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { BaseTableCell } from "@/shared/ui";
+import { INVOICE_STATUS_LABELS } from "@/widgets/clients-invoices/clients-invoices-table/model/client-invoice.helpers.ts";
 import { DownloadInvoicePdf } from "@/features/download-invoice-pdf/download-invoice-pdf.tsx";
-import { OpenClientInvoiceButton } from "@/features/clients-invoices";
+import { EditInvoiceTrigger } from "@/features/edit-invoice";
 import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
-import type { IClientInvoiceTableRowDto } from "@/entities/invoices/model/clients-invoices.types.ts";
+import type { IClientInvoiceTableRowDto } from "@/entities/invoices/client-invoice/model/client-invoice.types.ts";
 
 import s from './clients-invoices-table.module.scss';
 
@@ -91,9 +92,10 @@ export const CLIENTS_INVOICES_COLUMNS: ColumnDef<IClientInvoiceTableRowDto>[] = 
     maxSize: 120,
     cell: ({ row }) => (
       <BaseTableCell className={s.cell}>
-        <OpenClientInvoiceButton
+        <EditInvoiceTrigger
           invoiceId={row.original.invoiceId}
-          invoiceRow={row.original}
+          role={"client"}
+          shortInvoiceId={row.original.shortInvoiceId}
         />
         <DownloadInvoicePdf invoiceId={row.original.invoiceId}/>
       </BaseTableCell>
@@ -107,7 +109,7 @@ export const CLIENTS_INVOICES_COLUMNS: ColumnDef<IClientInvoiceTableRowDto>[] = 
     maxSize: 204,
     cell: ({ row }) => (
       <BaseTableCell>
-        {row.original.status}
+        {INVOICE_STATUS_LABELS[row.original.status]}
       </BaseTableCell>
     ),
   },

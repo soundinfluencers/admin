@@ -1,0 +1,89 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  margin-bottom: 30px;
+
+  @include breakpoints.tablet {
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+}
+
+.logo {
+  margin: 0 auto;
+  width: 240px;
+  height: 24px;
+  object-fit: contain;
+
+  @include breakpoints.tablet {
+    width: 185px;
+    height: 20px;
+  }
+  @include breakpoints.mobile {
+    width: 150px;
+    height: 16px;
+  }
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.invoiceNumber {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  @include breakpoints.tablet {
+    gap: 4px;
+  }
+}
+
+.label {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--gray-dark);
+
+  @include breakpoints.tablet {
+    font-size: 16px;
+  }
+  @include breakpoints.mobile {
+    font-size: 14px;
+  }
+}
+
+.number {
+  position: relative;
+  top: 3px;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--black);
+
+  @include breakpoints.tablet {
+    top: 2px;
+  }
+  @include breakpoints.mobile {
+    top: 1px;
+  }
+}
+
+.date {
+  position: relative;
+  top: 3px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--black);
+
+  @include breakpoints.tablet {
+    top: 2px;
+  }
+  @include breakpoints.mobile {
+    top: 1px;
+  }
+}

@@ -166,13 +166,27 @@ export interface INewInfluencerRequestDetailsDto {
   accounts: TInfluencerAccount[];
 }
 
+// New social account request
+export interface INewInfluencerAccountRequestDetailsDto {
+  requestId: string;
+  group: TRequestFilterStatus;
+  type: "NEW_SOCIAL_ACCOUNT_REQUEST";
+  date: string;
+  influencerId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  accountDetails: TInfluencerAccount;
+}
+
 export interface IAdminRequestDetailsByType {
   NEW_CLIENT_REQUEST: INewClientRequestDetailsDto;
   NEW_INFLUENCER_REQUEST: INewInfluencerRequestDetailsDto;
   CAMPAIGN_REQUEST: ICampaignRequestDetailsDto;
   BESPOKE_CAMPAIGN_REQUEST: IBespokeCampaignRequestDetailsDto;
   PROPOSAL_CAMPAIGN_REQUEST: any;
-  NEW_SOCIAL_ACCOUNT_REQUEST: any;
+  NEW_SOCIAL_ACCOUNT_REQUEST: INewInfluencerAccountRequestDetailsDto;
   PRICE_UPDATE_REQUEST: IPriceUpdateRequestDetailsDto;
 }
 

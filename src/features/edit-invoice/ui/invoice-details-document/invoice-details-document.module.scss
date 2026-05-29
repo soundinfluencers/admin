@@ -1,0 +1,12 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.root {
+  font-family: Inter, sans-serif;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

@@ -60,7 +60,7 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
   const renderValue = (key: typeof ACCOUNT_INFO_FIELDS[number]['key']): React.ReactNode => {
     switch (key) {
       case 'price':
-        return formatCurrency(account.price, account.currency);
+        return formatCurrency(account.price, 'EUR');
       case 'initialPrice':
         return formatCurrency(account.initialPrice, account.currency);
       case 'logoUrl':

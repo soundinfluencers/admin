@@ -13,13 +13,13 @@
 
   padding: 32px;
   background: var(--white);
+  border-radius: 0;
 
   justify-content: flex-start;
   align-items: stretch;
   gap: 0;
 
   overflow-y: auto;
-  scrollbar-gutter: stable;
 
   &::-webkit-scrollbar {
     width: 6px;
