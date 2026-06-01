@@ -13,9 +13,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ rightSlot }) => {
       <Container>
         <div className={styles.appHeaderInner}>
           <Logo />
-          {rightSlot && (
-            <>{rightSlot}</>
-          )}
+          {rightSlot && (rightSlot)}
         </div>
       </Container>
     </header>

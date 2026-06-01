@@ -33,9 +33,10 @@ export const CampaignInfo: React.FC<CampaignInfoProps> = ({
       <ul className={s.fields}>
         {CAMPAIGN_INFO_FIELDS.map(({ key, label }) => {
           const isMultiDescription = key === 'descriptions' && item.descriptions.length > 1;
+          const isMultiAccounts = key === "accounts" && item.accounts.length > 5;
 
           return (
-            <li key={key} className={clsx(s.field, (key === 'accounts' || isMultiDescription) && s.field_top)}>
+            <li key={key} className={clsx(s.field, (isMultiAccounts || isMultiDescription) && s.field_top)}>
               <span className={s.label}>{label}</span>
               <span className={clsx(s.value, key === 'descriptions' && s.value_column)}>
                 {renderValue(key, item)}

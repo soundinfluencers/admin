@@ -68,6 +68,8 @@ export const INFLUENCER_HISTORY_DETAILS_COLUMNS: ColumnDef<IInfluencerHistoryDet
       return (
         <CampaignCell
           value={item.campaignName}
+          campaignId={item.campaignId}
+          campaignStatus={item.campaignStatus}
           isStillInCampaign={item.isStillInCampaign}
         />
       );

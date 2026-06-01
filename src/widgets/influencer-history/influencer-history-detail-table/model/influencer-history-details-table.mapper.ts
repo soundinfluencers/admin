@@ -31,6 +31,8 @@ export const mapInfluencerHistoryActionToTableRow = (
 
       isStillInCampaign: null,
       campaignName: null,
+      campaignId: null,
+      campaignStatus: null,
       reward: action.amount,
       paymentMethod: action.paymentMethod,
       statusLabel: null,
@@ -50,6 +52,8 @@ export const mapInfluencerHistoryActionToTableRow = (
 
       isStillInCampaign: action.isStillInCampaign,
       campaignName: action.campaignName,
+      campaignId: action.campaignId,
+      campaignStatus: action.campaignStatus,
       reward: action.reward,
       paymentMethod: null,
       statusLabel: action.statusLabel,

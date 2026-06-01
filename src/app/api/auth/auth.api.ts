@@ -1,10 +1,10 @@
-import { $api } from "@/app/api/http.ts";
+import { $api, $auth } from "@/app/api/http.ts";
 import type { IAdmin, TLoginRequest, TLoginResponse } from "@/app/api/auth/types.ts";
 
 export async function loginApi(data: TLoginRequest): Promise<TLoginResponse> {
   console.log("Logging in with data:", data);
 
-  const response = await $api.post("/auth/login", data);
+  const response = await $auth.post("/auth/login", data);
 
   console.log("Received login response:", response.data.data);
 

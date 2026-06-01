@@ -22,7 +22,7 @@ const CHIP_KEYS = new Set<typeof ACCOUNT_INFO_FIELDS[number]['key']>([
 const COMMUNITY_HIDDEN: Set<typeof ACCOUNT_INFO_FIELDS[number]['key']> = new Set(['creatorCategories']);
 const CREATOR_HIDDEN: Set<typeof ACCOUNT_INFO_FIELDS[number]['key']> = new Set(['musicGenres', 'categories']);
 
-const CHIPS_TOP_THRESHOLD = 3;
+const CHIPS_TOP_THRESHOLD = 6;
 
 export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
   const isCommunity = account.profileCategory === 'community';

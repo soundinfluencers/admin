@@ -6,6 +6,7 @@ export type TInvoiceStatus = "submitted" | "paid";
 export interface IClientInvoiceTableRowDto {
   invoiceId: string;
   shortInvoiceId: string;
+  referenceNumber: string;
   company: string;
   campaignName: string;
   date: string;
