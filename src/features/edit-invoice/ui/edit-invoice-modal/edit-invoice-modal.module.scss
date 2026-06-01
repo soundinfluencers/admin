@@ -1,0 +1,39 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.modal {
+  padding: 40px 16px;
+  align-items: flex-start;
+}
+
+.content {
+  width: min(600px, calc(100vw - 32px));
+  box-sizing: border-box;
+  max-height: calc(100vh - 80px);
+
+  padding: 40px 40px 25px;
+  background: var(--white);
+  border-radius: 0;
+
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0;
+
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--blue);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--white-gray-20);
+  }
+
+  @include breakpoints.tablet {
+    padding: 24px 16px;
+  }
+}

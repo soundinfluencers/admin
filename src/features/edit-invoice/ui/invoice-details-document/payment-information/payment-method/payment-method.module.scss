@@ -1,0 +1,118 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.card {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(180deg, #EBECFF 0%, #DFF0FF 100%) border-box;
+
+  @include breakpoints.tablet {
+    gap: 4px;
+    padding: 8px;
+  }
+}
+
+.method {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--gray-dark);
+
+  @include breakpoints.tablet {
+    font-size: 9px;
+  }
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  aspect-ratio: 1 / 1;
+
+  filter: invert(1);
+
+  @include breakpoints.tablet {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--gray-dark);
+}
+
+.text {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--gray-dark);
+}
+
+// Bank Transfer
+.bankTransferCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  @include breakpoints.tablet {
+    gap: 4px;
+  }
+}
+
+.bankTransferMethod {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  @include breakpoints.tablet {
+    font-size: 10px;
+  }
+}
+
+.bankTransferIcon {
+  width: 24px;
+  height: 24px;
+  aspect-ratio: 1 / 1;
+  filter: invert(1);
+
+  @include breakpoints.tablet {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.bankTransferValue {
+  display: grid;
+  grid-template-columns: minmax(90px, 98px) 1fr;
+  column-gap: 4px;
+}
+
+
+
+

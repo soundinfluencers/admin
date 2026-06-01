@@ -60,6 +60,10 @@
   flex-wrap: wrap;
   gap: 8px;
 
+  min-width: 0;
+  word-break: break-all;
+  overflow-wrap: break-word;
+
   font-size: 15px;
   color: var(--navy-blue);
 

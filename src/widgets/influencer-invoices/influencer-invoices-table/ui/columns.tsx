@@ -1,20 +1,21 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { BaseTableCell } from "@/shared/ui";
 import { PaidStatusCell, } from "@/widgets/influencer-invoices/influencer-invoices-table/ui/paid-status-cell/paid-status-cell.tsx";
-import { OpenInfluencerInvoiceButton } from "@/features/influencer-invoices";
 import { DownloadInvoicePdf } from "@/features/download-invoice-pdf/download-invoice-pdf.tsx";
 import { PAYMENT_METHOD_LABELS } from "@/shared/libs/normalize/payment-method.normalize.ts";
 import {
   SOCIAL_MEDIA_ICONS,
 } from "@/widgets/influencer-invoices/influencer-invoices-table/model/influencer-invoices-table.constants.ts";
 import {
+  getPaymentDetailsLabel,
   INFLUENCER_INVOICES_STATUS_LABEL,
 } from "@/widgets/influencer-invoices/influencer-invoices-table/model/influencer-invoices-table.helper.ts";
 import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
-import { getPaymentDetailsLabel } from "@/widgets/influencer-invoices/invoice-preview/model/invoice-preview.helper.ts";
 
-import type { IInvoiceTableRowDto } from "@/entities/invoices/model/influencer-invoices.types.ts";
+import type { IInvoiceTableRowDto } from "@/entities/invoices/influencer-invoice/model/influencer-invoice.types.ts";
+
 import s from './columns.module.scss';
+import { EditInvoiceTrigger } from "@/features/edit-invoice";
 
 export const INFLUENCERS_INVOICES_COLUMNS: ColumnDef<IInvoiceTableRowDto>[] = [
   {
@@ -183,10 +184,14 @@ export const INFLUENCERS_INVOICES_COLUMNS: ColumnDef<IInvoiceTableRowDto>[] = [
     minSize: 91,
     maxSize: 91,
     cell: ({ row }) => (
-      <BaseTableCell>
-        <OpenInfluencerInvoiceButton
-          invoiceRow={row.original}
+      <BaseTableCell className={s.cell}>
+        <EditInvoiceTrigger
           invoiceId={row.original.invoiceId}
+          shortInvoiceId={row.original.shortInvoiceId}
+          paymentDetails={row.original.paymentDetails}
+          paymentMethod={row.original.paymentMethod}
+          role={"influencer"}
+          className={s.editTrigger}
         />
         <DownloadInvoicePdf invoiceId={row.original.invoiceId}/>
       </BaseTableCell>

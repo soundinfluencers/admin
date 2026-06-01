@@ -1,7 +1,7 @@
 import {
   useInfluencerInvoicesPageState,
 } from "@/pages/influencer-invoices-page/model/use-influencer-invoices-page-state.ts";
-import { useInfluencersInvoicesQuery } from "@/pages/influencer-invoices-page/model/use-influencers-invoices-query.ts";
+import { useInfluencersInvoicesQuery } from "@/entities/invoices/influencer-invoice/api/influencer-invoice.queries.ts";
 
 import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";

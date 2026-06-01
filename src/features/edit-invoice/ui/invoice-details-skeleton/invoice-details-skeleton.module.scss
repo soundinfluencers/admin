@@ -1,0 +1,327 @@
+.root {
+  width: 100%;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.skeleton {
+  display: block;
+  border-radius: 6px;
+  background: #e2e7f0 linear-gradient(
+    90deg,
+    #e2e7f0 0,
+    #edf1f7 40px,
+    #e2e7f0 80px
+  );
+  background-size: 240px 100%;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: -240px 0; }
+  100% { background-position: 240px 0; }
+}
+
+/* Header */
+.header {
+  margin-bottom: 34px;
+}
+
+.logo {
+  width: clamp(140px, 43vw, 240px);
+  height: 24px;
+  margin: 0 auto 34px;
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.invoiceNumber {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.invoiceTitle {
+  width: clamp(50px, 15vw, 82px);
+  height: 24px;
+}
+
+.invoiceNo {
+  width: clamp(46px, 14vw, 76px);
+  height: 12px;
+}
+
+.date {
+  width: clamp(58px, 17vw, 92px);
+  height: 14px;
+}
+
+/* Parties */
+.parties {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.partyBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: clamp(120px, 38vw, 230px);
+}
+
+.partyBlockRight {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.partyTitle {
+  width: clamp(26px, 8vw, 42px);
+  height: 16px;
+  margin-bottom: 4px;
+}
+
+.company {
+  width: clamp(78px, 22vw, 126px);
+  height: 14px;
+}
+
+.lineLg {
+  width: clamp(100px, 33vw, 190px);
+  height: 11px;
+}
+
+.lineMd {
+  width: clamp(80px, 26vw, 150px);
+  height: 11px;
+}
+
+.lineSm {
+  width: clamp(52px, 17vw, 96px);
+  height: 11px;
+}
+
+.contactLine {
+  width: clamp(110px, 36vw, 205px);
+  height: 13px;
+  margin-top: 3px;
+}
+
+/* Balance */
+.balanceCard {
+  min-height: 106px;
+  padding: 12px;
+  border: 1px solid #d9e6ff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.balanceTop {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.balanceLabel {
+  width: clamp(64px, 19vw, 108px);
+  height: 16px;
+}
+
+.receipt {
+  width: clamp(46px, 14vw, 78px);
+  height: 11px;
+}
+
+.balanceBottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.totalDue {
+  width: clamp(44px, 13vw, 72px);
+  height: 14px;
+}
+
+.balanceValue {
+  width: clamp(30px, 8vw, 46px);
+  height: 26px;
+}
+
+/* Table */
+.tableCard {
+  border: 1px solid #d9e6ff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tableHead,
+.tableRow {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 0.8fr 0.7fr 0.7fr;
+  column-gap: clamp(6px, 3vw, 18px);
+  padding: 14px clamp(6px, 2vw, 12px);
+}
+
+.tableHead {
+  border-bottom: 1px solid #e3ebfa;
+}
+
+.tableRow {
+  min-height: 60px;
+  align-items: center;
+  border-bottom: 1px solid #e3ebfa;
+}
+
+.thItem,
+.thProject,
+.thPo,
+.thReach,
+.thTotal {
+  height: 10px;
+}
+
+.thItem    { width: clamp(48px, 17vw, 96px); }
+.thProject { width: clamp(30px, 10vw, 58px); }
+.thPo      { width: clamp(14px, 4vw, 22px); }
+.thReach   { width: clamp(20px, 7vw, 38px); }
+.thTotal   { width: clamp(18px, 6vw, 34px); }
+
+.tdItem    { width: clamp(80px, 28vw, 160px); height: 13px; }
+.tdProject { width: clamp(66px, 23vw, 130px); height: 13px; }
+.tdPo      { width: clamp(18px, 6vw, 32px);   height: 13px; }
+.tdReach   { width: clamp(22px, 8vw, 42px);   height: 13px; }
+.tdTotal   { width: clamp(18px, 6vw, 32px);   height: 13px; }
+
+.tableFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px;
+}
+
+.footerTotal {
+  width: clamp(44px, 13vw, 72px);
+  height: 14px;
+}
+
+/* Influencer Payment */
+.influencerPayment {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.influencerPaymentTitle {
+  width: clamp(80px, 27vw, 148px);
+  height: 16px;
+}
+
+.influencerBankCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.influencerLine1 { width: clamp(140px, 50vw, 280px); height: 12px; }
+.influencerLine2 { width: clamp(160px, 62vw, 340px); height: 12px; }
+.influencerLine3 { width: clamp(100px, 36vw, 200px); height: 12px; }
+.influencerLine4 { width: clamp(80px,  29vw, 160px); height: 12px; }
+.influencerLine5 { width: clamp(60px,  22vw, 120px); height: 12px; }
+.influencerLine6 { width: clamp(110px, 40vw, 220px); height: 12px; }
+.influencerLine7 { width: clamp(70px,  25vw, 140px); height: 12px; }
+
+/* Payment */
+.payment {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paymentTitle {
+  width: clamp(80px, 27vw, 148px);
+  height: 16px;
+  margin: 0 auto;
+}
+
+.bankCard,
+.smallPaymentCard {
+  border: 1px solid #d9e6ff;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.bankCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.methodTitle {
+  width: clamp(90px, 30vw, 168px);
+  height: 15px;
+}
+
+.bankLineLg {
+  width: clamp(160px, 65vw, 360px);
+  height: 12px;
+}
+
+.bankLineMd {
+  height: 12px;
+}
+
+.paymentCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.paymentCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 72px;
+  padding: 10px;
+  border: 1px solid #d9e6ff;
+  border-radius: 8px;
+  background: #f7f9fe;
+}
+
+.cardTitle {
+  width: clamp(40px, 13vw, 70px);
+  height: 12px;
+}
+
+.cardLineLg {
+  width: clamp(60px, 22vw, 120px);
+  height: 10px;
+}
+
+.cardLineMd {
+  width: clamp(46px, 16vw, 90px);
+  height: 10px;
+}
+
+.bottomCards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.smallPaymentCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

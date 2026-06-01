@@ -1,5 +1,5 @@
 import React from "react";
-import { OpenInvoiceButton } from "@/features/manage-invoice";
+import { EditInvoiceTrigger } from "@/features/edit-invoice";
 
 import s from './campaign-invoice-cell.module.scss';
 
@@ -15,9 +15,10 @@ export const CampaignInvoiceCell: React.FC<CampaignInvoiceProps> = ({
   return (
     <div className={s.campaignInvoiceCell}>
       {invoiceId ? (
-        <OpenInvoiceButton
+        <EditInvoiceTrigger
           invoiceId={invoiceId}
-          shortInvoiceNumber={shortInvoiceNumber}
+          role={"client"}
+          shortInvoiceId={String(shortInvoiceNumber)}
         />
         ) : (
         <span className={s.text}>{"—"}</span>

@@ -1,5 +1,6 @@
 import type { TSocialMediaValue } from "@/entities/influencers/model/influencers.constants.ts";
 import type { TPaymentMethod } from "@/shared/types/types.ts";
+import type { TCampaignStatus } from "@/entities/campaign";
 
 export type TActionType = 'invoice' | 'campaign';
 
@@ -26,6 +27,8 @@ export interface IInvoiceAction extends IInfluencerActionBase {
 
 export interface ICampaignAction extends IInfluencerActionBase {
   actionType: "campaign";
+  campaignId: string;
+  campaignStatus: TCampaignStatus;
   campaignName: string;
   reward: number;
   socialMedia: TSocialMediaValue;

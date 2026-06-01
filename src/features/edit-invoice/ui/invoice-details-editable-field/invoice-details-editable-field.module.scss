@@ -1,0 +1,27 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.root {
+  display: block;
+  width: 100%;
+
+  user-select: none;
+  cursor: pointer;
+
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.isDisabled {
+  cursor: auto;
+}
+
+.textInput {
+  @include mixins.reset-input;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  text-align: end;
+}

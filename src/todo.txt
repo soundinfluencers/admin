@@ -1,8 +1,16 @@
 1. Fix phone input for client details ✅
-2. Rebuild invoice document + invoice management system
+2. Rebuild invoice document + invoice management system ✅
 3. Simple rebuild Modal component ✅
 4. Rebuild table component + add base cell for table
-5. Add skeleton loaders for all pages
 
-Modal places:
-- invoice details
+5. Back end:
+1. Add short invoice id for /admin/invoices/{role} ✅
+
+6. UI improvements:
+1. Add skeleton loaders for client details page
+2. Add skeleton loaders for requests details modal
+3. Add skeleton loaders for account details page
+4. Add skeleton loaders for account details edit account page
+5. Add skeleton loaders for influencer history page
+6. Add skeleton loaders for influencer history details page
+7. Add skeleton loaders for initial app load

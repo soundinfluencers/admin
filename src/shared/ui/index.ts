@@ -1,6 +1,7 @@
 export { Container } from './container/container';
 export { Logo } from './logo/logo';
 export { Input } from './input/input';
+export { Modal } from './modal/modal';
 
 export { BaseMaskedPasswordInput } from './form-input/base-masked-password-input/base-masked-password-input';
 export { BaseTextInput } from './form-input/base-text-input/base-text-input';

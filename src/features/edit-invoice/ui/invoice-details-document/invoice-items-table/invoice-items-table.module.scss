@@ -1,0 +1,99 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.wrapper {
+  padding: 12px 8px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(180deg, #EBECFF 0%, #DFF0FF 100%) border-box;
+
+  @include breakpoints.tablet {
+    padding: 8px;
+  }
+
+  @include breakpoints.mobile {
+    padding: 4px;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  @include breakpoints.tablet {
+    gap: 8px;
+  }
+}
+
+.gridRow {
+  display: grid;
+  grid-template-columns:
+    minmax(75px, 190fr)
+    minmax(52px, 139fr)
+    minmax(40px, 73fr)
+    minmax(32px, 35fr)
+    minmax(51px, 62fr);
+  align-items: center;
+  min-width: 0;
+}
+
+.headRow {
+  border-bottom: 1px solid var(--gradient);
+  padding-bottom: 8px;
+  @include breakpoints.tablet {
+    padding-bottom: 4px;
+  }
+}
+
+.headCell {
+  font-size: 9px;
+  font-weight: 500;
+  padding-inline: 4px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  @include breakpoints.tablet {
+    gap: 4px;
+  }
+}
+
+.cell {
+  font-size: 10px;
+  font-weight: 400;
+  padding-inline: 4px;
+
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.input {
+  text-align: left;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+
+  border-top: 1px solid var(--gradient);
+  padding-top: 8px;
+
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-dark);
+
+  @include breakpoints.tablet {
+    padding-top: 4px;
+    font-size: 10px;
+    gap: 8px;
+  }
+}

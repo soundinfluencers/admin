@@ -1,0 +1,35 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 500;
+
+  @include breakpoints.tablet {
+    font-size: 10px;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.methodTitle {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 2px;
+
+  @include breakpoints.tablet {
+    font-size: 10px;
+  }
+}
+
+

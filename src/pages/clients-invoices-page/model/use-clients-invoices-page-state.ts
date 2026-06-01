@@ -5,7 +5,7 @@ import {
   parseAsString,
   useQueryState,
 } from "nuqs";
-import type { TGetClientsInvoicesParams } from "@/entities/invoices/model/clients-invoices.types.ts";
+import type { TGetClientsInvoicesParams } from "@/entities/invoices/client-invoice/model/client-invoice.types.ts";
 
 export const useClientsInvoicesPageState = () => {
   const LIMIT = 10;
