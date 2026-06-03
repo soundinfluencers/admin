@@ -180,11 +180,13 @@ export const normalizeCampaignForEdit = (
             username: toStringSafe(acc?.username),
             followers: Number(acc?.followers ?? 0),
             publicPrice: Number(acc?.publicPrice ?? 0),
+            price: Number(acc?.price ?? 0),
             firstName: toStringSafe(acc?.firstName),
             logoUrl: toStringSafe(acc?.logoUrl ?? ""),
             genres: Array.isArray(acc?.genres) ? acc.genres : [],
             countries: Array.isArray(acc?.countries) ? acc.countries : [],
             statusLabel: toStringSafe(acc?.statusLabel).trim(),
+            phoneNumber: toStringSafe(acc?.phoneNumber ?? ''),
             selectedCampaignContentItem: selected
                 ? {
                     campaignContentItemId: toStringSafe(

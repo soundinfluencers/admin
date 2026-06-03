@@ -23,6 +23,7 @@ import {toast} from "react-toastify";
 import {uploadCampaignFile} from "@/entities/campaign-managment/api/upload-campaign-file.ts";
 import {CircleLoader} from "@/shared/ui/circle-loader/circle-loader.tsx";
 import {
+    buildWhatsAppInfluencerPromoData, buildWhatsAppInfluencerPromoMessage,
     buildWhatsAppPromoData, buildWhatsAppPromoMessage
 } from "@/widgets/campaign-management/campaign-management-table/model/whats-app.helpers.ts";
 import {sendCampaignWhatsAppOne} from "@/entities/campaign-managment/api/campaign-whatsapp.api.ts";
@@ -73,22 +74,24 @@ export const CampaignManagementInsightTable = ({
         isOpen: boolean;
         data: null | {
             influencerName: string;
-            platform: string;
-            page: string;
-            content: string;
-            description: string;
-            storyTag: string;
-            storyRequest: string;
-            storyLink: string;
-            specialRequest: string;
-            reward: string;
+            promos: Array<{
+                influencerName: string;
+                platform: string;
+                page: string;
+                content: string;
+                description: string;
+                storyTag: string;
+                storyLink: string;
+                specialRequest: string;
+                reward: string;
+            }>;
         };
-        account: any | null;
+        accounts: any[];
         isSending: boolean;
     }>({
         isOpen: false,
         data: null,
-        account: null,
+        accounts: [],
         isSending: false,
     });
     const rows = React.useMemo(
@@ -123,17 +126,16 @@ export const CampaignManagementInsightTable = ({
         previewUrl: "",
         isUploading: false,
     });
-    const whatsappFields = [
-        { label: "Platform", value: whatsAppModal.data?.platform },
-        { label: "Page", value: whatsAppModal.data?.page },
-        { label: "Content", value: whatsAppModal.data?.content },
-        { label: "Description", value: whatsAppModal.data?.description },
-        { label: "Story Tag", value: whatsAppModal.data?.storyTag },
-        { label: "Story Request", value: whatsAppModal.data?.storyRequest },
-        { label: "Story Link", value: whatsAppModal.data?.storyLink },
-        { label: "Special request", value: whatsAppModal.data?.specialRequest },
-        { label: "Reward", value: whatsAppModal.data?.reward },
-    ];
+    // const whatsappFields = [
+    //     { label: "Platform", value: whatsAppModal.data?.platform },
+    //     { label: "Page", value: whatsAppModal.data?.page },
+    //     { label: "Content", value: whatsAppModal.data?.content },
+    //     { label: "Description", value: whatsAppModal.data?.description },
+    //     { label: "Story Tag", value: whatsAppModal.data?.storyTag },
+    //     { label: "Story Link", value: whatsAppModal.data?.storyLink },
+    //     { label: "Special request", value: whatsAppModal.data?.specialRequest },
+    //     { label: "Reward", value: whatsAppModal.data?.reward },
+    // ];
     const setAccountInsightField = useCampaignManagementStore(
         (s) => s.setAccountInsightField,
     );
@@ -281,27 +283,40 @@ export const CampaignManagementInsightTable = ({
         (row: CampaignManagementInsightRow) => {
             if (!editable) return;
 
-            const data = buildWhatsAppPromoData({
-                account: row.account,
+            const influencerId = String(row.account?.influencerId ?? "");
+
+            const influencerAccounts = (editable.addedAccounts ?? []).filter(
+                (account: any) =>
+                    String(account?.influencerId ?? "") === influencerId,
+            );
+
+            const accountsForMessage = influencerAccounts.length
+                ? influencerAccounts
+                : [row.account];
+
+            const data = buildWhatsAppInfluencerPromoData({
+                accounts: accountsForMessage,
                 campaignContent: editable.campaignContent,
             });
 
             setWhatsAppModal({
                 isOpen: true,
                 data,
-                account: row.account,
+                accounts: accountsForMessage,
                 isSending: false,
             });
         },
         [editable],
     );
     const handleSendWhatsAppOne = React.useCallback(async () => {
-        if (!whatsAppModal.data || !whatsAppModal.account) return;
+        if (!whatsAppModal.data || !whatsAppModal.accounts.length) return;
 
         if (!realtimeClientId || !isConnected) {
             toast.error("Socket client is not ready");
             return;
         }
+
+        const firstAccount = whatsAppModal.accounts[0];
 
         try {
             setWhatsAppModal((prev) => ({
@@ -309,21 +324,21 @@ export const CampaignManagementInsightTable = ({
                 isSending: true,
             }));
 
-            const message = buildWhatsAppPromoMessage(whatsAppModal.data);
+            const message = buildWhatsAppInfluencerPromoMessage(whatsAppModal.data);
 
             const payload = {
-                influencerId: String(whatsAppModal.account.influencerId ?? ""),
+                influencerId: String(firstAccount.influencerId ?? ""),
                 accountId: String(
-                    whatsAppModal.account.socialAccountId ??
-                    whatsAppModal.account.accountId ??
+                    firstAccount.socialAccountId ??
+                    firstAccount.accountId ??
                     "",
                 ),
-                socialMedia: String(whatsAppModal.account.socialMedia ?? ""),
+                socialMedia: String(firstAccount.socialMedia ?? ""),
                 message,
                 clientId: realtimeClientId,
             };
 
-            console.log("[WHATSAPP ONE PAYLOAD]", payload);
+            console.log("[WHATSAPP INFLUENCER PAYLOAD]", payload);
 
             await sendCampaignWhatsAppOne(payload);
 
@@ -332,7 +347,7 @@ export const CampaignManagementInsightTable = ({
             setWhatsAppModal({
                 isOpen: false,
                 data: null,
-                account: null,
+                accounts: [],
                 isSending: false,
             });
         } catch (error) {
@@ -521,7 +536,7 @@ export const CampaignManagementInsightTable = ({
                         setWhatsAppModal({
                             isOpen: false,
                             data: null,
-                            account: null,
+                            account: [],
                             isSending: false,
                         })
                     }
@@ -544,12 +559,32 @@ export const CampaignManagementInsightTable = ({
                             </div>
 
                             <div className="whatsapp-preview__content">
-                                {whatsappFields.map((field) => (
-                                    <div key={field.label} className="whatsapp-preview__row">
-                                        <p>{field.label}:</p>
-                                        <p>{field.value || "—"}</p>
-                                    </div>
-                                ))}
+                                {whatsAppModal.data.promos.flatMap((promo, index) => {
+                                    const fields = [
+                                        { label: "Platform", value: promo.platform },
+                                        { label: "Page", value: promo.page },
+                                        { label: "Content", value: promo.content },
+                                        { label: "Description", value: promo.description },
+                                        { label: "Story Tag", value: promo.storyTag },
+                                        { label: "Story Link", value: promo.storyLink },
+                                        { label: "Special request", value: promo.specialRequest },
+                                        { label: "Reward", value: promo.reward },
+                                    ];
+
+                                    return [
+
+
+                                        ...fields.map((field) => (
+                                            <div
+                                                key={`promo-${index}-${field.label}`}
+                                                className="whatsapp-preview__row"
+                                            >
+                                                <p>{field.label}:</p>
+                                                <p>{field.value || "—"}</p>
+                                            </div>
+                                        )),
+                                    ];
+                                })}
                             </div>
 
                             <div className="whatsapp-preview__footer">

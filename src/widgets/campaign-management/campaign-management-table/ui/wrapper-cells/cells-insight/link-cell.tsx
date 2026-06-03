@@ -22,13 +22,14 @@ export const LinkCell = ({
 
     const onOpen = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!canOpen) return;
-        window.open(url as string, "_blank", "noopener,noreferrer");
+
+        if (!url) return;
+
+        window.open(url, "_blank", "noopener,noreferrer");
     };
 
     return (
         <div className="link-block">
-
             {canEdit && (
                 <div
                     className="link-block-icon"
@@ -40,15 +41,12 @@ export const LinkCell = ({
                     <img src={editIcon} alt="" />
                 </div>
             )}
-            <div className="link-block-icon" onClick={onOpen}>
-                <img
-                    src={linkIcon}
-                    alt=""
-                    style={!canOpen ? { opacity: 0.4, cursor: "not-allowed" } : undefined}
-                />
-            </div>
 
-
+            {canOpen && (
+                <div className="link-block-icon" onClick={onOpen}>
+                    <img src={linkIcon} alt="" />
+                </div>
+            )}
         </div>
     );
 };

@@ -267,7 +267,7 @@ export const getCampaignManagementInsightColumns = ({
                 return orderA - orderB;
             },
             cell: ({ row }) => (
-                <div>{getPromoStatusLabel(row.original.account.statusLabel ?? "")}</div>
+                    <div><p className='status-insight'>{getPromoStatusLabel(row.original.account.statusLabel ?? "")}</p></div>
             ),
         },
 

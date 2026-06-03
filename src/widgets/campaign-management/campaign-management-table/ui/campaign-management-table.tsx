@@ -45,9 +45,9 @@ export const CampaignManagementTable = ({
                                         }: Props) => {
     const status = useCampaignManagementStore((state) => state.status);
 
-    const recentlyAddedAccountKeys = useCampaignManagementStore(
-        (state) => state.recentlyAddedAccountKeys,
-    );
+    // const recentlyAddedAccountKeys = useCampaignManagementStore(
+    //     (state) => state.recentlyAddedAccountKeys,
+    // );
 
     const deletingAccountKey = useCampaignManagementStore(
         (state) => state.deletingAccountKey,

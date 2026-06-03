@@ -11,6 +11,6 @@ export const NetworkTableCell = ({ row }: Props) => {
 
     return <div className='username_row'>
         <img src={getSocialMediaIcon(row.account.socialMedia as TSocialMedia)} alt=""/>
-        <p className='hidden-text-user'>{row.account.username}</p>
+        <p title={row.account.username} className='hidden-text-user'>{row.account.username}</p>
     </div>;
 };
