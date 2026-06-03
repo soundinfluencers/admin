@@ -500,11 +500,13 @@ export const CampaignManagment = () => {
             ))}
         </div>
     );
-
     const renderInsightTable = () => {
-        const canContactInfluencer =
-            String(status || statusParam || "").toLowerCase() === "distributing";
+        const normalizedStatus = String(status || statusParam || "").toLowerCase();
 
+        const canContactInfluencer =
+            normalizedStatus !== "proposal" &&
+            normalizedStatus !== "completed";
+                console.log(networks,'net')
         return (
             <>
                 <h3>Campaign Insights</h3>

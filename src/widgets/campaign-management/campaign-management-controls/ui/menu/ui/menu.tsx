@@ -17,14 +17,40 @@ import type { CampaignStatus } from "@/entities/campaign-managment/model/campaig
 import { useRealtime } from "@/app/providers/realtime-provider/use-realtime.ts";
 import { useCampaignManagementStore } from "@/entities/campaign-managment/store/campaign-management.store.ts";
 import {
-    buildWhatsAppPromoData,
-    buildWhatsAppPromoMessage,
+    buildWhatsAppInfluencerPromoData,
+    buildWhatsAppInfluencerPromoMessage,
+    groupAccountsByInfluencer,
 } from "@/widgets/campaign-management/campaign-management-table/model/whats-app.helpers.ts";
 import { sendCampaignWhatsAppOne } from "@/entities/campaign-managment/api/campaign-whatsapp.api.ts";
 import { CircleLoader } from "@/shared/ui/circle-loader/circle-loader.tsx";
 
+import { Table } from "@/shared/ui/table/table";
+
+import type {
+    WhatsAppSendRow,
+    WhatsAppSendStatus,
+} from "@/widgets/campaign-management/campaign-management-controls/ui/menu/model/menu.types.ts";
+import {
+    buildInitialWhatsAppRows,
+} from "@/widgets/campaign-management/campaign-management-controls/ui/menu/model/whats-app-table.helpers.ts";
+import {
+    whatsAppColumns,
+} from "@/widgets/campaign-management/campaign-management-controls/ui/menu/ui/contact-cells.tsx";
+
 const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
+
+const formatSendDate = () => {
+    return new Date().toLocaleString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+    });
+};
 
 export const Menu = ({
                          status,
@@ -39,14 +65,54 @@ export const Menu = ({
     const [isPdfLoading, setIsPdfLoading] = React.useState(false);
     const [isActionLoading, setIsActionLoading] = React.useState(false);
     const [isWhatsAppSending, setIsWhatsAppSending] = React.useState(false);
+    const [whatsAppRows, setWhatsAppRows] = React.useState<WhatsAppSendRow[]>([]);
+
+    const previousCampaignIdRef = React.useRef<string | null>(null);
 
     const editable = useCampaignManagementStore((s) => s.editable);
     const { clientId, isConnected } = useRealtime();
 
     const normalizedStatus = String(status ?? "").toLowerCase();
-    const canSendWhatsApp = normalizedStatus === "distributing";
+
+    const canSendWhatsApp =
+        normalizedStatus !== "proposal" &&
+        normalizedStatus !== "completed";
 
     const isLoading = isPdfLoading || isActionLoading || isWhatsAppSending;
+
+    /**
+     * Сбрасываем таблицу только когда реально зашли в другую campaign.
+     * При закрытии/открытии drawer ничего не сбрасывается.
+     */
+    React.useEffect(() => {
+        if (!campaignId) return;
+
+        if (previousCampaignIdRef.current === null) {
+            previousCampaignIdRef.current = campaignId;
+            setWhatsAppRows([]);
+            return;
+        }
+
+        if (previousCampaignIdRef.current !== campaignId) {
+            previousCampaignIdRef.current = campaignId;
+            setWhatsAppRows([]);
+        }
+    }, [campaignId]);
+
+    /**
+     * При открытии меню создаём пустую таблицу только если rows ещё нет.
+     * Поэтому после отправки SENT/FAILED сохраняются при закрытии.
+     */
+    React.useEffect(() => {
+        if (!isOpen) return;
+        if (whatsAppRows.length > 0) return;
+
+        setWhatsAppRows(
+            buildInitialWhatsAppRows({
+                accounts: editable?.addedAccounts ?? [],
+            }),
+        );
+    }, [isOpen, editable?.addedAccounts, whatsAppRows.length]);
 
     React.useEffect(() => {
         if (!isOpen) return;
@@ -66,6 +132,31 @@ export const Menu = ({
         };
     }, [isOpen, isLoading]);
 
+    const updateRowStatus = React.useCallback(
+        (
+            targetInfluencerId: string,
+            nextStatus: WhatsAppSendStatus,
+            fallbackRows: WhatsAppSendRow[] = [],
+        ) => {
+            if (!targetInfluencerId) return;
+
+            setWhatsAppRows((prev) => {
+                const sourceRows = prev.length ? prev : fallbackRows;
+
+                return sourceRows.map((row) =>
+                    row.influencerId === targetInfluencerId
+                        ? {
+                            ...row,
+                            status: nextStatus,
+                            date: nextStatus ? formatSendDate() : "",
+                        }
+                        : row,
+                );
+            });
+        },
+        [],
+    );
+
     const handleDownloadPdf = async () => {
         if (!campaignId || isLoading) return;
 
@@ -74,6 +165,7 @@ export const Menu = ({
             await getPDF(campaignId);
         } catch (error) {
             console.error("Failed to download PDF", error);
+            toast.error("Failed to download PDF");
         } finally {
             setIsPdfLoading(false);
         }
@@ -143,37 +235,51 @@ export const Menu = ({
             return;
         }
 
+        const initialRows = buildInitialWhatsAppRows({ accounts });
+        setWhatsAppRows(initialRows);
+
+        const accountsByInfluencer = groupAccountsByInfluencer(accounts);
+        const influencerGroups = Object.values(accountsByInfluencer);
+
         try {
             setIsWhatsAppSending(true);
 
             let successCount = 0;
             let failedCount = 0;
 
-            for (const account of accounts) {
-                const influencerId = String(account.influencerId ?? "");
+            for (const influencerAccounts of influencerGroups) {
+                const firstAccount = influencerAccounts[0];
+
+                const influencerId = String(firstAccount?.influencerId ?? "");
                 const accountId = String(
-                    account.socialAccountId ??
-                    (account as any).accountId ??
+                    firstAccount?.socialAccountId ??
+                    firstAccount?.accountId ??
                     "",
                 );
-                const socialMedia = String(account.socialMedia ?? "");
+                const socialMedia = String(firstAccount?.socialMedia ?? "");
 
                 if (!influencerId || !accountId || !socialMedia) {
                     failedCount += 1;
+
+                    updateRowStatus(influencerId, "FAILED", initialRows);
+
                     console.warn(
-                        "Skipped WhatsApp account because required ids are missing",
-                        account,
+                        "Skipped WhatsApp influencer because required ids are missing",
+                        influencerAccounts,
                     );
+
                     continue;
                 }
 
+                updateRowStatus(influencerId, "SENDING", initialRows);
+
                 try {
-                    const data = buildWhatsAppPromoData({
-                        account,
+                    const data = buildWhatsAppInfluencerPromoData({
+                        accounts: influencerAccounts,
                         campaignContent,
                     });
 
-                    const message = buildWhatsAppPromoMessage(data);
+                    const message = buildWhatsAppInfluencerPromoMessage(data);
 
                     await sendCampaignWhatsAppOne({
                         influencerId,
@@ -184,9 +290,16 @@ export const Menu = ({
                     });
 
                     successCount += 1;
+                    updateRowStatus(influencerId, "SENT", initialRows);
                 } catch (error) {
                     failedCount += 1;
-                    console.error("Failed to send WhatsApp to account", account, error);
+                    updateRowStatus(influencerId, "FAILED", initialRows);
+
+                    console.error(
+                        "Failed to send WhatsApp to influencer",
+                        influencerAccounts,
+                        error,
+                    );
                 }
 
                 await sleep(400);
@@ -194,7 +307,6 @@ export const Menu = ({
 
             if (successCount > 0 && failedCount === 0) {
                 toast.success(`WhatsApp messages sent to ${successCount} influencers`);
-                setIsOpen(false);
                 return;
             }
 
@@ -335,6 +447,19 @@ export const Menu = ({
                                                 : "Send all"}
                                         </p>
                                     </button>
+                                </div>
+                            )}
+
+                            {canSendWhatsApp && (
+                                <div className={styles.whatsAppTable}>
+                                    <Table
+                                        data={whatsAppRows}
+                                        columns={whatsAppColumns}
+                                        minWidth={529}
+                                        tableLayout="fixed"
+                                        emptyText="No WhatsApp messages"
+                                        skeletonRows={4}
+                                    />
                                 </div>
                             )}
                         </div>
