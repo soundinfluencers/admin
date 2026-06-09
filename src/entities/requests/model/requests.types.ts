@@ -115,12 +115,17 @@ export interface IBespokeCampaignRequestDetailsDto {
   lastName: string;
   email: string;
   phoneNumber: string;
-  category: string;
+  category: "artist" | "music" | "event" | "other";
+  currency: TCurrency;
   campaignGoal: string;
   contentLink: string;
   budget: number;
   targetTerritories: string;
   extraBriefs: string;
+  trackLink: string;
+  releaseDate: string;
+  smartLink: string;
+  ticketLink: string;
 }
 
 // Change pric request

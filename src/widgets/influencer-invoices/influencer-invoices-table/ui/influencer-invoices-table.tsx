@@ -1,6 +1,6 @@
 import React from "react";
 import { Table } from "@/shared/ui";
-import type { IInvoiceTableRowDto } from "@/entities/invoices/model/influencer-invoices.types.ts";
+import type { IInvoiceTableRowDto } from "@/entities/invoices/influencer-invoice/model/influencer-invoice.types.ts";
 import { INFLUENCERS_INVOICES_COLUMNS } from "@/widgets/influencer-invoices/influencer-invoices-table/ui/columns.tsx";
 
 interface InfluencersTableProps {
