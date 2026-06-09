@@ -248,12 +248,28 @@ export const CampaignManagment = () => {
     }, [normalizedViewParam, view, setView]);
     const handleSave = async () => {
         if (!campaignId || !status) return;
+
         const requestStatus: CampaignStatus =
             status === "under_review" ? "pending" : (status as CampaignStatus);
+
         const body = buildSavePayload();
         if (!body) return;
-        console.log(body,'payload');
-        console.log("status", status);
+
+        console.log(
+            "FRONT_BEFORE_SAVE",
+            JSON.stringify(
+                body.addedAccounts.map((acc: any, index: number) => ({
+                    index,
+                    addedAccountsId: acc.addedAccountsId,
+                    socialAccountId: acc.socialAccountId,
+                    influencerId: acc.influencerId,
+                    selected: acc.selectedCampaignContentItem,
+                })),
+                null,
+                2,
+            ),
+        );
+
         try {
             setIsSaving(true);
 
@@ -263,6 +279,24 @@ export const CampaignManagment = () => {
                 optionIndex,
                 body,
             });
+
+            console.log(
+                "BACKEND_AFTER_SAVE",
+                JSON.stringify(
+                    updated?.addedAccounts?.map((acc: any, index: number) => ({
+                        index,
+                        addedAccountsId: acc.addedAccountsId,
+                        socialAccountId: acc.socialAccountId,
+                        influencerId: acc.influencerId,
+                        selected:
+                            acc.selectedCampaignContentItem ??
+                            acc.selectedContent ??
+                            null,
+                    })),
+                    null,
+                    2,
+                ),
+            );
 
             if (updated) {
                 initCampaign(updated, optionIndex);
@@ -288,6 +322,10 @@ export const CampaignManagment = () => {
                 price: currentBudget,
                 campaignPrice: currentBudget,
                 addedAccounts: editable.addedAccounts.map((acc) => ({
+                    ...(acc.addedAccountsId
+                        ? { addedAccountsId: acc.addedAccountsId }
+                        : {}),
+
                     socialAccountId: acc.socialAccountId,
                     influencerId: acc.influencerId,
                     socialMedia: acc.socialMedia,

@@ -41,9 +41,7 @@ export const CardsContainer: React.FC<Props> = ({
     const isSelected = React.useCallback(
         (card: PromoAccount) => {
             if (isAttachMode) {
-                return selectedCards.some(
-                    (item) => String(item.accountId) === String(card.accountId),
-                );
+                return false;
             }
 
             return selectedPromoCardIds.includes(card.accountId);
