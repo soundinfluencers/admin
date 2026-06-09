@@ -15,17 +15,20 @@
 }
 
 .item {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: clamp(100px, 30vw, 127px) minmax(0, 1fr);
   gap: 8px;
+  align-items: center;
 }
 
 .label {
-  width: clamp(100px, 30vw, 127px);
   font-size: 14px;
   color: var(--gray);
 }
 
-.item {
+.value {
+  min-width: 0;
+  font-size: 15px;
   color: var(--navy-blue);
+  overflow-wrap: anywhere;
 }
