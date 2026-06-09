@@ -24,13 +24,19 @@ import {uploadCampaignFile} from "@/entities/campaign-managment/api/upload-campa
 import {CircleLoader} from "@/shared/ui/circle-loader/circle-loader.tsx";
 import {
     buildWhatsAppInfluencerPromoData, buildWhatsAppInfluencerPromoMessage,
-    buildWhatsAppPromoData, buildWhatsAppPromoMessage
 } from "@/widgets/campaign-management/campaign-management-table/model/whats-app.helpers.ts";
 import {sendCampaignWhatsAppOne} from "@/entities/campaign-managment/api/campaign-whatsapp.api.ts";
 import type {CampaignStatus} from "@/entities/campaign-managment/model/campaign.managment.ts";
 import {useRealtime} from "@/app/providers/realtime-provider/use-realtime.ts";
 
-
+type WhatsAppPromoAccount = {
+    influencerId?: string;
+    socialAccountId?: string;
+    accountId?: string;
+    socialMedia?: string;
+    username?: string;
+    addedAccountsId?: string;
+};
 type Props = {
     networks: any[];
     totals: {
@@ -86,7 +92,7 @@ export const CampaignManagementInsightTable = ({
                 reward: string;
             }>;
         };
-        accounts: any[];
+        accounts: WhatsAppPromoAccount[];
         isSending: boolean;
     }>({
         isOpen: false,
@@ -286,8 +292,7 @@ export const CampaignManagementInsightTable = ({
             const influencerId = String(row.account?.influencerId ?? "");
 
             const influencerAccounts = (editable.addedAccounts ?? []).filter(
-                (account: any) =>
-                    String(account?.influencerId ?? "") === influencerId,
+                (account) => String(account?.influencerId ?? "") === influencerId,
             );
 
             const accountsForMessage = influencerAccounts.length
@@ -536,7 +541,7 @@ export const CampaignManagementInsightTable = ({
                         setWhatsAppModal({
                             isOpen: false,
                             data: null,
-                            account: [],
+                            accounts: [],
                             isSending: false,
                         })
                     }

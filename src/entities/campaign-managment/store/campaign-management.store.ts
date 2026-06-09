@@ -18,6 +18,7 @@ export enum AdminPromoStatusLabelEnum {
     na = "N/A",
 }
 export type EditableAccount = {
+    __clientId?: string;
     addedAccountsId?: string;
     socialAccountId: string;
     influencerId: string;
@@ -146,9 +147,30 @@ const objectId = () => {
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
 };
+const ensureClientIds = (accounts: any[]) => {
+    const usedIds = new Set<string>();
 
+    return (accounts ?? []).map((account) => {
+        const backendAddedId = String(account?.addedAccountsId ?? "");
+
+        let clientId = String(account?.__clientId ?? backendAddedId ?? "");
+
+        if (!clientId || usedIds.has(clientId)) {
+            clientId = objectId();
+        }
+
+        usedIds.add(clientId);
+
+        return {
+            ...account,
+            addedAccountsId: backendAddedId || undefined,
+            __clientId: clientId,
+        };
+    });
+};
 export const getAccountKey = (account: EditableAccount | any) =>
     String(
+        account.__clientId ??
         account.addedAccountsId ??
         account.socialAccountId ??
         account.accountId ??
@@ -168,16 +190,19 @@ const getFinalBudget = (editable: EditableCampaign) => {
 export const normalizeCampaignForEdit = (
     data: CampaignResponse,
 ): EditableCampaign => {
-    const normalizedAccounts = (data.addedAccounts ?? []).map((acc) => {
+    const normalizedAccountsRaw = (data.addedAccounts ?? []).map((acc) => {
         const selected =
             acc?.selectedCampaignContentItem ?? acc?.selectedContent ?? null;
 
         return {
             addedAccountsId: toStringSafe(acc?.addedAccountsId),
+            __clientId: toStringSafe(acc?.addedAccountsId),
+
             socialAccountId: toStringSafe(acc?.socialAccountId),
             influencerId: toStringSafe(acc?.influencerId),
             socialMedia: toStringSafe(acc?.socialMedia).toLowerCase(),
             username: toStringSafe(acc?.username),
+
             followers: Number(acc?.followers ?? 0),
             publicPrice: Number(acc?.publicPrice ?? 0),
             price: Number(acc?.price ?? 0),
@@ -186,7 +211,8 @@ export const normalizeCampaignForEdit = (
             genres: Array.isArray(acc?.genres) ? acc.genres : [],
             countries: Array.isArray(acc?.countries) ? acc.countries : [],
             statusLabel: toStringSafe(acc?.statusLabel).trim(),
-            phoneNumber: toStringSafe(acc?.phoneNumber ?? ''),
+            phoneNumber: toStringSafe(acc?.phoneNumber ?? ""),
+
             selectedCampaignContentItem: selected
                 ? {
                     campaignContentItemId: toStringSafe(
@@ -212,6 +238,20 @@ export const normalizeCampaignForEdit = (
             datePost: toStringSafe(acc?.datePost),
         } satisfies EditableAccount;
     });
+
+    const normalizedAccounts = ensureClientIds(normalizedAccountsRaw);
+
+    console.log(
+        normalizedAccounts.map((acc, index) => ({
+            index,
+            addedAccountsId: acc.addedAccountsId,
+            __clientId: acc.__clientId,
+            socialAccountId: acc.socialAccountId,
+            selected: acc.selectedCampaignContentItem?.campaignContentItemId,
+        })),
+    );
+
+
 
     const price = Number(data.price ?? 0);
 
@@ -342,15 +382,18 @@ const isEditableNow = ({
 const buildBasePayload = (editable: EditableCampaign) => {
     const finalBudget = getFinalBudget(editable);
 
-    return {
+    const payload = {
         campaignName: editable.campaignName,
-
 
         price: finalBudget,
         campaignPrice: finalBudget,
         isBudgetManual: Boolean(editable.isBudgetManual),
 
         addedAccounts: editable.addedAccounts.map((acc) => ({
+            ...(acc.addedAccountsId
+                ? { addedAccountsId: acc.addedAccountsId }
+                : {}),
+
             socialAccountId: acc.socialAccountId,
             influencerId: acc.influencerId,
             socialMedia: acc.socialMedia,
@@ -408,6 +451,17 @@ const buildBasePayload = (editable: EditableCampaign) => {
 
         displayCurrency: editable.displayCurrency,
     };
+
+    console.log(
+        payload.addedAccounts.map((acc: any, index: number) => ({
+            index,
+            addedAccountsId: acc.addedAccountsId,
+            socialAccountId: acc.socialAccountId,
+            selected: acc.selectedCampaignContentItem?.campaignContentItemId,
+        })),"payload-acc"
+    );
+
+    return payload;
 };
 // const buildExtendedPayload = (editable: EditableCampaign) => ({
 //     ...buildBasePayload(editable),
@@ -797,22 +851,24 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
 
         addAccounts: (accounts) =>
             set((state) => {
+                console.log("ADD_ACCOUNTS_INPUT", accounts);
+
                 if (!state.editable) return state;
 
-                const prevAccounts = state.editable.addedAccounts;
-                const prevKeys = new Set(prevAccounts.map(getAccountKey));
-
-                const nextRaw = (accounts ?? []).filter(
-                    (acc) => !prevKeys.has(getAccountKey(acc)),
-                );
-
-                if (!nextRaw.length) return state;
+                const incomingAccounts = accounts ?? [];
+                if (!incomingAccounts.length) return state;
 
                 const allContent = state.editable.campaignContent;
 
-                const nextPrepared = nextRaw.map((acc) => {
+                const nextPrepared = incomingAccounts.map((acc) => {
                     const sm = String(acc.socialMedia ?? "").toLowerCase();
                     const group = getGroupBySocial(sm);
+
+                    const backendAddedId = acc.addedAccountsId
+                        ? String(acc.addedAccountsId)
+                        : undefined;
+
+                    const clientId = backendAddedId || objectId();
 
                     const defaultItem =
                         allContent.find(
@@ -831,16 +887,28 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
                             }
                             : null;
 
+                    const selected =
+                        acc.selectedCampaignContentItem ??
+                        acc.selectedContent ??
+                        defaultSelected;
+
                     return {
                         ...acc,
-                        socialMedia: String(acc.socialMedia ?? "").toLowerCase(),
+                        addedAccountsId: backendAddedId,
+                        __clientId: clientId,
+                        socialMedia: sm,
                         publicPrice: Number(acc.publicPrice ?? 0),
-                        selectedCampaignContentItem: defaultSelected,
+                        selectedCampaignContentItem: selected,
                         dateRequest: acc.dateRequest ?? "ASAP",
                     };
                 });
 
-                const nextAccounts = [...prevAccounts, ...nextPrepared];
+                console.log("ADD_ACCOUNTS_PREPARED", nextPrepared);
+
+                const nextAccounts = [...state.editable.addedAccounts, ...nextPrepared];
+
+                console.log("ADD_ACCOUNTS_NEXT", nextAccounts);
+
                 const nextAutoBudget = getAutoBudgetFromAccounts(nextAccounts);
 
                 return {

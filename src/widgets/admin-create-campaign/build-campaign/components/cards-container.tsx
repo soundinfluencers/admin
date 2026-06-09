@@ -31,7 +31,6 @@ export const CardsContainer: React.FC<Props> = ({
                                                     isAttachMode,
                                                 }) => {
     const dimStyle = isRefetching ? { opacity: 0.6 } : undefined;
-
     const selectedCards = useCampaignManagementAddAccountsStore((s) => s.selectedCards);
     const toggleCard = useCampaignManagementAddAccountsStore((s) => s.toggleCard);
 
