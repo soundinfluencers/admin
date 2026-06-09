@@ -31,7 +31,6 @@ export const CardsContainer: React.FC<Props> = ({
                                                     isAttachMode,
                                                 }) => {
     const dimStyle = isRefetching ? { opacity: 0.6 } : undefined;
-
     const selectedCards = useCampaignManagementAddAccountsStore((s) => s.selectedCards);
     const toggleCard = useCampaignManagementAddAccountsStore((s) => s.toggleCard);
 
@@ -41,7 +40,9 @@ export const CardsContainer: React.FC<Props> = ({
     const isSelected = React.useCallback(
         (card: PromoAccount) => {
             if (isAttachMode) {
-                return false;
+                return selectedCards.some(
+                    (item) => String(item.accountId) === String(card.accountId),
+                );
             }
 
             return selectedPromoCardIds.includes(card.accountId);

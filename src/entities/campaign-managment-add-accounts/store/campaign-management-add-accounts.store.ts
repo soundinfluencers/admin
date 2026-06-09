@@ -26,15 +26,36 @@ export const useCampaignManagementAddAccountsStore =
         selectedCards: [],
 
         toggleCard: (card) =>
-            set((state) => ({
-                selectedCards: [
-                    ...state.selectedCards,
-                    {
-                        ...card,
-                        __pickId: makePickId(card),
-                    },
-                ],
-            })),
+            set((state) => {
+                const accountId = String(card.accountId);
+
+                const alreadySelected = state.selectedCards.some(
+                    (item) => String(item.accountId) === accountId,
+                );
+
+                if (alreadySelected) {
+                    return {
+                        selectedCards: state.selectedCards.filter(
+                            (item) => String(item.accountId) !== accountId,
+                        ),
+                    };
+                }
+
+                const cardWithoutAddedAccountsId = {
+                    ...card,
+                    addedAccountsId: undefined,
+                };
+
+                return {
+                    selectedCards: [
+                        ...state.selectedCards,
+                        {
+                            ...cardWithoutAddedAccountsId,
+                            __pickId: makePickId(card),
+                        },
+                    ],
+                };
+            }),
 
         removeSelectedCard: (pickId) =>
             set((state) => ({
