@@ -1,14 +1,16 @@
 import type { TSocialMedia } from "@/shared/types/types.ts";
 
 export type TCampaignStatus = 'proposal' | 'pending' | 'distributing' | 'completed';
-export type TViewCampaignMode = 'main' | 'payments';
+export type TPaymentStatus = 'wait' | 'confirmed';
+export type TViewCampaignMode = 'affiliate' | 'payments';
 
 export interface ICampaign {
   campaignId: string;
   socialMedia: TSocialMedia;
   campaignName: string;
-  creatorRole: string; // check role
-  creatorName: string;
+  creatorRole: 'admin' | 'client'; // check role
+  creatorName?: string;
+  creatorCompanyName?: string;
   followers: number;
   cost: number;
   salePrice: number;
@@ -16,7 +18,7 @@ export interface ICampaign {
   status: TCampaignStatus;
   statusLabel: string;
   reportSent: boolean;
-  paymentStatus: 'wait' | 'paid';
+  paymentStatus: TPaymentStatus;
   invoiceId: string;
   shortInvoiceNumber: number;
   notes: string;

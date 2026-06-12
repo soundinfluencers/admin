@@ -1,21 +1,15 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import { CampaignNameCell } from "../ui/campaign-name-cell/campaign-name-cell.tsx";
+import { CampaignActionsCell } from "../ui/campaign-actions-cell/campaign-actions-cell.tsx";
+import { CampaignReportCell } from "../ui/campaign-report-cell/campaign-report-cell.tsx";
+import { CampaignPriceCell } from "../ui/campaign-price-cell/campaign-price-cell.tsx";
+import { CampaignFollowersCell } from "../ui/campaign-followers-cell/campaign-followers-cell.tsx";
+import { CampaignTextCell } from "../ui/campaign-text-cell/campaign-text-cell.tsx";
+import { CampaignNoteCell } from "../ui/campaign-note-cell/campaign-note-cell.tsx";
+import { CampaignInvoiceCell } from "../ui/campaign-invoice-cell/campaign-invoice-cell.tsx";
+import { PROMO_PAYMENT_STATUS_PAYMENTS, PROMO_STATUS } from "../model/campaigns-table.helpers.ts";
+
 import type { ICampaign } from "@/entities/campaign/model/campaign.types.ts";
-import { CampaignNameCell } from "@/widgets/campaigns/campaigns-table/ui/campaign-name-cell/campaign-name-cell.tsx";
-import {
-  CampaignActionsCell,
-} from "@/widgets/campaigns/campaigns-table/ui/campaign-actions-cell/campaign-actions-cell.tsx";
-import {
-  CampaignReportCell,
-} from "@/widgets/campaigns/campaigns-table/ui/campaign-report-cell/campaign-report-cell.tsx";
-import { CampaignPriceCell } from "@/widgets/campaigns/campaigns-table/ui/campaign-price-cell/campaign-price-cell.tsx";
-import {
-  CampaignFollowersCell,
-} from "@/widgets/campaigns/campaigns-table/ui/campaign-followers-cell/campaign-followers-cell.tsx";
-import { CampaignTextCell } from "@/widgets/campaigns/campaigns-table/ui/campaign-text-cell/campaign-text-cell.tsx";
-import { CampaignNoteCell } from "@/widgets/campaigns/campaigns-table/ui/campaign-note-cell/campaign-note-cell.tsx";
-import {
-  CampaignInvoiceCell,
-} from "@/widgets/campaigns/campaigns-table/ui/campaign-invoice-cell/campaign-invoice-cell.tsx";
 
 import styles from './columns.module.scss';
 
@@ -29,7 +23,10 @@ export const paymentsCampaignColumns: ColumnDef<ICampaign>[] = [
     cell: ({ row }) => (
       <CampaignNameCell
         campaignName={row.original.campaignName}
-        socialMedia={row.original.socialMedia} status={row.original.status} campaignId={row.original.campaignId}/>
+        socialMedia={row.original.socialMedia}
+        status={row.original.status}
+        campaignId={row.original.campaignId}
+      />
     ),
   },
 
@@ -49,17 +46,23 @@ export const paymentsCampaignColumns: ColumnDef<ICampaign>[] = [
   },
 
   {
-    accessorKey: 'creatorRole',
+    id: 'client',
     header: "Client",
     size: 70,
     minSize: 70,
     maxSize: 70,
-    cell: ({ row }) => (
-      <CampaignTextCell
-        value={row.original.creatorRole}
-        className={styles.cell}
-      />
-    ),
+    cell: ({ row }) => {
+
+      const value = row.original.creatorRole === 'admin' ? "Admin" : row.original.creatorCompanyName;
+
+      return (
+        <CampaignTextCell
+          value={value || "—"}
+          isAdmin={row.original.creatorRole === 'admin'}
+          className={styles.cell}
+        />
+      );
+    },
   },
 
   {
@@ -98,7 +101,7 @@ export const paymentsCampaignColumns: ColumnDef<ICampaign>[] = [
     maxSize: 75,
     cell: ({ row }) => (
       <CampaignPriceCell
-        value={row.original.cost}
+        value={row.original.salePrice}
         className={styles.cell}
       />
     ),
@@ -119,14 +122,14 @@ export const paymentsCampaignColumns: ColumnDef<ICampaign>[] = [
   },
 
   {
-    accessorKey: "statusLabel",
+    accessorKey: "status",
     header: "Status",
     size: 85,
     minSize: 85,
     maxSize: 85,
     cell: ({ row }) => (
       <CampaignTextCell
-        value={row.original.statusLabel}
+        value={PROMO_STATUS[row.original.status]}
         className={styles.cell}
       />
     ),
@@ -155,7 +158,7 @@ export const paymentsCampaignColumns: ColumnDef<ICampaign>[] = [
     maxSize: 106,
     cell: ({ row }) => (
       <CampaignTextCell
-        value={row.original.paymentStatus}
+        value={PROMO_PAYMENT_STATUS_PAYMENTS[row.original.paymentStatus]}
         className={styles.cell}
       />
     ),

@@ -94,7 +94,7 @@ export const useCampaignsPageState = () => {
   };
 
   const handleModeChange = () => {
-    const nextMode = mode === "main" ? "payments" : "main";
+    const nextMode = mode === "affiliate" ? "payments" : "affiliate";
 
     void setMode(nextMode, { history: "replace" });
     void setPage(1, { history: "replace" });

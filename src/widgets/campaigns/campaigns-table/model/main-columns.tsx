@@ -5,6 +5,7 @@ import { CampaignTextCell } from "@/widgets/campaigns/campaigns-table/ui/campaig
 import { CampaignPriceCell } from "@/widgets/campaigns/campaigns-table/ui/campaign-price-cell/campaign-price-cell.tsx";
 import { CampaignNoteCell } from "@/widgets/campaigns/campaigns-table/ui/campaign-note-cell/campaign-note-cell.tsx";
 import { CampaignAffiliateCell } from "@/widgets/campaigns/campaigns-table/ui/campaign-affiliate-cell/campaign-affiliate-cell.tsx";
+import { PROMO_STATUS } from "@/widgets/campaigns/campaigns-table/model/campaigns-table.helpers.ts";
 
 import styles from "./columns.module.scss";
 
@@ -71,14 +72,14 @@ export const mainCampaignColumns: ColumnDef<ICampaign>[] = [
   },
 
   {
-    accessorKey: "statusLabel",
+    accessorKey: "status",
     header: "Payment Status",
     size: 90,
     minSize: 90,
     maxSize: 90,
     cell: ({ row } ) => (
       <CampaignTextCell
-        value={row.original.statusLabel}
+        value={PROMO_STATUS[row.original.status]}
         className={styles.cell}
       />
     ),

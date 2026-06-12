@@ -18,8 +18,6 @@ export const CampaignsTable = ({
 }: CampaignsTableProps) => {
   const columns = view === 'payments' ? paymentsCampaignColumns : mainCampaignColumns;
 
-  console.log("CampaignsTable", data);
-
   return (
     <Table
       data={data}

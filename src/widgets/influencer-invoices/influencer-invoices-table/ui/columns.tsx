@@ -11,11 +11,11 @@ import {
   INFLUENCER_INVOICES_STATUS_LABEL,
 } from "@/widgets/influencer-invoices/influencer-invoices-table/model/influencer-invoices-table.helper.ts";
 import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
+import { EditInvoiceTrigger } from "@/features/edit-invoice";
 
 import type { IInvoiceTableRowDto } from "@/entities/invoices/influencer-invoice/model/influencer-invoice.types.ts";
 
 import s from './columns.module.scss';
-import { EditInvoiceTrigger } from "@/features/edit-invoice";
 
 export const INFLUENCERS_INVOICES_COLUMNS: ColumnDef<IInvoiceTableRowDto>[] = [
   {
@@ -26,7 +26,9 @@ export const INFLUENCERS_INVOICES_COLUMNS: ColumnDef<IInvoiceTableRowDto>[] = [
     maxSize: 100,
     cell: ({ row }) => (
       <BaseTableCell>
-        {row.original.firstName}
+        <span title={row.original.firstName}>
+          {row.original.firstName ? row.original.firstName : "—"}
+        </span>
       </BaseTableCell>
     ),
   },
@@ -39,7 +41,11 @@ export const INFLUENCERS_INVOICES_COLUMNS: ColumnDef<IInvoiceTableRowDto>[] = [
     maxSize: 110,
     cell: ({ row }) => (
       <BaseTableCell>
-        {row.original.lastName ? row.original.lastName : '—'}
+        <span
+          title={row.original.lastName}
+        >
+          {row.original.lastName ? row.original.lastName : '—'}
+        </span>
       </BaseTableCell>
     ),
   },
@@ -120,7 +126,7 @@ export const INFLUENCERS_INVOICES_COLUMNS: ColumnDef<IInvoiceTableRowDto>[] = [
           className={s.text}
           title={PAYMENT_METHOD_LABELS[row.original.paymentMethod]}
         >
-          {PAYMENT_METHOD_LABELS[row.original.paymentMethod]}
+          {PAYMENT_METHOD_LABELS[row.original.paymentMethod] ? PAYMENT_METHOD_LABELS[row.original.paymentMethod] : "—"}
         </span>
       </BaseTableCell>
     ),
