@@ -765,6 +765,9 @@
   border: 1px solid #202934;
   color: white;
   border-radius: 24px;
+  &.center{
+    margin: 0 auto;
+  }
 }
 .modal-secondary-btn{
   background: #fff;
@@ -972,19 +975,22 @@
   background-color: white;
   padding: 24px;
   max-width: 506px;
+  max-height: min(506px, 70vh);
+  overflow-y: auto;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 24px;
   border-radius: 8px;
   border: 1px solid #EBECFF;
+
   &__base,
   &__title,
   &__content,
   &__footer {
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: flex-start;
   }
 
   &__base,
@@ -997,41 +1003,150 @@
     gap: 8px;
   }
 
-  &__row {
+  &__content {
+    width: 100%;
+  }
+
+  &__promo {
     width: 100%;
     display: flex;
-    justify-content: space-between;
-    gap: 24px;
+    flex-direction: column;
+    gap: 8px;
+
+    &:not(:last-child) {
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #EBECFF;
+    }
+  }
+
+  &__promo-title {
+    margin: 0;
+    color: #2a2a2a;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: normal;
+    text-align: left;
+  }
+
+  &__row {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(120px, 150px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: flex-start;
+    min-width: 0;
+
+    h4 {
+      margin: 0;
+      color: #2a2a2a;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: normal;
+      text-align: left;
+
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
 
     p {
-      max-width: 250px;
       margin: 0;
       color: #2a2a2a;
       font-size: 16px;
       font-style: normal;
       font-weight: 400;
       line-height: normal;
+      text-align: right;
+
+      min-width: 0;
+      max-width: 100%;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-
     }
-
   }
 
   &__caption {
     text-transform: uppercase;
+    margin: 0;
+    color: #2a2a2a;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
   }
+
   &__subtext,
-  &__subtitle{
-    color:  #2A2A2A !important;
+  &__subtitle {
+    color: #2A2A2A !important;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     text-align: left !important;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
-  &__subtext{
+
+  &__subtext {
     font-size: 14px !important;
+  }
+
+  &__subtitle {
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+.create-option-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 505px;
+}
+
+.create-option-copy-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  button {
+    max-width: 250px;
+  }
+
+}
+
+.create-option-send-btn {
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .whatsapp-preview {
+    padding: 16px;
+    max-height: 65vh;
+    gap: 16px;
+
+    &__base,
+    &__footer {
+      gap: 16px;
+    }
+
+    &__row {
+      grid-template-columns: 1fr;
+      gap: 4px;
+
+      p {
+        text-align: left;
+      }
+    }
+  }
+
+  .create-option-copy-actions {
+    grid-template-columns: 1fr;
+    justify-items: center;
   }
 }
 @media (max-width: 700px) {
@@ -1223,4 +1338,9 @@
 .status-insight{
   text-align: center;
   white-space: wrap;
+}
+
+.modalCenter{
+  padding: 0px 12px !important;
+  align-items: center;
 }
