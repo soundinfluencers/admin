@@ -15,7 +15,7 @@ export const OpenCampaignPayments: React.FC<OpenCampaignPaymentsProps> = ({ camp
   return (
     <button
       className={clsx(styles.button, {
-        [styles['button--active']]: campaignMode === 'payments',
+        [styles['button--active']]: campaignMode === 'affiliate',
       })}
       onClick={onToggle}
     >
@@ -26,7 +26,7 @@ export const OpenCampaignPayments: React.FC<OpenCampaignPaymentsProps> = ({ camp
         width={18}
         height={18}
       />
-      {campaignMode === 'main' ? 'See payments & report status' : 'See campaigns affiliate'}
+      {campaignMode === 'affiliate' ? 'See payments & report status' : 'See campaigns affiliate'}
     </button>
   );
 };

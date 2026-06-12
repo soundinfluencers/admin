@@ -8,6 +8,6 @@ export const campaignStatusValues: TCampaignStatus[] =
 export const campaignStatusParser =
   parseAsStringLiteral(campaignStatusValues);
 
-const campaignsMode: TViewCampaignMode[] = ['main', 'payments'];
+const campaignsMode: TViewCampaignMode[] = ['affiliate', 'payments'];
 
-export const campaignsModeParser = parseAsStringLiteral(campaignsMode).withDefault("main");
+export const campaignsModeParser = parseAsStringLiteral(campaignsMode).withDefault("payments");

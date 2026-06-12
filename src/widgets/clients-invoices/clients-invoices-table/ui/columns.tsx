@@ -55,7 +55,7 @@ export const CLIENTS_INVOICES_COLUMNS: ColumnDef<IClientInvoiceTableRowDto>[] = 
          className={s.text}
          title={row.original.company}
        >
-         {row.original.company}
+         {row.original.company ? row.original.company : "—"}
        </span>
       </BaseTableCell>
     ),
@@ -72,7 +72,7 @@ export const CLIENTS_INVOICES_COLUMNS: ColumnDef<IClientInvoiceTableRowDto>[] = 
         className={s.text}
         title={row.original.campaignName}
        >
-         {row.original.campaignName}
+         {row.original.campaignName ? row.original.campaignName : "—"}
        </span>
       </BaseTableCell>
     ),
