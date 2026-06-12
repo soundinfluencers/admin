@@ -34,6 +34,7 @@ export type EditableAccount = {
         percentage: number;
         _id?: string;
     }>;
+    currency?: string;
     statusLabel?: keyof typeof AdminPromoStatusLabelEnum | string;
     selectedCampaignContentItem: SelectedCampaignContentItem | null;
     dateRequest: string;
@@ -202,7 +203,7 @@ export const normalizeCampaignForEdit = (
             influencerId: toStringSafe(acc?.influencerId),
             socialMedia: toStringSafe(acc?.socialMedia).toLowerCase(),
             username: toStringSafe(acc?.username),
-
+            currency: toStringSafe(acc?.currency),
             followers: Number(acc?.followers ?? 0),
             publicPrice: Number(acc?.publicPrice ?? 0),
             price: Number(acc?.price ?? 0),
