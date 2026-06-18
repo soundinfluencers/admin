@@ -206,6 +206,7 @@ export const normalizeCampaignForEdit = (
             currency: toStringSafe(acc?.currency),
             followers: Number(acc?.followers ?? 0),
             publicPrice: Number(acc?.publicPrice ?? 0),
+            initialPrice: Number(acc?.initialPrice ?? 0),
             price: Number(acc?.price ?? 0),
             firstName: toStringSafe(acc?.firstName),
             logoUrl: toStringSafe(acc?.logoUrl ?? ""),
@@ -386,7 +387,6 @@ const buildBasePayload = (editable: EditableCampaign) => {
     const payload = {
         campaignName: editable.campaignName,
 
-        price: finalBudget,
         campaignPrice: finalBudget,
         isBudgetManual: Boolean(editable.isBudgetManual),
 

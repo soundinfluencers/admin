@@ -127,6 +127,16 @@ const getSelectedDescription = ({
     return selectedDescription?.description ?? "";
 };
 
+const getRewardValue = (account: any) => {
+    const initialPrice = Number(account?.initialPrice ?? 0);
+
+    if (initialPrice > 0) {
+        return `${initialPrice} ${valueToString(account?.currency)}`;
+    }
+
+    return `${Number(account?.price ?? 0)} EUR`;
+};
+
 export const buildWhatsAppPromoData = ({
                                            account,
                                            campaignContent,
@@ -186,7 +196,7 @@ export const buildWhatsAppPromoData = ({
             accountSelectedContentItem?.additionalBrief ??
             selectedContentItem?.additionalBrief,
         ),
-        reward: `${Number(account?.price ?? 0)} ${valueToString(account?.currency)}`,
+        reward: getRewardValue(account),
     };
 };
 
