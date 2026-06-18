@@ -379,7 +379,7 @@ export const CampaignManagementInsightTable = ({
             const accountsForMessage = influencerAccounts.length
                 ? influencerAccounts
                 : [row.account];
-
+            console.log(accountsForMessage,'wshat-app');
             const data = buildWhatsAppInfluencerPromoData({
                 accounts: accountsForMessage,
                 campaignContent: editable.campaignContent,
@@ -412,7 +412,6 @@ export const CampaignManagementInsightTable = ({
             }));
 
             const message = buildWhatsAppInfluencerPromoMessage(whatsAppModal.data);
-
             const payload = {
                 influencerId: String(firstAccount.influencerId ?? ""),
                 accountId: String(

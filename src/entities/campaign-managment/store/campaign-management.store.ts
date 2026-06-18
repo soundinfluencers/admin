@@ -386,7 +386,6 @@ const buildBasePayload = (editable: EditableCampaign) => {
     const payload = {
         campaignName: editable.campaignName,
 
-        price: finalBudget,
         campaignPrice: finalBudget,
         isBudgetManual: Boolean(editable.isBudgetManual),
 
