@@ -87,6 +87,7 @@ export const columns: ColumnDef<IRequest>[] = [
         <BaseTableCell>
           <ReviewRequest
             request={row.original}
+            unreadMessages={row.original.unreadMessages}
           />
         </BaseTableCell>
       );

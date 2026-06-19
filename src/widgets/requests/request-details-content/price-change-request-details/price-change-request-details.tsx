@@ -12,12 +12,14 @@ interface PriceChangeRequestDetailsProps {
   request: IRequest;
   data: IPriceUpdateRequestDetailsDto;
   onCloseModal: () => void;
+  onToggleNegotiatePanel: () => void;
 }
 
 export const PriceChangeRequestDetails: React.FC<PriceChangeRequestDetailsProps> = ({
   request,
   data,
   onCloseModal,
+  onToggleNegotiatePanel,
 }) => {
   return (
     <div className={s.root}>
@@ -35,6 +37,7 @@ export const PriceChangeRequestDetails: React.FC<PriceChangeRequestDetailsProps>
         <RequestAnswer
           requestId={data.requestId}
           onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
         />
       )}
     </div>

@@ -12,12 +12,14 @@ interface NewInfluencerRequestDetailsProps {
   request: IRequest;
   data: INewInfluencerRequestDetailsDto;
   onCloseModal: () => void;
+  onToggleNegotiatePanel: () => void;
 }
 
 export const NewInfluencerRequestDetails: React.FC<NewInfluencerRequestDetailsProps> = ({
   data,
   request,
   onCloseModal,
+  onToggleNegotiatePanel,
 }) => {
   return (
     <div className={s.root}>
@@ -40,6 +42,7 @@ export const NewInfluencerRequestDetails: React.FC<NewInfluencerRequestDetailsPr
         <RequestAnswer
           requestId={data.requestId}
           onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
         />
       )}
     </div>

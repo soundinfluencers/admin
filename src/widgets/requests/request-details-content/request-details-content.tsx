@@ -11,34 +11,79 @@ interface RequestDetailsContentProps {
   request: IRequest;
   data: TAdminRequestDetails;
   onCloseModal: () => void;
+  onToggleNegotiatePanel: () => void;
 }
 
 export const RequestDetailsContent: React.FC<RequestDetailsContentProps> = ({
   request,
   data,
   onCloseModal,
+  onToggleNegotiatePanel
 }) => {
   switch (data.type) {
     case 'NEW_CLIENT_REQUEST':
-      return <NewClientRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+      return (
+        <NewClientRequestDetails
+          request={request}
+          data={data}
+          onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
+
+        />
+      );
 
     case 'NEW_INFLUENCER_REQUEST':
-      return <NewInfluencerRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+      return (
+        <NewInfluencerRequestDetails
+          request={request}
+          data={data}
+          onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
+        />
+      );
 
     case 'CAMPAIGN_REQUEST':
-      return <CampaignRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+      return (
+        <CampaignRequestDetails
+          request={request}
+          data={data}
+          onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
+        />
+      );
 
     case 'BESPOKE_CAMPAIGN_REQUEST':
-      return <BespokeCampaignRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+      return (
+        <BespokeCampaignRequestDetails
+          request={request}
+          data={data}
+          onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
+        />
+      );
 
     // case 'PROPOSAL_CAMPAIGN_REQUEST':
     //   return <ProposalCampaignRequestDetails request={request} data={data} />;
 
     case 'NEW_SOCIAL_ACCOUNT_REQUEST':
-      return <NewSocialAccountRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+      return (
+        <NewSocialAccountRequestDetails
+          request={request}
+          data={data}
+          onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
+        />
+      );
 
     case 'PRICE_UPDATE_REQUEST':
-      return <PriceChangeRequestDetails request={request} data={data} onCloseModal={onCloseModal}/>;
+      return (
+        <PriceChangeRequestDetails
+          request={request}
+          data={data}
+          onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
+        />
+      );
 
     default:
       return null;

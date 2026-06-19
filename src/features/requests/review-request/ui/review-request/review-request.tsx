@@ -8,10 +8,12 @@ type TSelectedRequest = Pick<IRequest, 'requestId' | 'type'>;
 
 interface ReviewRequestProps {
   request: IRequest;
+  unreadMessages?: number;
 }
 
 export const ReviewRequest: React.FC<ReviewRequestProps> = ({
   request,
+  unreadMessages,
 }) => {
   const [selectedRequest, setSelectedRequest] = useState<TSelectedRequest | null>(null);
 
@@ -29,6 +31,12 @@ export const ReviewRequest: React.FC<ReviewRequestProps> = ({
         }}
       >
         Review
+
+        {!!unreadMessages && (
+          <span className={s.unreadCount}>
+          {unreadMessages}
+        </span>
+        )}
       </button>
 
       {selectedRequest && (

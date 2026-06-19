@@ -12,12 +12,14 @@ interface NewSocialAccountRequestDetailsProps {
   request: IRequest;
   data: INewInfluencerAccountRequestDetailsDto;
   onCloseModal: () => void;
+  onToggleNegotiatePanel: () => void;
 }
 
 export const NewSocialAccountRequestDetails: React.FC<NewSocialAccountRequestDetailsProps> = ({
   data,
   request,
   onCloseModal,
+  onToggleNegotiatePanel,
 }) => {
   return (
     <div className={s.root}>
@@ -35,6 +37,7 @@ export const NewSocialAccountRequestDetails: React.FC<NewSocialAccountRequestDet
         <RequestAnswer
           requestId={data.requestId}
           onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
         />
       )}
     </div>

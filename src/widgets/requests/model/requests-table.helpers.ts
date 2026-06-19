@@ -14,6 +14,7 @@ export const REQUEST_SPECIFIED_STATUS = {
   WAITING_FOR_ADMIN: "Pending Review",
   APPROVED: "Approved",
   REJECTED: "Rejected",
+  NEGOTIATION: "Negotiation",
 } as const satisfies Record<TRequestSpecifiedStatus, string>;
 
 export const REQUEST_GROUP = {

@@ -1,6 +1,7 @@
 export { Container } from './container/container';
 export { Logo } from './logo/logo';
 export { Input } from './input/input';
+export { TextArea } from './text-area/text-area';
 export { Modal } from './modal/modal';
 
 export { BaseMaskedPasswordInput } from './form-input/base-masked-password-input/base-masked-password-input';
@@ -11,6 +12,7 @@ export { BaseCurrencySelector } from './form-input/base-currency-selector/base-c
 export { BasePriceInput } from './form-input/base-price-input/base-price-input';
 export { BaseCountryAutocompleteField } from './form-input/base-country-autocomplete-field/base-country-autocomplete-field';
 export { BaseCheckboxTreeField } from './form-input/base-checkbox-tree-field/base-checkbox-tree-field';
+export { TextAreaInput } from './form-input/text-area-input/text-area-input';
 export { BaseTableCell } from './base-table-cell/base-table-cell';
 
 export { Form } from './form/form';
