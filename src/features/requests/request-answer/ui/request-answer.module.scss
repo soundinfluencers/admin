@@ -58,3 +58,25 @@
     border: 1px solid transparent;
   }
 }
+
+.negotiate {
+  border: 1px solid var(--white-gray-20);
+  background: #F9FAFB;
+  color: var(--black-blue);
+
+  &:not(:disabled) {
+    @include mixins.hover {
+      background: #d8d8d8;
+    }
+
+    &:active {
+      background: #eaeaea;
+    }
+  }
+
+  &:disabled {
+    background-color: var(--disabled-button-1);
+    color: #b8b8b8;
+    border: 1px solid transparent;
+  }
+}

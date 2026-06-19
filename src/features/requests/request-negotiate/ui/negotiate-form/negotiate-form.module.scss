@@ -1,0 +1,13 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.submit {
+  margin: 0 auto;
+  width: 100%;
+}

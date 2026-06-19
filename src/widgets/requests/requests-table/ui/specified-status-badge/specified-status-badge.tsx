@@ -18,6 +18,7 @@ export const SpecifiedStatusBadge: React.FC<SpecifiedStatusBadgeProps> = ({
       [s.pending]: status === "WAITING_FOR_ADMIN",
       [s.approved]: status === "APPROVED",
       [s.rejected]: status === "REJECTED",
+      [s.negotiation]: status === "NEGOTIATION",
     })}>
       <span className={s.dot}/>
       <span className={s.label}>{REQUEST_SPECIFIED_STATUS[status]}</span>

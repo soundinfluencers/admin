@@ -9,11 +9,13 @@ import s from './request-answer.module.scss';
 interface RequestAnswerProps {
   requestId: string;
   onCloseModal: () => void;
+  onToggleNegotiatePanel: () => void;
 }
 
 export const RequestAnswer: React.FC<RequestAnswerProps> = ({
   requestId,
   onCloseModal,
+  onToggleNegotiatePanel,
 }) => {
   const [pendingAction, setPendingAction] = useState<TResponse | null>(null);
   const mutation = useRequestAnswerMutation();
@@ -49,6 +51,15 @@ export const RequestAnswer: React.FC<RequestAnswerProps> = ({
         disabled={mutation.isPending}
       >
         {pendingAction === 'REJECT' ? "Rejecting..." : "Reject"}
+      </Button>
+
+      <Button
+        type="button"
+        size="large"
+        className={clsx(s.btn, s.negotiate)}
+        onClick={onToggleNegotiatePanel}
+      >
+        Negotiate
       </Button>
     </div>
   );

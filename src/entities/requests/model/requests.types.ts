@@ -6,7 +6,7 @@ export const ADMIN_REQUEST_TYPES = [
   'NEW_INFLUENCER_REQUEST',
   'CAMPAIGN_REQUEST',
   'BESPOKE_CAMPAIGN_REQUEST',
-  'PROPOSAL_CAMPAIGN_REQUEST',
+  // 'PROPOSAL_CAMPAIGN_REQUEST',
   'NEW_SOCIAL_ACCOUNT_REQUEST',
   'PRICE_UPDATE_REQUEST',
 ] as const;
@@ -16,7 +16,8 @@ export type TRequestType = typeof ADMIN_REQUEST_TYPES[number];
 export type TRequestSpecifiedStatus =
   | "WAITING_FOR_ADMIN"
   | "APPROVED"
-  | "REJECTED";
+  | "REJECTED"
+  | "NEGOTIATION";
 
 export type TRequestFilterStatus = "CLIENT" | "INFLUENCER" | "CAMPAIGN" | "PRICING";
 export type TRequestLifecycleStatus = "OPEN" | "CLOSED";
@@ -31,6 +32,7 @@ export interface IRequest {
   type: TRequestType;
   lifecycleStatus: TRequestLifecycleStatus;
   specifiedStatus: TRequestSpecifiedStatus;
+  unreadMessages?: number;
 }
 
 export interface IGetListRequestsParams {
@@ -190,7 +192,7 @@ export interface IAdminRequestDetailsByType {
   NEW_INFLUENCER_REQUEST: INewInfluencerRequestDetailsDto;
   CAMPAIGN_REQUEST: ICampaignRequestDetailsDto;
   BESPOKE_CAMPAIGN_REQUEST: IBespokeCampaignRequestDetailsDto;
-  PROPOSAL_CAMPAIGN_REQUEST: any;
+  // PROPOSAL_CAMPAIGN_REQUEST: any;
   NEW_SOCIAL_ACCOUNT_REQUEST: INewInfluencerAccountRequestDetailsDto;
   PRICE_UPDATE_REQUEST: IPriceUpdateRequestDetailsDto;
 }

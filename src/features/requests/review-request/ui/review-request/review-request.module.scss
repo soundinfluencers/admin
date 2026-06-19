@@ -3,6 +3,7 @@
 @use '@/app/styles/utils/variables' as variables;
 
 .reviewRequest {
+  position: relative;
   @include mixins.reset-button;
   display: flex;
   align-items: center;
@@ -21,4 +22,24 @@
   @include mixins.hover {
     opacity: 0.8;
   }
+}
+
+.unreadCount {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+
+  @include mixins.flex-center();
+
+  width: 20px;
+  height: 20px;
+
+  border-radius: 999px;
+  border: 1px solid var(--light-green);
+  background: var(--light-green-2);
+
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green);
 }

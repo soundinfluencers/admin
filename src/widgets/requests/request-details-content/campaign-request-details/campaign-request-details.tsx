@@ -11,12 +11,14 @@ interface CampaignRequestDetailsProps {
   request: IRequest;
   data: ICampaignRequestDetailsDto;
   onCloseModal: () => void;
+  onToggleNegotiatePanel: () => void;
 }
 
 export const CampaignRequestDetails: React.FC<CampaignRequestDetailsProps> = ({
   data,
   request,
   onCloseModal,
+  onToggleNegotiatePanel,
 }) => {
   return (
     <div className={s.root}>
@@ -39,6 +41,7 @@ export const CampaignRequestDetails: React.FC<CampaignRequestDetailsProps> = ({
         <RequestAnswer
           requestId={data.requestId}
           onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
         />
       )}
     </div>

@@ -10,12 +10,14 @@ interface NewClientRequestDetailsProps {
   request: IRequest;
   data: INewClientRequestDetailsDto;
   onCloseModal: () => void;
+  onToggleNegotiatePanel: () => void;
 }
 
 export const NewClientRequestDetails: React.FC<NewClientRequestDetailsProps> = ({
   request,
   data,
   onCloseModal,
+  onToggleNegotiatePanel,
 }) => {
   return (
     <div className={s.root}>
@@ -35,6 +37,7 @@ export const NewClientRequestDetails: React.FC<NewClientRequestDetailsProps> = (
           <RequestAnswer
             requestId={data.requestId}
             onCloseModal={onCloseModal}
+            onToggleNegotiatePanel={onToggleNegotiatePanel}
           />
         )}
       </div>

@@ -12,7 +12,7 @@ export const toFields = [
     key: "company",
     render: (data, isDisabled) => (
       <InvoiceDetailsEditableField
-        initialValue={data.company}
+        initialValue={data.company || data.fullName}
         invoiceId={data.invoiceId}
         fieldKey="company"
         isDisabled={isDisabled}

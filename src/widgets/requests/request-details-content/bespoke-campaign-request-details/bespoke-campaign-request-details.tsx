@@ -11,12 +11,14 @@ interface BespokeCampaignRequestDetailsProps {
   request: IRequest;
   data: IBespokeCampaignRequestDetailsDto;
   onCloseModal: () => void;
+  onToggleNegotiatePanel: () => void;
 }
 
 export const BespokeCampaignRequestDetails: React.FC<BespokeCampaignRequestDetailsProps> = ({
   data,
   request,
   onCloseModal,
+  onToggleNegotiatePanel,
 }) => {
   return (
     <div className={s.root}>
@@ -29,11 +31,12 @@ export const BespokeCampaignRequestDetails: React.FC<BespokeCampaignRequestDetai
           <BespokeCampaignInfo data={data}/>
         </div>
       </div>
-      
+
       {request.lifecycleStatus === "OPEN" && (
         <RequestAnswer
           requestId={data.requestId}
           onCloseModal={onCloseModal}
+          onToggleNegotiatePanel={onToggleNegotiatePanel}
         />
       )}
     </div>
