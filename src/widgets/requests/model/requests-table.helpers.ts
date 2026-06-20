@@ -5,7 +5,6 @@ export const REQUEST_TYPE = {
   NEW_INFLUENCER_REQUEST: "Influencer Registration",
   CAMPAIGN_REQUEST: "Campaign Submission",
   BESPOKE_CAMPAIGN_REQUEST: "Bespoke Campaign Request",
-  PROPOSAL_CAMPAIGN_REQUEST: "Proposal Campaign Request",
   NEW_SOCIAL_ACCOUNT_REQUEST: "Additional Social Account",
   PRICE_UPDATE_REQUEST: "Rate Change Request",
 } as const satisfies Record<TRequestType, string>;
