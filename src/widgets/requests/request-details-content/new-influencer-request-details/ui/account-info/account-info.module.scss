@@ -40,9 +40,11 @@
 
 .field {
   display: grid;
-  grid-template-columns: clamp(93px, 20vw, 130px) auto;
+  grid-template-columns: clamp(93px, 20vw, 130px) minmax(0, 1fr);
   align-items: first baseline;
   column-gap: 8px;
+
+  min-width: 0;
 }
 
 .field_top {
@@ -63,6 +65,12 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
+
+  min-width: 0;
+  max-width: 100%;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
 
   font-size: 15px;
   color: var(--navy-blue);

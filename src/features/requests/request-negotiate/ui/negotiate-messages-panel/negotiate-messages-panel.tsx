@@ -111,10 +111,7 @@ export const NegotiateMessagesPanel: React.FC<NegotiateMessagesPanelProps> = ({
                   )}
 
                   <div
-                    className={clsx(s.field, {
-                      [s.inbound]: isInbound,
-                      [s.outbound]: isOutbound,
-                    })}
+                    className={clsx(s.field)}
                   >
                     {message.bodyText}
                   </div>
