@@ -281,7 +281,7 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
                 <Modal onClose={closeModalVideo}>
                     <div className="modal-card">
                         <h2>Video {selectedVideo.index}</h2>
-                        {media0 ? (
+                        {videoUrl || pathLower ? (
                             <VideoPreview
                                 className="modal-card-video"
                                 videoUrl={videoUrl}
