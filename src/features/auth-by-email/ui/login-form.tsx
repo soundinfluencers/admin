@@ -31,7 +31,7 @@ export const LoginForm = () => {
           name={'password'}
           label={'Password'}
           placeholder={'Enter password'}
-          autoComplete={"password"}
+          autoComplete={"current-password"}
         />
       </div>
 

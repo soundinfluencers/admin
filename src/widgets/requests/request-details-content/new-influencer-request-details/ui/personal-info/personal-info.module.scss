@@ -9,17 +9,25 @@
 
 .item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+
+  min-width: 0;
 }
 
 .label {
-  width: clamp(89px, 30vw, 108px);
+  flex: 0 0 clamp(89px, 30vw, 108px);
 
   font-size: 14px;
   color: var(--gray);
 }
 
 .value {
+  flex: 1 1 0;
+  min-width: 0;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
   color: var(--navy-blue);
 }

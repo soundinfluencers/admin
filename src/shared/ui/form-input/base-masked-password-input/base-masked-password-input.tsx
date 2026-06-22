@@ -6,7 +6,7 @@ import clsx from "clsx";
 import eye from '@/assets/icons/eye.svg';
 import closeEye from '@/assets/icons/eye-off.svg';
 
-import styles from './base-masked-password-input.module.scss';
+import s from './base-masked-password-input.module.scss';
 
 interface BaseMaskedPasswordInputProps<T extends FieldValues> {
   name: Path<T>;
@@ -39,6 +39,7 @@ export function BaseMaskedPasswordInput<T extends FieldValues>({
     <Input
       id={name}
       name={name}
+      className={s.input}
       ref={ref}
       label={label}
       type={isVisible ? "text" : "password"}
@@ -52,7 +53,7 @@ export function BaseMaskedPasswordInput<T extends FieldValues>({
       rightSlot={
         hasValue ? (
           <button
-            className={clsx(styles.showBtn)}
+            className={clsx(s.showBtn)}
             type="button"
             onClick={() => setIsVisible((prev) => !prev)}
           >
