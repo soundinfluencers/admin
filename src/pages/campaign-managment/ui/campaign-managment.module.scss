@@ -8,6 +8,8 @@
     margin-bottom: 12px;
   }
 
+
+
   .title{
     display: flex;
     justify-content: space-between;
@@ -25,7 +27,26 @@
         font-weight: 400;
         line-height: normal;
       }
+      .campaignNameInput {
+        width: 100%;
+        max-width: 720px;
 
+        margin: 0;
+        padding: 0;
+        border: none;
+        background: transparent;
+        outline: none;
+        box-shadow: none;
+
+        font-size: 36px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        color: inherit;
+        font-family: inherit;
+
+        appearance: none;
+      }
     }
     &__flex{
       display: flex;
