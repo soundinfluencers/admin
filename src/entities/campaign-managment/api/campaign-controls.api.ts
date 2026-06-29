@@ -1,63 +1,61 @@
 import { $api } from "@/app/api/http.ts";
 
 type PayPromoProps = {
-    campaignId: string;
-    promoId: string;
+  campaignId: string;
+  promoId: string;
 };
 
 type UpdateAllPostDetailsBody = {
-    campaignId: string;
-    campaignName: string;
-    clientId: string;
+  campaignId: string;
+  campaignName: string;
+  clientId: string;
 };
 
 export const getPdfFile = async (campaignId: string) => {
-    return await $api.get(`/campaigns/${campaignId}/pdf`, {
-        responseType: "blob",
-        timeout: 15000,
-    });
+  return await $api.get(`/campaigns/${campaignId}/pdf`, {
+    responseType: "blob",
+    timeout: 15000,
+  });
 };
 
 export const closeCampaign = async (campaignId: string) => {
-    return await $api.post(`/admin/campaigns/${campaignId}/close`);
+  return await $api.post(`/admin/campaigns/${campaignId}/close`);
 };
 
 export const reopenCampaign = async (campaignId: string) => {
-    return await $api.post(`/admin/campaigns/${campaignId}/reopen`);
+  return await $api.post(`/admin/campaigns/${campaignId}/reopen`);
 };
 
 export const payPromoCampaign = async ({
-                                           campaignId,
-                                           promoId,
-                                       }: PayPromoProps) => {
-    const res = await $api.patch(`/admin/campaigns/${campaignId}/pay/${promoId}`);
-    return res.data.data;
+  campaignId,
+  promoId,
+}: PayPromoProps) => {
+  const res = await $api.patch(`/admin/campaigns/${campaignId}/pay/${promoId}`);
+  return res.data.data;
 };
 
 export const updateAllPostDetails = async ({
-                                               campaignId,
-                                               campaignName,
-                                               clientId,
-                                           }: UpdateAllPostDetailsBody) => {
-    const res = await $api.post("/scrapers/post-details/all", {
-        campaignId,
-        campaignName,
-        clientId,
-    });
+  campaignId,
+  campaignName,
+  clientId,
+}: UpdateAllPostDetailsBody) => {
+  const res = await $api.patch("/scrapers/post-details/all", {
+    campaignId,
+    campaignName,
+    clientId,
+  });
 
-    return res.data?.data ?? res.data;
+  return res.data?.data ?? res.data;
 };
 
 export const sendPromoEmail = async ({
-                                         campaignId,
-                                         promoId,
-                                     }: {
-    campaignId: string;
-    promoId: string;
+  campaignId,
+  promoId,
+}: {
+  campaignId: string;
+  promoId: string;
 }) => {
-    const res = await $api.post(
-        `/admin/campaigns/mail/${campaignId}/${promoId}`,
-    );
+  const res = await $api.post(`/admin/campaigns/mail/${campaignId}/${promoId}`);
 
-    return res.data;
+  return res.data;
 };

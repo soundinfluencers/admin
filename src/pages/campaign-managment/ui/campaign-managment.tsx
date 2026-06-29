@@ -145,6 +145,7 @@ export const CampaignManagment = () => {
     const buildSavePayload = useCampaignManagementStore((s) => s.buildSavePayload);
     const resetEditableToOriginal = useCampaignManagementStore((s) => s.resetEditableToOriginal);
     const campaignName = useCampaignManagementStore((s) => s.editable?.campaignName ?? "");
+    const setCampaignName = useCampaignManagementStore((s) => s.setCampaignName);
     const existingOptions = useCampaignManagementStore((s) => s.existingOptions);
     const status = useCampaignManagementStore((s) => s.status);
     const canEdit = useCampaignManagementStore((s) => s.canEdit);
@@ -154,7 +155,50 @@ export const CampaignManagment = () => {
     const kind = getCampaignKindByStatus(resolvedStatus);
     const [isCampaignLoading, setIsCampaignLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [isEditingCampaignName, setIsEditingCampaignName] = useState(false);
+    const [campaignNameDraft, setCampaignNameDraft] = useState("");
 
+    useEffect(() => {
+        if (!isEditingCampaignName) {
+            setCampaignNameDraft(campaignName);
+        }
+    }, [campaignName, isEditingCampaignName]);
+
+    const handleStartEditCampaignName = () => {
+        if (!isEditable()) return;
+
+        setCampaignNameDraft(campaignName);
+        setIsEditingCampaignName(true);
+    };
+
+    const handleCancelEditCampaignName = () => {
+        setCampaignNameDraft(campaignName);
+        setIsEditingCampaignName(false);
+    };
+
+    const handleCommitCampaignName = () => {
+        const nextName = campaignNameDraft.trim();
+
+        if (!nextName) {
+            handleCancelEditCampaignName();
+            return;
+        }
+
+        setCampaignName(nextName);
+        setIsEditingCampaignName(false);
+    };
+
+    const handleCampaignNameKeyDown = (
+        event: React.KeyboardEvent<HTMLInputElement>,
+    ) => {
+        if (event.key === "Enter") {
+            handleCommitCampaignName();
+        }
+
+        if (event.key === "Escape") {
+            handleCancelEditCampaignName();
+        }
+    };
     const editablePrice = useCampaignManagementStore(
         (state) => Number(state.editable?.price ?? 0),
     );
@@ -619,7 +663,26 @@ export const CampaignManagment = () => {
             <div className={styles.containerBar}>
                 <div className={styles.title}>
                     <div className={styles.title__block}>
-                        {campaignName && <h2 className={styles.title}>{campaignName}</h2>}
+                        {isEditingCampaignName ? (
+                            <input
+                                className={styles.campaignNameInput}
+                                value={campaignNameDraft}
+                                autoFocus
+                                onChange={(event) => setCampaignNameDraft(event.target.value)}
+                                onBlur={handleCommitCampaignName}
+                                onKeyDown={handleCampaignNameKeyDown}
+                            />
+                        ) : (
+                            campaignName && (
+                                <h2
+                                    className={styles.campaignName}
+                                    onDoubleClick={handleStartEditCampaignName}
+                                    title={isEditable() ? "Double click to edit campaign name" : campaignName}
+                                >
+                                    {campaignName}
+                                </h2>
+                            )
+                        )}
                         {isLockedStatus &&  <p>status: {status}</p>}
                     </div>
                     {status !== "proposal" && (
