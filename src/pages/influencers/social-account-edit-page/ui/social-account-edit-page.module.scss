@@ -1,0 +1,20 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use "@/app/styles/utils/mixins" as mixins;
+
+.editAccountPage {
+  @include mixins.flex-center($direction: column);
+  padding-block: 32px;
+  gap: 38px;
+
+  @include breakpoints.tablet {
+    padding-block: 16px;
+    gap: 32px;
+  }
+  @include breakpoints.mobile {
+    gap: 24px;
+  }
+}
+
+.title {
+  text-align: center;
+}

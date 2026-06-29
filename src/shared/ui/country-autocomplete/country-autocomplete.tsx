@@ -20,6 +20,8 @@ interface CountryAutocompleteProps {
 
   onCommit: (value: string | null) => void;
   onInputChange?: (raw: string) => void;
+
+  size?: 'sm';
 }
 
 export const CountryAutocomplete: React.FC<CountryAutocompleteProps> = ({
@@ -33,6 +35,7 @@ export const CountryAutocomplete: React.FC<CountryAutocompleteProps> = ({
   excludeCountries,
   onCommit,
   onInputChange,
+  size,
 }) => {
   const rootRef = useRef<HTMLDivElement>(null);
   const isSelectingRef = useRef(false);
@@ -75,7 +78,9 @@ export const CountryAutocomplete: React.FC<CountryAutocompleteProps> = ({
       className={clsx(s.root, isFocused && s.focused)}
     >
       <Input
-        className={s.input}
+        className={clsx(s.input, {
+          [s.inputSm]: size === 'sm',
+        })}
         id={name}
         name={name}
         type="text"
@@ -84,7 +89,7 @@ export const CountryAutocomplete: React.FC<CountryAutocompleteProps> = ({
         placeholder={placeholder}
         disabled={disabled}
         autoComplete="off"
-        error={error}
+        error={showDropdown ? undefined : error}
         onChange={(e) => {
           const rawValue = e.target.value;
           setSearchValue(rawValue);
@@ -130,12 +135,11 @@ export const CountryAutocomplete: React.FC<CountryAutocompleteProps> = ({
           showDropdown && s.listWrapperVisible,
         )}
       >
-        <ul className={s.list} role="listbox">
+        <ul className={s.list}>
           {filteredCountries.map((country) => (
             <li
               key={country.code}
               className={s.item}
-              role="option"
               tabIndex={-1}
               aria-selected={false}
               onMouseDown={(e) => {

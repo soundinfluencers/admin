@@ -1,0 +1,48 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.currencySelector {
+  display: flex;
+  justify-content: flex-start;
+  gap: 16px;
+}
+
+.option {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: var(--white);
+  border: 1px solid var(--white-gray-20);
+  border-radius: 50%;
+
+  transition:
+    background var(--transition-base),
+    border-color var(--transition-base);
+
+  cursor: pointer;
+}
+
+.selected {
+  background: #F6FAFF;
+  border-color: var(--blue);
+}
+
+.input {
+  display: none;
+}
+
+.label {
+  color: var(--gray-dark);
+  font-size: 14px;
+
+  user-select: none;
+}
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

@@ -5,8 +5,8 @@ import { ACCOUNT_INFO_FIELDS } from '../../model/new-social-account-request.conf
 import { SOCIAL_MEDIA_DARK_ICONS, SOCIAL_MEDIA_LABEL_MAP } from "@/widgets/requests/model/social-media.constants.ts";
 import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
 import {
-  parseCountries,
-  parseMusicGenres,
+  parseCommunityMusicGenres,
+  parseCountries, parseCreatorContentFocus, parseCreatorMusicGenres, parseThemeTopics,
   type TParsedCountry,
 } from "@/widgets/requests/request-details-content/new-influencer-request-details/model/new-influencer-request-details.parsers.ts";
 
@@ -17,14 +17,14 @@ interface AccountInfoProps {
 }
 
 const CHIP_KEYS = new Set<typeof ACCOUNT_INFO_FIELDS[number]['key']>([
-  'musicGenres',
-  'categories',
-  'creatorCategories',
-  'countries',
+  'creatorMusicGenres',
+  'creatorContentFocus',
+  'communityThemeTopics',
+  'communityMusicGenres',
 ]);
 
-const COMMUNITY_HIDDEN: Set<typeof ACCOUNT_INFO_FIELDS[number]['key']> = new Set(['creatorCategories']);
-const CREATOR_HIDDEN: Set<typeof ACCOUNT_INFO_FIELDS[number]['key']> = new Set(['musicGenres', 'categories']);
+const COMMUNITY_HIDDEN: Set<typeof ACCOUNT_INFO_FIELDS[number]['key']> = new Set(['creatorContentFocus', 'creatorMusicGenres']);
+const CREATOR_HIDDEN: Set<typeof ACCOUNT_INFO_FIELDS[number]['key']> = new Set(['communityMusicGenres', 'communityThemeTopics']);
 
 const CHIPS_TOP_THRESHOLD = 3;
 
@@ -41,13 +41,27 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
     ));
   };
 
-  const getChipsCount = (key: typeof ACCOUNT_INFO_FIELDS[number]['key']): number => {
+  const getChipsCount = (
+    key: typeof ACCOUNT_INFO_FIELDS[number]["key"],
+  ): number => {
     switch (key) {
-      case 'musicGenres': return parseMusicGenres(account.musicGenres).length;
-      case 'categories': return account.categories.length;
-      case 'creatorCategories': return account.creatorCategories.length;
-      case 'countries': return account.countries.filter((c) => c.country).length;
-      default: return 0;
+      case "communityMusicGenres":
+        return account.communityMusicGenres?.length ?? 0;
+
+      case "communityThemeTopics":
+        return account.communityThemeTopics?.length ?? 0;
+
+      case "creatorMusicGenres":
+        return account.creatorMusicGenres?.length ?? 0;
+
+      case "creatorContentFocus":
+        return account.creatorContentFocus?.length ?? 0;
+
+      case "countries":
+        return account.countries.filter((c) => c.country).length;
+
+      default:
+        return 0;
     }
   };
 
@@ -61,28 +75,49 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
     ));
   };
 
-  const renderValue = (key: typeof ACCOUNT_INFO_FIELDS[number]['key']): React.ReactNode => {
+  const renderValue = (
+    key: typeof ACCOUNT_INFO_FIELDS[number]["key"],
+  ): React.ReactNode => {
     switch (key) {
-      case 'price':
-        return formatCurrency(account.price, 'EUR');
-      case 'initialPrice':
+      case "price":
+        return formatCurrency(account.price, "EUR");
+
+      case "initialPrice":
         return formatCurrency(account.initialPrice, account.currency);
-      case 'logoUrl':
-        return account.logoUrl
-          ? <img className={s.logo} src={account.logoUrl} alt="logo" width={32} height={32} />
-          : 'N/A';
-      case 'musicGenres':
-        return renderChips(parseMusicGenres(account.musicGenres));
-      case 'categories':
-        return renderChips(account.categories);
-      case 'creatorCategories':
-        return renderChips(account.creatorCategories);
-      case 'countries':
+
+      case "logoUrl":
+        return account.logoUrl ? (
+          <img
+            className={s.logo}
+            src={account.logoUrl}
+            alt="logo"
+            width={32}
+            height={32}
+          />
+        ) : (
+          "N/A"
+        );
+
+      case "communityMusicGenres":
+        return renderChips(parseCommunityMusicGenres(account.communityMusicGenres));
+
+      case "communityThemeTopics":
+        return renderChips(parseThemeTopics(account.communityThemeTopics));
+
+      case "creatorMusicGenres":
+        return renderChips(parseCreatorMusicGenres(account.creatorMusicGenres));
+
+      case "creatorContentFocus":
+        return renderChips(parseCreatorContentFocus(account.creatorContentFocus));
+
+      case "countries":
         return renderCountries(parseCountries(account.countries));
+
       default: {
         const val = account[key];
-        const str = val != null ? String(val) : '';
-        return str || 'N/A';
+        const str = val != null ? String(val) : "";
+
+        return str || "N/A";
       }
     }
   };

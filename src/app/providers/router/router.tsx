@@ -12,8 +12,8 @@ import { CompanyDetailsPage } from "@/pages/company-details";
 import { CampaignsPage } from "@/pages/campaigns";
 import { InfluencersListPage } from "@/pages/influencers/influencer-list-page";
 import { InfluencerDetailsPage } from "@/pages/influencers/influencer-details-page";
-import { CreateInfluencerAccountPage } from "@/pages/influencers/create-influencer-account-page";
-import { EditInfluencerAccountPage } from "@/pages/influencers/edit-influencer-account-page";
+import { SocialAccountCreatePage } from "@/pages/influencers/social-account-create-page";
+import { SocialAccountEditPage } from "@/pages/influencers/social-account-edit-page";
 import { CampaignManagment } from "@/pages/campaign-managment";
 import { InfluencerHistoryPage } from "@/pages/influencer-history/influencer-history-page";
 import { InfluencerHistoryDetailsPage } from "@/pages/influencer-history/influencer-history-details-page";
@@ -122,8 +122,8 @@ export const ROUTER = createBrowserRouter([
                       {
                         path: "accounts",
                         children: [
-                          { path: ":platform/create", element: <CreateInfluencerAccountPage/> },
-                          { path: ":platform/:accountId/edit", element: <EditInfluencerAccountPage/> },
+                          { path: ":platform/create", element: <SocialAccountCreatePage/> },
+                          { path: ":platform/:accountId/edit", element: <SocialAccountEditPage/> },
                         ],
                       },
                     ],

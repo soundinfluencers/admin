@@ -1,47 +1,21 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useDeleteSocialAccountMutation } from "@/entities/influencers/api/use-delete-social-account-mutation.ts";
 import { Modal } from "@/shared/ui/modal/modal.tsx";
 import { Button } from "@/shared/ui";
-import { toast } from "react-toastify";
-
-import type { TSocialMediaValue } from "@/entities/influencers/model/influencers.constants.ts";
 
 import s from './delete-social-account.module.scss';
 
 interface DeleteSocialAccountProps {
-  influencerId: string;
-  accountId: string;
-  socialMedia: TSocialMediaValue;
+  onHandleDelete?: () => void;
+  isDeletePending?: boolean;
   onClose: () => void;
 }
 
 export const DeleteSocialAccount: React.FC<DeleteSocialAccountProps> = ({
-  influencerId,
-  accountId,
-  socialMedia,
+  onHandleDelete,
+  isDeletePending,
   onClose,
 }) => {
-  const { mutate, isPending } = useDeleteSocialAccountMutation();
-  const navigate = useNavigate();
 
-  const handleDeleteSocialAccount = () => {
-    mutate({
-      influencerId,
-      accountId,
-      socialMedia,
-    }, {
-      onSuccess: () => {
-        onClose();
-        navigate(`/dashboard/influencers/${influencerId}`);
-        toast("Social account deleted successfully!", {
-          type: "success",
-          position: "top-right",
-          autoClose: 3000,
-        });
-      },
-    });
-  };
 
   return (
     <Modal onClose={onClose} isShownCloseButton>
@@ -66,10 +40,10 @@ export const DeleteSocialAccount: React.FC<DeleteSocialAccountProps> = ({
             variant="primary"
             type="button"
             size="large"
-            onClick={handleDeleteSocialAccount}
-            disabled={isPending}
+            onClick={onHandleDelete}
+            disabled={isDeletePending}
           >
-            {isPending ? "Deleting..." : "Delete"}
+            {isDeletePending ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </div>

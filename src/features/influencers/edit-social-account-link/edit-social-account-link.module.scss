@@ -1,0 +1,33 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.editLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px 16px;
+  flex-shrink: 0;
+
+  background: var(--white);
+  border: 1px solid var(--blue);
+  border-radius: 4px;
+
+  font-size: var(--text-sm);
+
+  transition: background var(--transition-base);
+
+  @include mixins.hover {
+    background: var(--white-gray-20);
+  }
+
+  @include breakpoints.mobile {
+    padding: 4px 8px;
+  }
+}
+
+.editIcon {
+  width: 18px;
+  height: 18px;
+  aspect-ratio: 1 / 1;
+}

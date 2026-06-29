@@ -1,32 +1,25 @@
-import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useInfluencerQuery } from "@/entities/influencers/api/use-influencer-query.ts";
 import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { InfluencerAccountDetails } from "@/widgets/influencers/influencer-account-details";
-import { InfluencerSocialAccounts } from "@/widgets/influencers/influencer-social-accounts";
-import { notifyApiError } from "@/app/api/errors/notify.ts";
+import { InfluencerSocialAccounts } from "@/widgets/influencers/social-accounts-list";
+import { mapInfluencerProfileToAccounts } from "../model/influencer-social-accounts.mapper.ts";
 
 import s from './influencer-details-page.module.scss';
 
 export const InfluencerDetailsPage = () => {
   const { influencerId } = useParams();
 
-  const { data, isLoading, isError, error } = useInfluencerQuery(influencerId);
+  const { data, isPending, isError } = useInfluencerQuery(influencerId);
 
-  console.log('Influencer details data', data, isLoading, isError, error);
-
-  useEffect(() => {
-    if (isError && error) {
-      notifyApiError(error);
-    }
-  }, [isError, error]);
+  const accountsDetails = data ? mapInfluencerProfileToAccounts(data) : null;
 
   if (!influencerId) {
     return <div>Influencer id is missing.</div>;
   }
 
-  if (isLoading) {
+  if (isPending && !data) {
     return <div>Loading...</div>;
   }
 
@@ -34,7 +27,7 @@ export const InfluencerDetailsPage = () => {
     return <div>Error loading influencer. Please try again later.</div>;
   }
 
-  if (!data) {
+  if (!data || !accountsDetails) {
     return <div>Influencer not found.</div>;
   }
 
@@ -57,9 +50,7 @@ export const InfluencerDetailsPage = () => {
         details={data}
       />
 
-      <InfluencerSocialAccounts
-        details={data}
-      />
+      <InfluencerSocialAccounts details={accountsDetails}/>
     </div>
   );
 };

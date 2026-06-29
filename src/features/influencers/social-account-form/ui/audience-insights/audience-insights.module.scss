@@ -1,0 +1,73 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.audienceInsights {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @include breakpoints.mobile {
+    gap: 16px;
+  }
+}
+
+.field {
+  display: grid;
+  grid-template-columns: minmax(0, 50px) auto;
+  grid-template-areas: "label inputs";
+  align-items: center;
+  column-gap: 16px;
+
+  @include breakpoints.mobile {
+    grid-template-columns: minmax(0, 40px) auto;
+    column-gap: 4px;
+  }
+}
+
+.label {
+  grid-area: label;
+}
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 20px;
+  font-family: Brygada1918, sans-serif;
+
+  @include breakpoints.mobile {
+    justify-content: flex-start;
+  }
+}
+
+.inputs {
+  grid-area: inputs;
+  display: grid;
+  grid-template-columns: minmax(0, 70px) auto;
+  grid-template-areas: "percentage country";
+  align-items: center;
+  column-gap: 8px;
+
+  @include breakpoints.mobile {
+    column-gap: 4px;
+  }
+}
+
+.percentage {
+  grid-area: percentage;
+}
+.country {
+  grid-area: country;
+}
+
+.percentageInput {
+  padding: 12px 8px;
+  height: 38px;
+  text-align: center;
+}

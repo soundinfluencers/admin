@@ -1,0 +1,36 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  font-size: 24px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: normal;
+  border-bottom: 1px solid var(--blue);
+
+  @include breakpoints.tablet {
+    font-size: 20px;
+  }
+}
+
+.subtitle {
+  font-size: var(--text-md);
+}
+
+.error {
+  border-bottom: 1px solid var(--error);
+}
+.errorMessage {
+  color: var(--error);
+  font-size: var(--text-sm);
+}

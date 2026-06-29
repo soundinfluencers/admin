@@ -8,5 +8,7 @@ export type TSocialMedia =
   | "press"
   | "multipromo";
 
+export type TPlatform = Exclude<TSocialMedia, "multipromo">;
+
 export type TCurrency = 'EUR' | 'GBP' | 'USD';
 export type TPaymentMethod = "paypal" | "ukBankTransfer" | "internationalBankTransfer";

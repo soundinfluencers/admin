@@ -1,3 +1,17 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  text-align: start;
+
+  @include breakpoints.mobile {
+    gap: 4px;
+  }
+}
+
 .title {
   font-size: var(--text-xl);
   font-weight: 400;

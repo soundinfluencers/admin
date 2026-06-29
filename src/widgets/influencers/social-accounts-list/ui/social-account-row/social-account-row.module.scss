@@ -1,0 +1,53 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.socialAccountRow {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @include breakpoints.mobile {
+    min-height: 30px;
+  }
+}
+
+.accountInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+
+  @include breakpoints.mobile {
+    gap: 8px;
+  }
+}
+
+.badge {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--white-gray-20);
+  border-radius: 4px;
+
+  background: transparent;
+
+  @include breakpoints.mobile {
+    flex-basis: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.username {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-size: var(--text-md);
+}

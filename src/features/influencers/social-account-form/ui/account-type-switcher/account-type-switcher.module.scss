@@ -1,0 +1,101 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.accountTypeSwitcher {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  @include breakpoints.mobile {
+    gap: 4px;
+  }
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: 400;
+  font-style: normal;
+  line-height: normal;
+}
+
+.options {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  @include breakpoints.mobile {
+    flex-direction: column;
+  }
+}
+
+.option {
+  flex: 1;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-block: 8px;
+
+  @include breakpoints.mobile {
+    gap: 4px;
+    padding-block: 0;
+  }
+}
+
+.button {
+  @include mixins.reset-button;
+  @include mixins.flex-center;
+  flex-shrink: 0;
+  position: relative;
+  isolation: isolate;
+  padding: 8px 0;
+  border-radius: 8px;
+
+  border: 1px solid #DFF0FF;
+  background: var(--white);
+  backdrop-filter: blur(3px) contrast(1.08) saturate(1.2);
+  -webkit-backdrop-filter: blur(3px) contrast(1.08) saturate(1.2);
+
+  font-size: 20px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: normal;
+
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--brightest-gradient);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    z-index: 0;
+  }
+
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @include breakpoints.mobile {
+    font-size: 16px;
+  }
+}
+
+.active::before {
+  opacity: 1;
+}
+
+.description {
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: normal;
+  text-align: center;
+
+  @include breakpoints.mobile {
+    font-size: 13px;
+  }
+}
