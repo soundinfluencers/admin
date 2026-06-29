@@ -1,12 +1,12 @@
 import type { TCurrency, TSocialMedia } from "@/shared/types/types.ts";
-import type { ISocialAccount } from "@/entities/influencers/model/social-account.types.ts";
+import type { ISocialAccount } from "@/entities/influencers/social-account/model/social-account.types.ts";
+
 
 export const ADMIN_REQUEST_TYPES = [
   'NEW_CLIENT_REQUEST',
   'NEW_INFLUENCER_REQUEST',
   'CAMPAIGN_REQUEST',
   'BESPOKE_CAMPAIGN_REQUEST',
-  // 'PROPOSAL_CAMPAIGN_REQUEST',
   'NEW_SOCIAL_ACCOUNT_REQUEST',
   'PRICE_UPDATE_REQUEST',
 ] as const;

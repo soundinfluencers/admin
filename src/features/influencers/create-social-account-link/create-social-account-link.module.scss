@@ -1,0 +1,33 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.addAccount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 4px;
+
+  border: 1px solid var(--white-gray-20);
+  background: var(--white);
+
+  font-size: var(--text-sm);
+  font-weight: 500;
+
+  transition: background var(--transition-base);
+
+  @include mixins.hover {
+    background: var(--white-gray-20);
+  }
+
+  @include breakpoints.mobile {
+    padding: 4px 8px;
+  }
+}
+
+.addIcon {
+  width: 18px;
+  height: 18px;
+  aspect-ratio: 1 / 1;
+}

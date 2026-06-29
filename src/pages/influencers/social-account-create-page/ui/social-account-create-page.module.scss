@@ -1,0 +1,32 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use "@/app/styles/utils/mixins" as mixins;
+
+.createAccountPage {
+  @include mixins.flex-center($direction: column);
+  padding-block: 32px;
+  gap: 38px;
+
+  @include breakpoints.tablet {
+    padding-block: 16px;
+    gap: 32px;
+  }
+  @include breakpoints.mobile {
+    gap: 24px;
+  }
+}
+
+.title {
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: var(--gray);
+
+  @include breakpoints.tablet {
+    font-size: 16px;
+  }
+  @include breakpoints.mobile {
+    font-size: 14px;
+  }
+}

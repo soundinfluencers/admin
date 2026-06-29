@@ -1,22 +1,26 @@
 import React, { useRef } from "react";
+import { DotLoader } from "@/shared/ui/loaders/dot-loader";
 import clsx from "clsx";
 
-import paperClip from '@/assets/icons/paperclip.svg';
-import trash from '@/assets/icons/campaigns/icons/trash.svg';
+import Trash from '@/assets/icons/trash-2.svg?react';
+import PaperClip from '@/assets/icons/paperclip.svg?react';
+import X from '@/assets/icons/x.svg?react';
 
 import s from './image-upload.module.scss';
-import { DotLoader } from "@/shared/ui/dot-loader/dot-loader.tsx";
 
 interface ImageUploadProps {
   name: string;
   label: string;
   placeholder?: string;
-  value: string | null;
+  value: string;
   error?: string;
+  hideErrorMessage?: boolean;
+  reserveErrorSpace?: boolean;
   disabled?: boolean;
   isPending?: boolean;
   onFileSelect: (file: File) => void;
   onRemove: () => void;
+  size: 'sm' | 'lg';
 }
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -25,10 +29,13 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   placeholder = "Upload Image",
   value,
   error,
+  hideErrorMessage,
+  reserveErrorSpace,
   disabled = false,
   isPending = false,
   onFileSelect,
   onRemove,
+  size,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const hasPreview = Boolean(value);
@@ -83,11 +90,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       />
 
       <div
-        className={clsx(
-          s.control,
-          hasPreview && s.preview,
-          error && s.inputError,
-        )}
+        className={clsx(s.control, {
+          [s.inputError]: error,
+          [s.large]: size === 'lg',
+          [s.controlExpanded]: hasPreview && size === 'lg',
+        })}
         onClick={!hasPreview ? openFileDialog : undefined}
         role={!hasPreview && isInteractive ? "button" : undefined}
         tabIndex={!hasPreview && isInteractive ? 0 : undefined}
@@ -101,31 +108,49 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         }}
       >
         {isPending ? (
-          <DotLoader />
+          <DotLoader/>
         ) : hasPreview ? (
           <>
-            <img
-              src={value as string}
-              alt="Uploaded preview"
-              className={clsx(s.logo)}
-              width={40}
-              height={40}
-              loading="lazy"
-            />
-
-            <button
-              type="button"
-              className={clsx(s.action)}
-              onClick={handleRemoveClick}
-              disabled={!isInteractive}
-            >
+            {size === 'lg' ? (
+              <div className={s.wrapper}>
+                <img
+                  src={value}
+                  alt="Uploaded preview"
+                  className={clsx(s.logo, s.logoLarge)}
+                  width={142}
+                  height={172}
+                  loading="lazy"
+                />
+                <button className={s.removeButton} onClick={handleRemoveClick} disabled={!isInteractive}>
+                  <X className={s.removeIcon} aria-label="Remove logo" />
+                </button>
+              </div>
+            ) : (
               <img
-                src={trash}
-                alt="Remove logo"
-                width={20}
-                height={20}
+                src={value}
+                alt="Uploaded preview"
+                className={s.logo}
+                width={40}
+                height={40}
+                loading="lazy"
               />
-            </button>
+            )}
+
+            {size === 'sm' && (
+              <button
+                type="button"
+                className={s.action}
+                onClick={handleRemoveClick}
+                disabled={!isInteractive}
+              >
+                <Trash
+                  className={s.actionIcon}
+                  width={20}
+                  height={20}
+                  aria-label="Remove logo"
+                />
+              </button>
+            )}
           </>
         ) : (
           <>
@@ -135,21 +160,26 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               type="button"
               className={clsx(s.action)}
             >
-              <img
-                src={paperClip}
-                alt="Add logo"
+              <PaperClip
+                className={s.actionIcon}
                 width={20}
                 height={20}
+                aria-label={"Add logo"}
               />
             </button>
           </>
         )}
       </div>
 
-      {error && (
-        <span className={s.error}>
-          {error}
-        </span>
+      {(error || reserveErrorSpace) && (
+        <p
+          className={clsx(
+            s.error,
+            (!error || hideErrorMessage) && s.errorTextHidden,
+          )}
+        >
+          {error || "\u00A0"}
+        </p>
       )}
     </div>
   );

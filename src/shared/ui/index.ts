@@ -10,9 +10,18 @@ export { BaseNumericInput } from './form-input/base-number-input/base-numeric-in
 export { BaseImageUpload } from './form-input/base-image-upload/base-image-upload';
 export { BaseCurrencySelector } from './form-input/base-currency-selector/base-currency-selector';
 export { BasePriceInput } from './form-input/base-price-input/base-price-input';
-export { BaseCountryAutocompleteField } from './form-input/base-country-autocomplete-field/base-country-autocomplete-field';
+export { PriceInput } from './form-input/price-input/price-input';
+export { CountryAutocompleteField } from './form-input/country-autocomplete-field/country-autocomplete-field';
 export { BaseCheckboxTreeField } from './form-input/base-checkbox-tree-field/base-checkbox-tree-field';
 export { TextAreaInput } from './form-input/text-area-input/text-area-input';
+export { CurrencySelectField } from './form-input/currency-select-field/currency-select-field';
+export { PricingField } from './form-input/pricing-field/pricing-field';
+export { NumericInput } from './form-input/numeric-input/numeric-input';
+export { TextInput } from './form-input/text-input/text-input';
+export { ImageUploadField } from './form-input/image-upload-field/image-upload-field';
+export { CheckboxTreeField } from './form-input/checkbox-tree-field/checkbox-tree-field';
+export { PercentageInput } from './form-input/percentage-input/percentage-input';
+
 export { BaseTableCell } from './base-table-cell/base-table-cell';
 
 export { Form } from './form/form';

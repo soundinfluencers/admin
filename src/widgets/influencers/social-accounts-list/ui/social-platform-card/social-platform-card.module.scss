@@ -1,0 +1,58 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/mixins' as mixins;
+
+.socialPlatformCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+
+  background: var(--white-50);
+  backdrop-filter: blur(3px) contrast(1.08) saturate(1.2);
+  -webkit-backdrop-filter: blur(3px) contrast(1.08) saturate(1.2);
+  border: 1px solid var(--white-gray-20);
+
+  box-shadow: -4px -4px 8px rgba(255, 255, 255, 0.25),
+  0 0 4px rgba(200, 225, 255, 0.25), 0 6px 12px rgba(0, 0, 0, 0.04);
+
+  @include breakpoints.tablet {
+    padding: 8px 12px;
+  }
+  @include breakpoints.mobile {
+    padding: 8px;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.platformInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.platformIcon {
+  width: 37px;
+  height: 37px;
+  aspect-ratio: 1 / 1;
+
+  @include breakpoints.mobile {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.label {
+  font-size: var(--text-md);
+}
+
+.accountsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
