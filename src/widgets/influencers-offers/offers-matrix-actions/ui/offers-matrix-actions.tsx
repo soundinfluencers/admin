@@ -29,9 +29,7 @@ export const OffersMatrixActions: React.FC<OffersMatrixActionsProps> = ({
         isDisabled={isDisabled}
       />
 
-      <PublishOffers
-        isDisabled={isDisabled}
-      />
+      <PublishOffers />
     </div>
   )
 };

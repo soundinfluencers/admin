@@ -1,11 +1,12 @@
-import type { TPlatform } from "@/features/influencers-offers/filter-offers-by-platforms/model/platform.config.ts";
-import type { TGenres } from "@/features/influencers-offers/filter-offers-by-genres/model/genres.config.ts";
+import type { TOfferMusicGenre } from "@/features/influencers-offers/offers-filter-by-genres";
+import type { TOfferSocialMedia } from "@/features/influencers-offers/offers-filter-by-platform";
 
 export interface IOfferHeader {
   offerId: string;
   title: string;
   isPublished: boolean;
-  price: number;
+  offerPrice: number;
+  costPrice: number;
   createdAt: string;
 }
 
@@ -13,6 +14,9 @@ export interface IOfferAccountRow {
   influencerId: string;
   accountId: string;
   username: string;
+  followers: number;
+  price: number;
+  pricePerFollower: number;
   logoUrl: string | null;
 }
 
@@ -31,14 +35,14 @@ export interface IInfluencersOffersMatrix {
 }
 
 export interface IInfluencersOffersMatrixResponse {
-  statusCode: string;
+  statusCode: number;
   message: string;
   data: IInfluencersOffersMatrix;
 }
 
 export interface IGetInfluencersOffersMatrixParams {
-  socialMedia: TPlatform;
-  genre: TGenres;
+  socialMedia: TOfferSocialMedia;
+  genre: TOfferMusicGenre;
 
   offersCursor?: string;
   accountsCursor?: string;
@@ -47,32 +51,24 @@ export interface IGetInfluencersOffersMatrixParams {
   accountsTake?: number;
 }
 
-export interface IOfferPublishedRequest {
-  offerId: string;
+export interface ICreateInfluencersOfferRequest {
+  socialMedia: TOfferSocialMedia;
+  genre: TOfferMusicGenre;
+  offerName: string;
 }
 
-export interface IOfferPublishedResponse {
-  statusCode: number;
-  message: string;
-}
-
-export interface IOfferAccountLinkRequest {
+export interface IInfluencersOfferLinkRequest {
   offerId: string;
   influencerId: string;
   accountId: string;
   connected: boolean;
 }
 
-export interface IOfferAccountLinkResponse {
-  statusCode: number;
-  message: string;
-}
-
-export interface IDeleteOfferRequest {
+export interface IPublishInfluencersOfferRequest {
   offerId: string;
 }
 
-export interface IDeleteOfferResponse {
+export interface IInfluencersOfferMutationResponse {
   statusCode: number;
   message: string;
 }

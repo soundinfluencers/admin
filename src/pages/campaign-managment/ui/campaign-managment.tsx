@@ -61,6 +61,7 @@ export const CampaignManagment = () => {
         viewParam === "-1" || viewParam === "0" || viewParam === "1"
             ? (Number(viewParam) as ViewMode)
             : null;
+
     const [modeState, setModeState] = useState<{
         key: string;
         mode: PageMode;
@@ -68,6 +69,7 @@ export const CampaignManagment = () => {
         key: modeKey,
         mode: getDefaultModeByStatus(statusParam),
     }));
+
     const [deleteOptionModal, setDeleteOptionModal] = useState<{
         isOpen: boolean;
         optionIndex: number | null;
@@ -75,6 +77,7 @@ export const CampaignManagment = () => {
         isOpen: false,
         optionIndex: null,
     });
+
     const handleOpenDeleteOptionModal = (nextOptionIndex: number) => {
         setDeleteOptionModal({
             isOpen: true,
@@ -423,6 +426,7 @@ export const CampaignManagment = () => {
             setIsSaving(false);
         }
     };
+
     const handleToggleMode = useCallback(() => {
         const normalizedStatus = String(statusParam ?? "").toLowerCase();
 
@@ -433,6 +437,7 @@ export const CampaignManagment = () => {
             });
             return;
         }
+
 
         setModeState((prev) => {
             const currentMode =
@@ -446,6 +451,7 @@ export const CampaignManagment = () => {
             };
         });
     }, [modeKey, statusParam]);
+
     const items = editable?.campaignContent ?? [];
     const networks = editable?.addedAccounts ?? [];
 

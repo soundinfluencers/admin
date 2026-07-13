@@ -7,7 +7,7 @@ export const getDefaultModeByStatus = (status?: string | null): PageMode => {
         return "strategy";
     }
 
-    if (normalizedStatus === "distributing" || normalizedStatus === "completed"  || normalizedStatus === 'pending' || normalizedStatus === 'distributing') {
+    if (normalizedStatus === "completed"  || normalizedStatus === 'pending') {
         return "insight";
     }
 

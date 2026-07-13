@@ -1,17 +1,17 @@
 import { useMemo } from "react";
-import {
-  useQueryState,
-} from "nuqs";
-import {
-  genresParser, offersModeParser,
-  offersPlatformParser,
-} from "@/pages/influencers-offers-page/model/influencers-offers.query-parsers.ts";
-import type { TGenres } from "@/features/influencers-offers/filter-offers-by-genres/model/genres.config.ts";
-import type { TPlatform } from "@/features/influencers-offers/filter-offers-by-platforms/model/platform.config.ts";
+import { useQueryState } from "nuqs";
+import { offersModeParser } from "@/pages/influencers-offers-page/model/influencers-offers.query-parsers.ts";
 import type {
   IGetInfluencersOffersMatrixParams, IInfluencersOffersMatrix,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
-
+import {
+  offersSocialMediaSearchParamParser,
+  type TOfferSocialMedia,
+} from "@/features/influencers-offers/offers-filter-by-platform";
+import {
+  offersGenresSearchParamParser,
+  type TOfferMusicGenre,
+} from "@/features/influencers-offers/offers-filter-by-genres";
 
 export const EMPTY_INFLUENCERS_OFFERS_MATRIX: IInfluencersOffersMatrix = {
   offerHeaders: [],
@@ -24,12 +24,12 @@ export const EMPTY_INFLUENCERS_OFFERS_MATRIX: IInfluencersOffersMatrix = {
 export const useInfluencersOffersPageState = () => {
   const [platform, setPlatformQuery] = useQueryState(
     "platform",
-    offersPlatformParser,
+    offersSocialMediaSearchParamParser,
   );
 
   const [genre, setGenreQuery] = useQueryState(
     "genre",
-    genresParser,
+    offersGenresSearchParamParser,
   );
 
   const [mode, setModeQuery] = useQueryState(
@@ -37,11 +37,11 @@ export const useInfluencersOffersPageState = () => {
     offersModeParser,
   );
 
-  const handlePlatformChange = (nextPlatform: TPlatform | null) => {
+  const handlePlatformChange = (nextPlatform: TOfferSocialMedia | null) => {
     void setPlatformQuery(nextPlatform, { history: "replace" });
   };
 
-  const handleGenreChange = (nextGenre: TGenres | null) => {
+  const handleGenreChange = (nextGenre: TOfferMusicGenre | null) => {
     void setGenreQuery(nextGenre, { history: "replace" });
   };
 

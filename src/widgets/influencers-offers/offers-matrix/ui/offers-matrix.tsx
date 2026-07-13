@@ -7,10 +7,15 @@ import React, {
 } from "react";
 
 import { useMediaQuery } from "@/shared/hooks/use-media-query.ts";
-import type { IInfluencersOffersMatrix } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
+import type {
+  IInfluencersOfferLinkRequest,
+  IInfluencersOffersMatrix,
+  IOfferAccountRow,
+} from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 import { getOfferAccountLinkKey } from "@/pages/influencers-offers-page/model/influencers-offers-page.helpers.ts";
 import { createInfluencersOffersLinksMap } from "@/widgets/influencers-offers/offers-matrix/model/create-influencers-offers-links-map.ts";
 import { OffersMatrixCell } from "@/widgets/influencers-offers/offers-matrix/ui/offers-matrix-cell.tsx";
+import { Switch, SwitchThumb } from "@radix-ui/react-switch";
 
 import add from '@/assets/icons/plus.svg';
 
@@ -22,6 +27,7 @@ const BRAND_COL_WIDTH = 200;
 const FOLLOWERS_COL_WIDTH = 110;
 const PRICE_PER_FOLLOWER_COL_WIDTH = 158;
 const OFFER_COL_WIDTH = 101;
+const ADD_OFFER_ACTION_WIDTH = 22;
 
 const LEFT_COLUMNS_WIDTH =
   BRAND_COL_WIDTH + FOLLOWERS_COL_WIDTH + PRICE_PER_FOLLOWER_COL_WIDTH;
@@ -50,6 +56,11 @@ interface OffersMatrixProps {
   isLoading?: boolean;
   onLoadMoreOffers?: () => void;
   onLoadMoreAccounts?: () => void;
+  onAddOffer?: () => void;
+  activeOfferIds?: string[];
+  onToggleOfferActive?: (offerId: string, isActive: boolean) => void;
+  onUpdateAccountOfferLinks?: (requests: IInfluencersOfferLinkRequest[]) => void;
+  isUpdatingAccountOfferLinks?: boolean;
 }
 
 export const OffersMatrix: React.FC<OffersMatrixProps> = ({
@@ -58,10 +69,20 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
   isLoading,
   onLoadMoreOffers,
   onLoadMoreAccounts,
+  onAddOffer,
+  activeOfferIds = [],
+  onToggleOfferActive,
+  onUpdateAccountOfferLinks,
+  isUpdatingAccountOfferLinks,
 }) => {
   const linksMap = useMemo(
     () => createInfluencersOffersLinksMap(data.links),
     [data.links],
+  );
+
+  const activeOfferIdsSet = useMemo(
+    () => new Set(activeOfferIds),
+    [activeOfferIds],
   );
 
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -185,6 +206,9 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
     updateFooterMetrics,
   ]);
 
+  const showSkeleton = Boolean(isLoading);
+  const showOverlay = Boolean(isFetching && !isLoading);
+
   const verticalCanScroll = bodyMetrics.scrollHeight > bodyMetrics.clientHeight;
   const horizontalCanScroll =
     footerMetrics.scrollWidth > footerMetrics.clientWidth;
@@ -192,6 +216,7 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
   const visibleOffersWidth =
     VIEWPORT_WIDTH -
     LEFT_COLUMNS_WIDTH -
+    ADD_OFFER_ACTION_WIDTH -
     (verticalCanScroll ? VERTICAL_SCROLLBAR_WIDTH : 0);
 
   const offerColWidth = Math.max(
@@ -342,8 +367,55 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
   const isTablet = useMediaQuery("(max-width: 811px)");
   const verticalSpacing = isTablet ? 8 : 16;
 
-  const showSkeleton = Boolean(isLoading);
-  const showOverlay = Boolean(isFetching && !isLoading);
+  const getLinkedActiveOfferIds = useCallback(
+    (account: IOfferAccountRow) =>
+      activeOfferIds.filter((offerId) =>
+        linksMap.has(
+          getOfferAccountLinkKey({
+            offerId,
+            influencerId: account.influencerId,
+            accountId: account.accountId,
+          }),
+        ),
+      ),
+    [activeOfferIds, linksMap],
+  );
+
+  const handleAccountOfferLinksToggle = useCallback(
+    (account: IOfferAccountRow) => {
+      if (!activeOfferIds.length || isUpdatingAccountOfferLinks) return;
+
+      const linkedActiveOfferIds = getLinkedActiveOfferIds(account);
+      const missingOfferIds = activeOfferIds.filter(
+        (offerId) => !linkedActiveOfferIds.includes(offerId),
+      );
+
+      const requests: IInfluencersOfferLinkRequest[] =
+        missingOfferIds.length > 0
+          ? missingOfferIds.map((offerId) => ({
+            offerId,
+            influencerId: account.influencerId,
+            accountId: account.accountId,
+            connected: true,
+          }))
+          : activeOfferIds.map((offerId) => ({
+            offerId,
+            influencerId: account.influencerId,
+            accountId: account.accountId,
+            connected: false,
+          }));
+
+      if (!requests.length) return;
+
+      onUpdateAccountOfferLinks?.(requests);
+    },
+    [
+      activeOfferIds,
+      getLinkedActiveOfferIds,
+      isUpdatingAccountOfferLinks,
+      onUpdateAccountOfferLinks,
+    ],
+  );
 
   const showEmpty =
     !isLoading &&
@@ -360,6 +432,9 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
       influencerId: `skeleton-influencer-${index}`,
       accountId: `skeleton-account-${index}`,
       username: "",
+      followers: 0,
+      price: 0,
+      pricePerFollower: 0,
       logoUrl: null,
     }))
     : data.accountRows;
@@ -369,7 +444,8 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
       offerId: `skeleton-offer-${index}`,
       title: "",
       isPublished: false,
-      price: 0,
+      offerPrice: 0,
+      costPrice: 0,
       createdAt: "",
     }))
     : data.offerHeaders;
@@ -379,7 +455,29 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
       <div className={s.wrapper}>
         {showOverlay && <div className={s.overlay} />}
 
-        <div className={s.headerClip}>
+        <div
+          className={s.addOfferAction}
+          style={{
+            right: 0,
+          }}
+        >
+          <button
+            className={s.addOfferButton}
+            type="button"
+            aria-label="Add offer"
+            onClick={onAddOffer}
+            disabled={showSkeleton}
+          >
+            <img src={add} alt="" width={18} height={18} />
+          </button>
+        </div>
+
+        <div
+          className={s.headerClip}
+          style={{
+            marginRight: ADD_OFFER_ACTION_WIDTH,
+          }}
+        >
           <div
             className={s.headerShift}
             style={{
@@ -437,25 +535,29 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
                       {showSkeleton ? (
                         <div className={s.skeletonCell} />
                       ) : (
-                        <div className={s.text} title={offer.title}>
-                          {offer.title}
-                        </div>
+                        <>
+                          <div className={s.text} title={offer.title}>
+                            {offer.title}
+                          </div>
+
+                          <Switch
+                            className={s.offerSwitchRoot}
+                            checked={activeOfferIdsSet.has(offer.offerId)}
+                            onCheckedChange={(isActive) =>
+                              onToggleOfferActive?.(offer.offerId, isActive)
+                            }
+                            aria-label={`Toggle ${offer.title} edit mode`}
+                          >
+                            <SwitchThumb className={s.offerSwitchThumb} />
+                          </Switch>
+                        </>
                       )}
                     </div>
                   </th>
                 ))}
 
                 {verticalCanScroll && (
-                  <th className={s.addOfferHeaderCell}>
-                    <button
-                      className={s.addOfferButton}
-                      type="button"
-                      aria-label="Add offer"
-                      onClick={() => alert("Add offer is not implemented yet!") /* Replace with actual add offer logic */ }
-                    >
-                      <img src={add} alt="" width={18} height={18} />
-                    </button>
-                  </th>
+                  <th className={s.scrollbarHeaderSpacer} />
                 )}
               </tr>
               </thead>
@@ -497,7 +599,11 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
                   <tr>
                     <td
                       className={s.stateCell}
-                      colSpan={Math.max(displayOffers.length + 3, 1)}
+                      colSpan={
+                        displayOffers.length +
+                        3 +
+                        (verticalCanScroll ? 1 : 0)
+                      }
                     >
                       {showEmptyAccounts
                         ? "No accounts found for this selection"
@@ -508,6 +614,21 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
                   displayAccounts.map((account, index, array) => {
                     const isFirst = index === 0;
                     const isLast = index === array.length - 1;
+                    const linkedActiveOfferIds = showSkeleton
+                      ? []
+                      : getLinkedActiveOfferIds(account);
+                    const activeOfferCount = activeOfferIds.length;
+                    const isLinkedToAllActiveOffers =
+                      activeOfferCount > 0 &&
+                      linkedActiveOfferIds.length === activeOfferCount;
+                    const isLinkedToSomeActiveOffers =
+                      linkedActiveOfferIds.length > 0 &&
+                      linkedActiveOfferIds.length < activeOfferCount;
+                    const isAccountActionDisabled =
+                      showSkeleton ||
+                      activeOfferCount === 0 ||
+                      !onUpdateAccountOfferLinks ||
+                      Boolean(isUpdatingAccountOfferLinks);
 
                     return (
                       <tr key={`${account.influencerId}:${account.accountId}`}>
@@ -525,9 +646,37 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
                             {showSkeleton ? (
                               <div className={s.skeletonCell} />
                             ) : (
-                              <div className={s.text} title={account.username}>
-                                {account.username}
-                              </div>
+                              <>
+                                <button
+                                  className={s.accountOfferAction}
+                                  type="button"
+                                  role="checkbox"
+                                  aria-label={`Update offers for ${account.username}`}
+                                  aria-checked={
+                                    isLinkedToSomeActiveOffers
+                                      ? "mixed"
+                                      : isLinkedToAllActiveOffers
+                                  }
+                                  data-state={
+                                    isLinkedToSomeActiveOffers
+                                      ? "mixed"
+                                      : isLinkedToAllActiveOffers
+                                        ? "checked"
+                                        : "unchecked"
+                                  }
+                                  onClick={() =>
+                                    handleAccountOfferLinksToggle(account)
+                                  }
+                                  disabled={isAccountActionDisabled}
+                                />
+
+                                <div
+                                  className={s.text}
+                                  title={account.username}
+                                >
+                                  {account.username}
+                                </div>
+                              </>
                             )}
                           </div>
                         </th>
@@ -546,7 +695,7 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
                             {showSkeleton ? (
                               <div className={s.skeletonCell} />
                             ) : (
-                              "—"
+                              account.followers
                             )}
                           </div>
                         </td>
@@ -565,7 +714,7 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
                             {showSkeleton ? (
                               <div className={s.skeletonCell} />
                             ) : (
-                              "—"
+                              account.pricePerFollower
                             )}
                           </div>
                         </td>
@@ -595,7 +744,10 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
                               {showSkeleton ? (
                                 <div className={s.skeletonCell} />
                               ) : (
-                                <OffersMatrixCell link={link} />
+                                <OffersMatrixCell
+                                  link={link}
+                                  price={account.price}
+                                />
                               )}
                             </td>
                           );
