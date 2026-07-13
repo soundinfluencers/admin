@@ -1,0 +1,51 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.modal {
+  max-width: 520px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @include breakpoints.mobile {
+    gap: 16px;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+
+  color: var(--black-blue);
+  font-size: var(--text-xl);
+  font-weight: 400;
+}
+
+.subtitle {
+  margin: 0;
+
+  color: var(--gray);
+  font-size: var(--text-md);
+  font-weight: 400;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  @include breakpoints.mobile {
+    flex-direction: column-reverse;
+  }
+}

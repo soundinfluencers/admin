@@ -1,0 +1,67 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  @include breakpoints.tablet {
+    gap: 4px;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.label {
+  font-size: var(--text-md);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+
+  border: 0;
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  &.prev {
+    transform: rotate(-180deg);
+  }
+}
+
+.control:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}

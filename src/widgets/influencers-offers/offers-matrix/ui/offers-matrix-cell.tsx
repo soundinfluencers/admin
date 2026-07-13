@@ -6,14 +6,16 @@ import s from "./offers-matrix-cell.module.scss";
 
 interface OffersMatrixCellProps {
   link?: IOfferLink;
+  price: number;
 }
 
 export const OffersMatrixCell = memo(({
   link,
+  price,
 }: OffersMatrixCellProps) => {
   return (
     <div className={clsx(s.cell, link && s.connected)}>
-      {link ? "✓" : ""}
+      {price}{"\u20AC"}
     </div>
   );
 });

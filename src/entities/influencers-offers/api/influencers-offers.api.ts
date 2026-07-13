@@ -1,6 +1,11 @@
 import { $api } from "@/app/api/http.ts";
 import type {
-  IGetInfluencersOffersMatrixParams, IInfluencersOffersMatrixResponse,
+  ICreateInfluencersOfferRequest,
+  IGetInfluencersOffersMatrixParams,
+  IInfluencersOfferLinkRequest,
+  IInfluencersOfferMutationResponse,
+  IInfluencersOffersMatrixResponse,
+  IPublishInfluencersOfferRequest,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 
 export const getInfluencersOffersMatrixApi = async (params: IGetInfluencersOffersMatrixParams) => {
@@ -15,8 +20,38 @@ export const getInfluencersOffersMatrixApi = async (params: IGetInfluencersOffer
   return data.data;
 }
 
-// export const publishOfferApi = async (dto: any) => {}
-//
-// export const updateAccountLinkApi = async (dto: any) => {}
-//
-// export const deleteOfferApi = async (dto: any) => {}
+export const createInfluencersOfferApi = async (dto: ICreateInfluencersOfferRequest) => {
+  const { data } = await $api.post<IInfluencersOfferMutationResponse>(
+    "/admin/offers",
+    dto,
+  );
+
+  return data;
+};
+
+export const updateInfluencersOfferLinkApi = async ({
+  offerId,
+  influencerId,
+  accountId,
+  connected,
+}: IInfluencersOfferLinkRequest) => {
+  const { data } = await $api.patch<IInfluencersOfferMutationResponse>(
+    `/admin/offers/${offerId}/links/${influencerId}/${accountId}/${connected}`,
+  );
+
+  return data;
+};
+
+export const publishInfluencersOfferApi = async ({
+  offerId,
+}: IPublishInfluencersOfferRequest) => {
+  const { data } = await $api.patch<IInfluencersOfferMutationResponse>(
+    "/admin/offers/published",
+    undefined,
+    {
+      params: { offerId },
+    },
+  );
+
+  return data;
+};

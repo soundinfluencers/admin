@@ -1,0 +1,22 @@
+import {
+  OFFER_MUSIC_GENRES,
+  type TOfferMusicGenre,
+} from "./enums";
+
+export const OFFER_MUSIC_GENRES_LABELS = {
+  [OFFER_MUSIC_GENRES.TECHNO_MELODIC_MINIMAL]: "Melodic, Minimal",
+  [OFFER_MUSIC_GENRES.TECHNO_HARD_PEAK]: "Hard, Peak",
+  [OFFER_MUSIC_GENRES.HOUSE_TECH_HOUSE]: "Tech House",
+  [OFFER_MUSIC_GENRES.HOUSE_MELODIC_AFRO]: "Melodic, Afro",
+  [OFFER_MUSIC_GENRES.EDM]: "EDM",
+  [OFFER_MUSIC_GENRES.DRUM_AND_BASS]: "D&B",
+  [OFFER_MUSIC_GENRES.BASS]: "Bass",
+  [OFFER_MUSIC_GENRES.PSY_TRANCE]: "Psy, Trance",
+  [OFFER_MUSIC_GENRES.DUBSTEP]: "Dubstep",
+  [OFFER_MUSIC_GENRES.HIP_HOP]: "Hip-hop",
+  [OFFER_MUSIC_GENRES.POP]: "Pop",
+} satisfies Record<TOfferMusicGenre, string>;
+
+
+
+

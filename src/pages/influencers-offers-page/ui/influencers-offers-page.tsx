@@ -1,7 +1,6 @@
+import { useCallback, useMemo, useState } from "react";
 import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
-import { PlatformsFilterBar } from "@/widgets/influencers-offers/platform-filter-bar";
-import { GenreFilterBar } from "@/widgets/influencers-offers/genre-filter-bar";
 import { OffersMatrixActions } from "@/widgets/influencers-offers/offers-matrix-actions";
 import {
   EMPTY_INFLUENCERS_OFFERS_MATRIX,
@@ -11,8 +10,16 @@ import {
   useInfluencersOffersInfiniteQuery,
 } from "@/pages/influencers-offers-page/model/use-influencers-offers.query.ts";
 import { OffersMatrix } from "@/widgets/influencers-offers/offers-matrix";
+import { OffersFilterByPlatform } from "@/features/influencers-offers/offers-filter-by-platform";
+import { OffersFilterByGenres } from "@/features/influencers-offers/offers-filter-by-genres";
+import { CreateOfferModal } from "@/features/influencers-offers/create-offer";
+import { useUpdateInfluencersOfferLinksMutation } from "@/features/influencers-offers/update-offer-links";
 
 import s from './influencers-offers-page.module.scss';
+
+type TInactiveOfferIdsByFilter = Record<string, string[]>;
+
+const EMPTY_INACTIVE_OFFER_IDS: string[] = [];
 
 /**
  * TODO: Offers edit mode is paused.
@@ -27,6 +34,7 @@ import s from './influencers-offers-page.module.scss';
  * - table renders offerHeaders/accountRows/links
  * - custom scrollbars work
  * - skeleton/empty/overlay prepared
+ * - add offer
  * Paused:
  * - platform/genre filters work
  * - edit mode
@@ -34,11 +42,18 @@ import s from './influencers-offers-page.module.scss';
  * - PATCH links
  * - publish
  * - export
- * - add offer
  * - card view
  * **/
 
 export const InfluencersOffersPage = () => {
+  const [isCreateOfferModalOpen, setIsCreateOfferModalOpen] = useState(false);
+  const [inactiveOfferIdsByFilter, setInactiveOfferIdsByFilter] =
+    useState<TInactiveOfferIdsByFilter>({});
+  const {
+    mutate: updateOfferLinks,
+    isPending: isUpdatingOfferLinks,
+  } = useUpdateInfluencersOfferLinksMutation();
+
   const {
     platform,
     genre,
@@ -59,6 +74,57 @@ export const InfluencersOffersPage = () => {
   } = useInfluencersOffersInfiniteQuery(queryParams);
 
   const matrixData = matrix ?? EMPTY_INFLUENCERS_OFFERS_MATRIX;
+  const filterKey = `${platform}:${genre}`;
+  const inactiveOfferIds =
+    inactiveOfferIdsByFilter[filterKey] ?? EMPTY_INACTIVE_OFFER_IDS;
+
+  const activeOfferIds = useMemo(() => {
+    const inactiveOfferIdSet = new Set(inactiveOfferIds);
+
+    return matrixData.offerHeaders
+      .map((offer) => offer.offerId)
+      .filter((offerId) => !inactiveOfferIdSet.has(offerId));
+  }, [inactiveOfferIds, matrixData.offerHeaders]);
+
+  const handleToggleOfferActive = useCallback(
+    (offerId: string, isActive: boolean) => {
+      setInactiveOfferIdsByFilter((prevInactiveOfferIdsByFilter) => {
+        const prevInactiveOfferIds =
+          prevInactiveOfferIdsByFilter[filterKey] ?? EMPTY_INACTIVE_OFFER_IDS;
+
+        if (isActive) {
+          const nextInactiveOfferIds = prevInactiveOfferIds.filter(
+            (inactiveOfferId) => inactiveOfferId !== offerId,
+          );
+
+          if (nextInactiveOfferIds.length === 0) {
+            const nextInactiveOfferIdsByFilter = {
+              ...prevInactiveOfferIdsByFilter,
+            };
+
+            delete nextInactiveOfferIdsByFilter[filterKey];
+
+            return nextInactiveOfferIdsByFilter;
+          }
+
+          return {
+            ...prevInactiveOfferIdsByFilter,
+            [filterKey]: nextInactiveOfferIds,
+          };
+        }
+
+        if (prevInactiveOfferIds.includes(offerId)) {
+          return prevInactiveOfferIdsByFilter;
+        }
+
+        return {
+          ...prevInactiveOfferIdsByFilter,
+          [filterKey]: [...prevInactiveOfferIds, offerId],
+        };
+      });
+    },
+    [filterKey],
+  );
 
   return (
     <div className={s.offersPage}>
@@ -76,14 +142,15 @@ export const InfluencersOffersPage = () => {
           />
 
           <div className={s.toolbar}>
-            <PlatformsFilterBar
-              platform={platform}
-              onPlatformChange={handlePlatformChange}
+            <OffersFilterByPlatform
+              value={platform}
+              onFilterChange={handlePlatformChange}
               isDisabled={isPending}
             />
-            <GenreFilterBar
-              genre={genre}
-              onGenreChange={handleGenreChange}
+
+            <OffersFilterByGenres
+              value={genre}
+              onFilterChange={handleGenreChange}
               isDisabled={isPending}
             />
           </div>
@@ -106,6 +173,11 @@ export const InfluencersOffersPage = () => {
                 isFetching={isFetchingNextPage}
                 onLoadMoreAccounts={fetchNextAccountsPage}
                 onLoadMoreOffers={fetchNextOffersPage}
+                onAddOffer={() => setIsCreateOfferModalOpen(true)}
+                activeOfferIds={activeOfferIds}
+                onToggleOfferActive={handleToggleOfferActive}
+                onUpdateAccountOfferLinks={updateOfferLinks}
+                isUpdatingAccountOfferLinks={isUpdatingOfferLinks}
               />
             )
             :
@@ -115,6 +187,14 @@ export const InfluencersOffersPage = () => {
           }
         </div>
       </div>
+
+      {isCreateOfferModalOpen && (
+        <CreateOfferModal
+          socialMedia={platform}
+          genre={genre}
+          onClose={() => setIsCreateOfferModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

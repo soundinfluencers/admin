@@ -143,9 +143,60 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
 
   min-height: 48px;
-  padding: 8px;
+  padding: 6px;
+
+  .text {
+    flex: 1 1 auto;
+  }
+}
+
+.offerSwitchRoot {
+  position: relative;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 16px;
+  padding: 0;
+  border-radius: 9999px;
+  background-color: var(--white);
+  border: 1px solid #B4B9C1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    opacity var(--transition-fast);
+
+  &[data-state="checked"] {
+    border-color: var(--navy-blue);
+    background-color: var(--white);
+  }
+
+  &[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.offerSwitchThumb {
+  display: block;
+  width: 10px;
+  height: 10px;
+  margin: 0;
+  border-radius: 9999px;
+  background-color: #B4B9C1;
+  transform: translateX(2px);
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast);
+  will-change: transform;
+
+  &[data-state="checked"] {
+    background-color: var(--navy-blue);
+    transform: translateX(14px);
+  }
 }
 
 .text {
@@ -153,6 +204,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  font-size: 14px;
 }
 
 .bodyArea {
@@ -196,6 +249,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
 
   min-height: 43px;
   padding: 4px 8px;
@@ -203,7 +257,7 @@
 
   min-width: 0;
 
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
 
   user-select: none;
@@ -215,12 +269,78 @@
   }
 }
 
+.brandCell {
+  .leftCellInner {
+    justify-content: flex-start;
+  }
+}
+
+.accountOfferAction {
+  position: relative;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid rgba(185, 208, 255, 1);
+  border-radius: 3px;
+  background: var(--white);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast),
+    opacity var(--transition-fast);
+
+  &::after {
+    content: "";
+    position: absolute;
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+  }
+
+  &[data-state="checked"] {
+    border-color: var(--navy-blue);
+    background: var(--navy-blue);
+
+    &::after {
+      left: 5px;
+      top: 2px;
+      width: 5px;
+      height: 9px;
+      border: solid var(--white);
+      border-width: 0 2px 2px 0;
+      opacity: 1;
+      transform: rotate(45deg);
+    }
+  }
+
+  &[data-state="mixed"] {
+    border-color: var(--navy-blue);
+    background: var(--navy-blue);
+
+    &::after {
+      left: 4px;
+      right: 4px;
+      top: 50%;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--white);
+      opacity: 1;
+      transform: translateY(-50%);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+}
+
 .cell {
   padding: 0;
   border-left: 1px solid var(--gradient);
 }
 
-.addOfferHeaderCell {
+.scrollbarHeaderSpacer {
   padding: 0;
   width: 22px;
   background: #f1f4fa;
@@ -228,6 +348,21 @@
   border-bottom: 1px solid var(--blue);
   border-left: 1px solid var(--blue);
 }
+
+.addOfferAction {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 35;
+
+  width: 22px;
+  min-height: 48px;
+
+  background: #f1f4fa;
+  border-bottom: 1px solid var(--blue);
+  border-left: 1px solid var(--blue);
+}
+
 .addOfferButton {
   width: 100%;
   min-height: 48px;
@@ -241,6 +376,11 @@
   background: transparent;
 
   cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
 .scrollbarBodySpacer {
@@ -384,7 +524,7 @@
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: 43px;
+  height: 35px;
   background: var(--light-blue);
   border-radius: 6px;
 }

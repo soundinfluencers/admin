@@ -1,5 +1,5 @@
 import type { IInfluencer } from "@/entities/influencers/model/influencers.types.ts";
-import type { ISocialAccount } from "@/entities/influencers/model/social-account.types.ts";
+import type { ISocialAccount } from "@/entities/influencers/social-account/model/social-account.types.ts";
 import type { TSocialMediaValue } from "@/entities/influencers/model/influencers.constants.ts";
 
 export type TInfluencersListRow =

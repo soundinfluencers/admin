@@ -3,6 +3,7 @@ export { Logo } from './logo/logo';
 export { Input } from './input/input';
 export { TextArea } from './text-area/text-area';
 export { Modal } from './modal/modal';
+export { HorizontalScroll } from './horizontal-scroll/horizontal-scroll';
 
 export { BaseMaskedPasswordInput } from './form-input/base-masked-password-input/base-masked-password-input';
 export { BaseTextInput } from './form-input/base-text-input/base-text-input';
