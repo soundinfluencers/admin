@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Form, Modal, TextInput } from "@/shared/ui";
-import type { TOfferMusicGenre } from "@/features/influencers-offers/offers-filter-by-genres";
+import type { TOfferGenre } from "@/features/influencers-offers/offers-filter-by-genres";
 import type { TOfferSocialMedia } from "@/features/influencers-offers/offers-filter-by-platform";
 import type {
   TCreateOfferFormValues,
@@ -11,7 +11,7 @@ import s from "./create-offer-modal.module.scss";
 
 interface CreateOfferModalProps {
   socialMedia: TOfferSocialMedia;
-  genre: TOfferMusicGenre;
+  genre: TOfferGenre;
   onClose: () => void;
 }
 

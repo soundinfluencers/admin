@@ -10,8 +10,14 @@ import {
 } from "@/features/influencers-offers/offers-filter-by-platform";
 import {
   offersGenresSearchParamParser,
-  type TOfferMusicGenre,
+  type TOfferGenre,
 } from "@/features/influencers-offers/offers-filter-by-genres";
+import {
+  isOfferCreatorMusicGenre, isOfferMusicGenre,
+} from "@/features/influencers-offers/offers-filter-by-genres/model/offers-filter-by-genres.guards.ts";
+import {
+  OFFER_CREATOR_MUSIC_GENRES_CONFIG, OFFER_MUSIC_GENRES_CONFIG,
+} from "@/features/influencers-offers/offers-filter-by-genres/constants/config.ts";
 
 export const EMPTY_INFLUENCERS_OFFERS_MATRIX: IInfluencersOffersMatrix = {
   offerHeaders: [],
@@ -27,7 +33,7 @@ export const useInfluencersOffersPageState = () => {
     offersSocialMediaSearchParamParser,
   );
 
-  const [genre, setGenreQuery] = useQueryState(
+  const [genreQuery, setGenreQuery] = useQueryState(
     "genre",
     offersGenresSearchParamParser,
   );
@@ -41,7 +47,7 @@ export const useInfluencersOffersPageState = () => {
     void setPlatformQuery(nextPlatform, { history: "replace" });
   };
 
-  const handleGenreChange = (nextGenre: TOfferMusicGenre | null) => {
+  const handleGenreChange = (nextGenre: TOfferGenre | null) => {
     void setGenreQuery(nextGenre, { history: "replace" });
   };
 
@@ -50,6 +56,23 @@ export const useInfluencersOffersPageState = () => {
 
     void setModeQuery(nextMode, { history: "replace" });
   };
+
+  const isCreatorPlatform =
+    platform === "tiktok_creators";
+
+  const genre = isCreatorPlatform
+    ? genreQuery &&
+    isOfferCreatorMusicGenre(genreQuery)
+      ? genreQuery
+      : OFFER_CREATOR_MUSIC_GENRES_CONFIG.defaultValue
+    : genreQuery &&
+    isOfferMusicGenre(genreQuery)
+      ? genreQuery
+      : OFFER_MUSIC_GENRES_CONFIG.defaultValue;
+
+  const genreOptions = isCreatorPlatform
+    ? OFFER_CREATOR_MUSIC_GENRES_CONFIG.options
+    : OFFER_MUSIC_GENRES_CONFIG.options;
 
   const queryParams: Omit<
     IGetInfluencersOffersMatrixParams,
@@ -67,6 +90,7 @@ export const useInfluencersOffersPageState = () => {
   return {
     platform,
     genre,
+    genreOptions,
     mode,
     queryParams,
 

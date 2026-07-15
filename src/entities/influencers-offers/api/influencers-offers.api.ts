@@ -5,7 +5,7 @@ import type {
   IInfluencersOfferLinkRequest,
   IInfluencersOfferMutationResponse,
   IInfluencersOffersMatrixResponse,
-  IPublishInfluencersOfferRequest,
+  IPublishInfluencersOffersRequest,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 
 export const getInfluencersOffersMatrixApi = async (params: IGetInfluencersOffersMatrixParams) => {
@@ -43,14 +43,11 @@ export const updateInfluencersOfferLinkApi = async ({
 };
 
 export const publishInfluencersOfferApi = async ({
-  offerId,
-}: IPublishInfluencersOfferRequest) => {
+  socialMedia,
+  genre,
+}: IPublishInfluencersOffersRequest) => {
   const { data } = await $api.patch<IInfluencersOfferMutationResponse>(
-    "/admin/offers/published",
-    undefined,
-    {
-      params: { offerId },
-    },
+    `/admin/offers/change-published-status/${socialMedia}/${genre}`,
   );
 
   return data;

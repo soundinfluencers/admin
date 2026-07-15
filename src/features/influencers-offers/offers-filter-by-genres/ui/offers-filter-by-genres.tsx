@@ -1,28 +1,26 @@
-import React from "react";
 import clsx from "clsx";
 import { HorizontalScroll } from "@/shared/ui";
-import {
-  OFFER_MUSIC_GENRES_OPTIONS,
-  type TOfferMusicGenre,
-} from "@/features/influencers-offers/offers-filter-by-genres";
+import { type TOfferGenre, type TOfferGenreOption } from "@/features/influencers-offers/offers-filter-by-genres";
 
 import s from './offers-filter-by-genres.module.scss';
 
 interface OffersFilterByGenresProps {
-  value: TOfferMusicGenre;
-  onFilterChange: (value: TOfferMusicGenre) => void;
+  value: TOfferGenre;
+  options: readonly TOfferGenreOption[];
+  onFilterChange: (value: TOfferGenre) => void;
   isDisabled?: boolean;
 }
 
-export const OffersFilterByGenres: React.FC<OffersFilterByGenresProps> = ({
+export const OffersFilterByGenres = ({
   value,
+  options,
   onFilterChange,
   isDisabled,
-}) => {
+}: OffersFilterByGenresProps) => {
   return (
     <HorizontalScroll label={"Select your music genre"}>
       <ul className={s.list}>
-        {OFFER_MUSIC_GENRES_OPTIONS.map((option) => {
+        {options.map((option) => {
           const isSelected = value === option.value;
 
           return (

@@ -4,14 +4,23 @@ import share from '@/assets/icons/share.svg';
 import s from './publish-offers.module.scss';
 import React from "react";
 
-export const PublishOffers: React.FC = () => {
+interface PublishOffersProps {
+  isDisabled: boolean;
+  onPublish: () => void;
+}
+
+export const PublishOffers: React.FC<PublishOffersProps> = ({
+  isDisabled,
+  onPublish,
+}) => {
   return (
     <button
       type="button"
       className={s.publishBtn}
-      aria-label="Publish is temporarily disabled until backend contract is finalized."
-      title="Publish is temporarily disabled until backend contract is finalized."
-      disabled
+      onClick={onPublish}
+      aria-label="Publish offers for current platform and genre"
+      title="Publish offers for current platform and genre"
+      disabled={isDisabled}
     >
       <img
         className={s.publishIcon}
