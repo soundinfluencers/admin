@@ -14,6 +14,7 @@ import { OffersFilterByPlatform } from "@/features/influencers-offers/offers-fil
 import { OffersFilterByGenres } from "@/features/influencers-offers/offers-filter-by-genres";
 import { CreateOfferModal } from "@/features/influencers-offers/create-offer";
 import { useUpdateInfluencersOfferLinksMutation } from "@/features/influencers-offers/update-offer-links";
+import { usePublishInfluencersOffersMutation } from "@/features/influencers-offers/publish-offers";
 
 import s from './influencers-offers-page.module.scss';
 
@@ -53,10 +54,15 @@ export const InfluencersOffersPage = () => {
     mutate: updateOfferLinks,
     isPending: isUpdatingOfferLinks,
   } = useUpdateInfluencersOfferLinksMutation();
+  const {
+    mutate: publishOffers,
+    isPending: isPublishingOffers,
+  } = usePublishInfluencersOffersMutation();
 
   const {
     platform,
     genre,
+    genreOptions,
     mode,
     queryParams,
     handlePlatformChange,
@@ -126,6 +132,36 @@ export const InfluencersOffersPage = () => {
     [filterKey],
   );
 
+  const handlePublishOffers = useCallback(() => {
+    if (
+      !matrixData.offerHeaders.length ||
+      isPending ||
+      isError ||
+      isPublishingOffers
+    ) {
+      return;
+    }
+
+    publishOffers({
+      socialMedia: platform,
+      genre,
+    });
+  }, [
+    genre,
+    isError,
+    isPending,
+    isPublishingOffers,
+    matrixData.offerHeaders.length,
+    platform,
+    publishOffers,
+  ]);
+
+  const isPublishDisabled =
+    isPending ||
+    isError ||
+    isPublishingOffers ||
+    matrixData.offerHeaders.length === 0;
+
   return (
     <div className={s.offersPage}>
       <PageBreadcrumbs
@@ -150,6 +186,7 @@ export const InfluencersOffersPage = () => {
 
             <OffersFilterByGenres
               value={genre}
+              options={genreOptions}
               onFilterChange={handleGenreChange}
               isDisabled={isPending}
             />
@@ -161,6 +198,8 @@ export const InfluencersOffersPage = () => {
             mode={mode}
             onToggleOffersView={handleModeChange}
             isDisabled={isPending || isError}
+            onPublishOffers={handlePublishOffers}
+            isPublishDisabled={isPublishDisabled}
           />
 
           {mode === "offers" ?

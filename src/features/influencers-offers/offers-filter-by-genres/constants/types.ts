@@ -1,7 +1,14 @@
-import type { TOfferMusicGenre } from "./enums";
+import type { TOfferGenre } from "./enums";
 
-export type TOfferGenreOption = {
-  value: TOfferMusicGenre;
+export type TOfferGenreOption<TGenre extends TOfferGenre = TOfferGenre> = {
+  value: TGenre;
   label: string;
   subLabel?: string;
+};
+
+export type TOfferGenreConfig<
+  TGenre extends TOfferGenre = TOfferGenre,
+> = {
+  options: readonly TOfferGenreOption<TGenre>[];
+  defaultValue: TGenre;
 };

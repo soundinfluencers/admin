@@ -1,4 +1,4 @@
-import type { TOfferMusicGenre } from "@/features/influencers-offers/offers-filter-by-genres";
+import type { TOfferGenre } from "@/features/influencers-offers/offers-filter-by-genres";
 import type { TOfferSocialMedia } from "@/features/influencers-offers/offers-filter-by-platform";
 
 export interface IOfferHeader {
@@ -42,7 +42,7 @@ export interface IInfluencersOffersMatrixResponse {
 
 export interface IGetInfluencersOffersMatrixParams {
   socialMedia: TOfferSocialMedia;
-  genre: TOfferMusicGenre;
+  genre: TOfferGenre;
 
   offersCursor?: string;
   accountsCursor?: string;
@@ -53,7 +53,7 @@ export interface IGetInfluencersOffersMatrixParams {
 
 export interface ICreateInfluencersOfferRequest {
   socialMedia: TOfferSocialMedia;
-  genre: TOfferMusicGenre;
+  genre: TOfferGenre;
   offerName: string;
 }
 
@@ -64,8 +64,9 @@ export interface IInfluencersOfferLinkRequest {
   connected: boolean;
 }
 
-export interface IPublishInfluencersOfferRequest {
-  offerId: string;
+export interface IPublishInfluencersOffersRequest {
+  socialMedia: TOfferSocialMedia;
+  genre: TOfferGenre;
 }
 
 export interface IInfluencersOfferMutationResponse {

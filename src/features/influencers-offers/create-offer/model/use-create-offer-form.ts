@@ -1,6 +1,6 @@
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { TOfferMusicGenre } from "@/features/influencers-offers/offers-filter-by-genres";
+import type { TOfferGenre } from "@/features/influencers-offers/offers-filter-by-genres";
 import type { TOfferSocialMedia } from "@/features/influencers-offers/offers-filter-by-platform";
 import {
   createOfferFormSchema,
@@ -10,7 +10,7 @@ import { useCreateInfluencersOfferMutation } from "@/features/influencers-offers
 
 interface UseCreateOfferFormParams {
   socialMedia: TOfferSocialMedia;
-  genre: TOfferMusicGenre;
+  genre: TOfferGenre;
   onClose: () => void;
 }
 

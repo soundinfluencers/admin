@@ -10,12 +10,16 @@ interface OffersMatrixActionsProps {
   mode: TOffersMode;
   onToggleOffersView: () => void;
   isDisabled: boolean;
+  onPublishOffers: () => void;
+  isPublishDisabled: boolean;
 }
 
 export const OffersMatrixActions: React.FC<OffersMatrixActionsProps> = ({
   mode,
   onToggleOffersView,
   isDisabled,
+  onPublishOffers,
+  isPublishDisabled,
 }) => {
   return (
     <div className={s.actions}>
@@ -29,7 +33,10 @@ export const OffersMatrixActions: React.FC<OffersMatrixActionsProps> = ({
         isDisabled={isDisabled}
       />
 
-      <PublishOffers />
+      <PublishOffers
+        isDisabled={isPublishDisabled}
+        onPublish={onPublishOffers}
+      />
     </div>
   )
 };
