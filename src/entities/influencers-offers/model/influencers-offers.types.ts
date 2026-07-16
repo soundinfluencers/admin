@@ -69,6 +69,16 @@ export interface IPublishInfluencersOffersRequest {
   genre: TOfferGenre;
 }
 
+export interface IUpdateInfluencersOfferPriceRequest {
+  offerId: string;
+  field: "price";
+  value: number;
+}
+
+export interface IDeleteInfluencersOfferRequest {
+  offerId: string;
+}
+
 export interface IInfluencersOfferMutationResponse {
   statusCode: number;
   message: string;

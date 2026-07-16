@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "react-toastify";
 import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
+import type { IOfferHeader } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 import { OffersMatrixActions } from "@/widgets/influencers-offers/offers-matrix-actions";
 import {
   EMPTY_INFLUENCERS_OFFERS_MATRIX,
@@ -15,10 +17,16 @@ import { OffersFilterByGenres } from "@/features/influencers-offers/offers-filte
 import { CreateOfferModal } from "@/features/influencers-offers/create-offer";
 import { useUpdateInfluencersOfferLinksMutation } from "@/features/influencers-offers/update-offer-links";
 import { usePublishInfluencersOffersMutation } from "@/features/influencers-offers/publish-offers";
+import { useUpdateInfluencersOfferPriceMutation } from "@/features/influencers-offers/update-offer-price";
+import {
+  DeleteOfferConfirmationModal,
+  useDeleteInfluencersOfferMutation,
+} from "@/features/influencers-offers/delete-offer";
 
 import s from './influencers-offers-page.module.scss';
 
 type TInactiveOfferIdsByFilter = Record<string, string[]>;
+type TSelectedOfferForDelete = Pick<IOfferHeader, "offerId" | "title">;
 
 const EMPTY_INACTIVE_OFFER_IDS: string[] = [];
 
@@ -48,6 +56,9 @@ const EMPTY_INACTIVE_OFFER_IDS: string[] = [];
 
 export const InfluencersOffersPage = () => {
   const [isCreateOfferModalOpen, setIsCreateOfferModalOpen] = useState(false);
+  const [selectedOfferForDelete, setSelectedOfferForDelete] =
+    useState<TSelectedOfferForDelete | null>(null);
+  const isDeleteSubmittingRef = useRef(false);
   const [inactiveOfferIdsByFilter, setInactiveOfferIdsByFilter] =
     useState<TInactiveOfferIdsByFilter>({});
   const {
@@ -58,6 +69,16 @@ export const InfluencersOffersPage = () => {
     mutate: publishOffers,
     isPending: isPublishingOffers,
   } = usePublishInfluencersOffersMutation();
+  const {
+    mutate: updateOfferPrice,
+    isPending: isUpdatingOfferPrice,
+    variables: updatingOfferPriceVariables,
+  } = useUpdateInfluencersOfferPriceMutation();
+  const {
+    mutateAsync: deleteOfferAsync,
+    isPending: isDeletingOffer,
+    variables: deletingOfferVariables,
+  } = useDeleteInfluencersOfferMutation();
 
   const {
     platform,
@@ -91,6 +112,43 @@ export const InfluencersOffersPage = () => {
       .map((offer) => offer.offerId)
       .filter((offerId) => !inactiveOfferIdSet.has(offerId));
   }, [inactiveOfferIds, matrixData.offerHeaders]);
+
+  useEffect(() => {
+    setInactiveOfferIdsByFilter((prevInactiveOfferIdsByFilter) => {
+      const prevInactiveOfferIds =
+        prevInactiveOfferIdsByFilter[filterKey] ?? EMPTY_INACTIVE_OFFER_IDS;
+
+      if (!prevInactiveOfferIds.length) {
+        return prevInactiveOfferIdsByFilter;
+      }
+
+      const currentOfferIds = new Set(
+        matrixData.offerHeaders.map((offer) => offer.offerId),
+      );
+      const nextInactiveOfferIds = prevInactiveOfferIds.filter((offerId) =>
+        currentOfferIds.has(offerId),
+      );
+
+      if (nextInactiveOfferIds.length === prevInactiveOfferIds.length) {
+        return prevInactiveOfferIdsByFilter;
+      }
+
+      if (nextInactiveOfferIds.length === 0) {
+        const nextInactiveOfferIdsByFilter = {
+          ...prevInactiveOfferIdsByFilter,
+        };
+
+        delete nextInactiveOfferIdsByFilter[filterKey];
+
+        return nextInactiveOfferIdsByFilter;
+      }
+
+      return {
+        ...prevInactiveOfferIdsByFilter,
+        [filterKey]: nextInactiveOfferIds,
+      };
+    });
+  }, [filterKey, matrixData.offerHeaders]);
 
   const handleToggleOfferActive = useCallback(
     (offerId: string, isActive: boolean) => {
@@ -156,6 +214,61 @@ export const InfluencersOffersPage = () => {
     publishOffers,
   ]);
 
+  const handleOpenDeleteOfferModal = useCallback(
+    (offer: TSelectedOfferForDelete) => {
+      if (isDeletingOffer) return;
+
+      setSelectedOfferForDelete(offer);
+    },
+    [isDeletingOffer],
+  );
+
+  const handleCloseDeleteOfferModal = useCallback(() => {
+    if (isDeletingOffer) return;
+
+    setSelectedOfferForDelete(null);
+  }, [isDeletingOffer]);
+
+  const handleConfirmDeleteOffer = useCallback(async () => {
+    if (
+      !selectedOfferForDelete ||
+      isDeletingOffer ||
+      isDeleteSubmittingRef.current
+    ) {
+      return;
+    }
+
+    const offerToDelete = selectedOfferForDelete;
+
+    isDeleteSubmittingRef.current = true;
+
+    try {
+      await deleteOfferAsync({
+        offerId: offerToDelete.offerId,
+      });
+
+      toast("Offer deleted successfully.", {
+        type: "success",
+        position: "top-right",
+        autoClose: 3000,
+      });
+
+      setSelectedOfferForDelete((currentSelectedOffer) =>
+        currentSelectedOffer?.offerId === offerToDelete.offerId
+          ? null
+          : currentSelectedOffer,
+      );
+    } catch {
+      toast("Failed to delete offer.", {
+        type: "error",
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } finally {
+      isDeleteSubmittingRef.current = false;
+    }
+  }, [deleteOfferAsync, isDeletingOffer, selectedOfferForDelete]);
+
   const isPublishDisabled =
     isPending ||
     isError ||
@@ -217,6 +330,18 @@ export const InfluencersOffersPage = () => {
                 onToggleOfferActive={handleToggleOfferActive}
                 onUpdateAccountOfferLinks={updateOfferLinks}
                 isUpdatingAccountOfferLinks={isUpdatingOfferLinks}
+                onUpdateOfferPrice={updateOfferPrice}
+                updatingOfferPriceId={
+                  isUpdatingOfferPrice
+                    ? updatingOfferPriceVariables?.offerId
+                    : undefined
+                }
+                onDeleteOffer={handleOpenDeleteOfferModal}
+                deletingOfferId={
+                  isDeletingOffer
+                    ? deletingOfferVariables?.offerId
+                    : undefined
+                }
               />
             )
             :
@@ -232,6 +357,15 @@ export const InfluencersOffersPage = () => {
           socialMedia={platform}
           genre={genre}
           onClose={() => setIsCreateOfferModalOpen(false)}
+        />
+      )}
+
+      {selectedOfferForDelete && (
+        <DeleteOfferConfirmationModal
+          offerTitle={selectedOfferForDelete.title}
+          isPending={isDeletingOffer}
+          onCancel={handleCloseDeleteOfferModal}
+          onConfirm={handleConfirmDeleteOffer}
         />
       )}
     </div>

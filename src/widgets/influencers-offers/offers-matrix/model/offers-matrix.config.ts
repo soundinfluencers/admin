@@ -1,0 +1,19 @@
+export const VIEWPORT_WIDTH = 1224;
+
+export const BRAND_COL_WIDTH = 200;
+export const FOLLOWERS_COL_WIDTH = 110;
+export const PRICE_PER_FOLLOWER_COL_WIDTH = 158;
+export const OFFER_COL_WIDTH = 101;
+export const ADD_OFFER_ACTION_WIDTH = 22;
+
+export const LEFT_COLUMNS_WIDTH =
+  BRAND_COL_WIDTH + FOLLOWERS_COL_WIDTH + PRICE_PER_FOLLOWER_COL_WIDTH;
+
+export const MAX_BODY_HEIGHT = 490;
+export const MIN_THUMB_SIZE = 70;
+export const SCROLL_END_OFFSET = 24;
+export const SCROLLBAR_INSET = 8;
+export const VERTICAL_SCROLLBAR_WIDTH = 22;
+
+export const SKELETON_ROWS = 8;
+export const SKELETON_OFFERS = 8;

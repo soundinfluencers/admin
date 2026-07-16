@@ -1,4 +1,11 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import {
+  forwardRef,
+  type InputHTMLAttributes,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 
 import s from './table-field-editor.module.scss';
 
@@ -8,10 +15,20 @@ interface TableFieldEditorProps {
   isPending?: boolean;
   onClose: () => void;
   inputId?: string;
+  inputMode?: InputHTMLAttributes<HTMLInputElement>["inputMode"];
+  sanitizeValue?: (value: string) => string;
 }
 
 export const TableFieldEditor = forwardRef<HTMLInputElement, TableFieldEditorProps>(
-  ({ initialValue, inputId, onClose, onSaveChange, isPending }, forwardedRef) => {
+  ({
+    initialValue,
+    inputId,
+    inputMode,
+    onClose,
+    onSaveChange,
+    isPending,
+    sanitizeValue,
+  }, forwardedRef) => {
     const [currentValue, setCurrentValue] = useState(initialValue);
     const inputRef = useRef<HTMLInputElement>(null);
     const isCancelledRef = useRef(false);
@@ -38,7 +55,14 @@ export const TableFieldEditor = forwardRef<HTMLInputElement, TableFieldEditorPro
         className={s.input}
         value={currentValue}
         placeholder=""
-        onChange={(e) => setCurrentValue(e.target.value)}
+        inputMode={inputMode}
+        onChange={(e) =>
+          setCurrentValue(
+            sanitizeValue
+              ? sanitizeValue(e.target.value)
+              : e.target.value,
+          )
+        }
         onBlur={() => {
           if (isCancelledRef.current) {
             isCancelledRef.current = false;

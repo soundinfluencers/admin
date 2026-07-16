@@ -7,13 +7,23 @@ export const useUpdateInfluencersOfferLinksMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (requests: IInfluencersOfferLinkRequest[]) =>
-      Promise.all(requests.map(updateInfluencersOfferLinkApi)),
+    mutationFn: async (requests: IInfluencersOfferLinkRequest[]) => {
+      const results = await Promise.allSettled(
+        requests.map(updateInfluencersOfferLinkApi),
+      );
 
-    onSettled: () => {
-      void queryClient.invalidateQueries({
-        queryKey: influencersOffersQueryKeys.matrixRoot(),
+      return results.map((result) => {
+        if (result.status === "rejected") {
+          throw result.reason;
+        }
+
+        return result.value;
       });
     },
+
+    onSettled: () =>
+      queryClient.invalidateQueries({
+        queryKey: influencersOffersQueryKeys.matrixRoot(),
+      }),
   });
 };
