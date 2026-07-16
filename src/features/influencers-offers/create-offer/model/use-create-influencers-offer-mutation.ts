@@ -8,10 +8,9 @@ export const useCreateInfluencersOfferMutation = () => {
   return useMutation({
     mutationFn: createInfluencersOfferApi,
 
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
+    onSuccess: () =>
+      queryClient.invalidateQueries({
         queryKey: influencersOffersQueryKeys.matrixRoot(),
-      });
-    },
+      }),
   });
 };

@@ -1,11 +1,13 @@
 import { $api } from "@/app/api/http.ts";
 import type {
   ICreateInfluencersOfferRequest,
+  IDeleteInfluencersOfferRequest,
   IGetInfluencersOffersMatrixParams,
   IInfluencersOfferLinkRequest,
   IInfluencersOfferMutationResponse,
   IInfluencersOffersMatrixResponse,
   IPublishInfluencersOffersRequest,
+  IUpdateInfluencersOfferPriceRequest,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 
 export const getInfluencersOffersMatrixApi = async (params: IGetInfluencersOffersMatrixParams) => {
@@ -48,6 +50,32 @@ export const publishInfluencersOfferApi = async ({
 }: IPublishInfluencersOffersRequest) => {
   const { data } = await $api.patch<IInfluencersOfferMutationResponse>(
     `/admin/offers/change-published-status/${socialMedia}/${genre}`,
+  );
+
+  return data;
+};
+
+export const updateInfluencersOfferPriceApi = async ({
+  offerId,
+  field,
+  value,
+}: IUpdateInfluencersOfferPriceRequest) => {
+  const { data } = await $api.patch<IInfluencersOfferMutationResponse>(
+    `/admin/offers/${offerId}`,
+    {
+      field,
+      value,
+    },
+  );
+
+  return data;
+};
+
+export const deleteInfluencersOfferApi = async ({
+  offerId,
+}: IDeleteInfluencersOfferRequest) => {
+  const { data } = await $api.delete<IInfluencersOfferMutationResponse>(
+    `/admin/offers/${offerId}`,
   );
 
   return data;

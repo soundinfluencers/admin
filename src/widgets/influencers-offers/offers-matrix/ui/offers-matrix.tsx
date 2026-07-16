@@ -11,44 +11,31 @@ import type {
   IInfluencersOfferLinkRequest,
   IInfluencersOffersMatrix,
   IOfferAccountRow,
+  IOfferHeader,
+  IUpdateInfluencersOfferPriceRequest,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 import { getOfferAccountLinkKey } from "@/pages/influencers-offers-page/model/influencers-offers-page.helpers.ts";
 import { createInfluencersOffersLinksMap } from "@/widgets/influencers-offers/offers-matrix/model/create-influencers-offers-links-map.ts";
-import { OffersMatrixCell } from "@/widgets/influencers-offers/offers-matrix/ui/offers-matrix-cell.tsx";
-import { Switch, SwitchThumb } from "@radix-ui/react-switch";
-
-import add from '@/assets/icons/plus.svg';
+import {
+  ADD_OFFER_ACTION_WIDTH,
+  LEFT_COLUMNS_WIDTH,
+  MIN_THUMB_SIZE,
+  OFFER_COL_WIDTH,
+  SCROLLBAR_INSET,
+  SCROLL_END_OFFSET,
+  SKELETON_OFFERS,
+  SKELETON_ROWS,
+  VERTICAL_SCROLLBAR_WIDTH,
+  VIEWPORT_WIDTH,
+} from "@/widgets/influencers-offers/offers-matrix/model/offers-matrix.config.ts";
+import type { ScrollMetrics } from "@/widgets/influencers-offers/offers-matrix/model/offers-matrix.types.ts";
+import { OffersMatrixAddOfferAction } from "@/widgets/influencers-offers/offers-matrix/ui/offers-matrix-add-offer-action.tsx";
+import { OffersMatrixBody } from "@/widgets/influencers-offers/offers-matrix/ui/offers-matrix-body.tsx";
+import { OffersMatrixBusinessFooter } from "@/widgets/influencers-offers/offers-matrix/ui/offers-matrix-business-footer.tsx";
+import { OffersMatrixHeader } from "@/widgets/influencers-offers/offers-matrix/ui/offers-matrix-header.tsx";
+import { OffersMatrixHorizontalScrollbar } from "@/widgets/influencers-offers/offers-matrix/ui/offers-matrix-horizontal-scrollbar.tsx";
 
 import s from "./offers-matrix.module.scss";
-
-const VIEWPORT_WIDTH = 1224;
-
-const BRAND_COL_WIDTH = 200;
-const FOLLOWERS_COL_WIDTH = 110;
-const PRICE_PER_FOLLOWER_COL_WIDTH = 158;
-const OFFER_COL_WIDTH = 101;
-const ADD_OFFER_ACTION_WIDTH = 22;
-
-const LEFT_COLUMNS_WIDTH =
-  BRAND_COL_WIDTH + FOLLOWERS_COL_WIDTH + PRICE_PER_FOLLOWER_COL_WIDTH;
-
-const MAX_BODY_HEIGHT = 490;
-const MIN_THUMB_SIZE = 70;
-const SCROLL_END_OFFSET = 24;
-const SCROLLBAR_INSET = 8;
-const VERTICAL_SCROLLBAR_WIDTH = 22;
-
-const SKELETON_ROWS = 8;
-const SKELETON_OFFERS = 8;
-
-interface ScrollMetrics {
-  scrollLeft: number;
-  scrollTop: number;
-  clientWidth: number;
-  clientHeight: number;
-  scrollWidth: number;
-  scrollHeight: number;
-}
 
 interface OffersMatrixProps {
   data: IInfluencersOffersMatrix;
@@ -61,6 +48,10 @@ interface OffersMatrixProps {
   onToggleOfferActive?: (offerId: string, isActive: boolean) => void;
   onUpdateAccountOfferLinks?: (requests: IInfluencersOfferLinkRequest[]) => void;
   isUpdatingAccountOfferLinks?: boolean;
+  onUpdateOfferPrice?: (request: IUpdateInfluencersOfferPriceRequest) => void;
+  updatingOfferPriceId?: string;
+  onDeleteOffer?: (offer: Pick<IOfferHeader, "offerId" | "title">) => void;
+  deletingOfferId?: string;
 }
 
 export const OffersMatrix: React.FC<OffersMatrixProps> = ({
@@ -74,6 +65,10 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
   onToggleOfferActive,
   onUpdateAccountOfferLinks,
   isUpdatingAccountOfferLinks,
+  onUpdateOfferPrice,
+  updatingOfferPriceId,
+  onDeleteOffer,
+  deletingOfferId,
 }) => {
   const linksMap = useMemo(
     () => createInfluencersOffersLinksMap(data.links),
@@ -208,6 +203,7 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
 
   const showSkeleton = Boolean(isLoading);
   const showOverlay = Boolean(isFetching && !isLoading);
+  const showEmptyOfferArea = !showSkeleton && data.offerHeaders.length === 0;
 
   const verticalCanScroll = bodyMetrics.scrollHeight > bodyMetrics.clientHeight;
   const horizontalCanScroll =
@@ -225,10 +221,13 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
   );
 
   const offersWidth = data.offerHeaders.length * offerColWidth;
+  const renderedOffersWidth = showEmptyOfferArea
+    ? visibleOffersWidth
+    : offersWidth;
 
   const tableWidth =
     LEFT_COLUMNS_WIDTH +
-    offersWidth +
+    renderedOffersWidth +
     (verticalCanScroll ? VERTICAL_SCROLLBAR_WIDTH : 0);
 
   const verticalTrackHeight = Math.max(
@@ -455,381 +454,79 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
       <div className={s.wrapper}>
         {showOverlay && <div className={s.overlay} />}
 
-        <div
-          className={s.addOfferAction}
-          style={{
-            right: 0,
-          }}
-        >
-          <button
-            className={s.addOfferButton}
-            type="button"
-            aria-label="Add offer"
-            onClick={onAddOffer}
-            disabled={showSkeleton}
-          >
-            <img src={add} alt="" width={18} height={18} />
-          </button>
-        </div>
+        <OffersMatrixAddOfferAction
+          onAddOffer={onAddOffer}
+          disabled={showSkeleton}
+        />
 
-        <div
-          className={s.headerClip}
-          style={{
-            marginRight: ADD_OFFER_ACTION_WIDTH,
-          }}
-        >
-          <div
-            className={s.headerShift}
-            style={{
-              width: tableWidth,
-              transform: `translateX(${-scrollLeft}px)`,
-            }}
-          >
-            <table className={s.table} style={{ minWidth: tableWidth }}>
-              <colgroup>
-                <col style={{ width: BRAND_COL_WIDTH }} />
-                <col style={{ width: FOLLOWERS_COL_WIDTH }} />
-                <col style={{ width: PRICE_PER_FOLLOWER_COL_WIDTH }} />
+        <OffersMatrixHeader
+          displayOffers={displayOffers}
+          scrollLeft={scrollLeft}
+          tableWidth={tableWidth}
+          offerColWidth={offerColWidth}
+          verticalCanScroll={verticalCanScroll}
+          showSkeleton={showSkeleton}
+          showEmptyOfferArea={showEmptyOfferArea}
+          activeOfferIdsSet={activeOfferIdsSet}
+          onToggleOfferActive={onToggleOfferActive}
+        />
 
-                {displayOffers.map((offer) => (
-                  <col key={offer.offerId} style={{ width: offerColWidth }} />
-                ))}
+        <OffersMatrixBody
+          displayAccounts={displayAccounts}
+          displayOffers={displayOffers}
+          linksMap={linksMap}
+          activeOfferIds={activeOfferIds}
+          scrollLeft={scrollLeft}
+          tableWidth={tableWidth}
+          offerColWidth={offerColWidth}
+          verticalCanScroll={verticalCanScroll}
+          verticalSpacing={verticalSpacing}
+          showSkeleton={showSkeleton}
+          showEmptyOfferArea={showEmptyOfferArea}
+          showEmpty={showEmpty}
+          showEmptyAccounts={showEmptyAccounts}
+          verticalThumbHeight={verticalThumbHeight}
+          verticalThumbTop={verticalThumbTop}
+          bodyScrollRef={bodyScrollRef}
+          onBodyScroll={handleBodyScroll}
+          onVerticalTrackPointerDown={handleVerticalTrackPointerDown}
+          onVerticalThumbPointerDown={handleVerticalThumbPointerDown}
+          onVerticalThumbPointerMove={handleVerticalThumbPointerMove}
+          getLinkedActiveOfferIds={getLinkedActiveOfferIds}
+          onAccountOfferLinksToggle={handleAccountOfferLinksToggle}
+          canUpdateAccountOfferLinks={Boolean(onUpdateAccountOfferLinks)}
+          isUpdatingAccountOfferLinks={isUpdatingAccountOfferLinks}
+        />
 
-                {verticalCanScroll && (
-                  <col style={{ width: VERTICAL_SCROLLBAR_WIDTH }} />
-                )}
-              </colgroup>
-
-              <thead>
-              <tr>
-                <th
-                  className={s.brandHeader}
-                  style={{ transform: `translateX(${scrollLeft}px)` }}
-                >
-                  <div className={s.headerCellInner}>
-                    <div className={s.text}>Brand name</div>
-                  </div>
-                </th>
-
-                <th
-                  className={s.followersHeader}
-                  style={{ transform: `translateX(${scrollLeft}px)` }}
-                >
-                  <div className={s.headerCellInner}>
-                    <div className={s.text}>Followers</div>
-                  </div>
-                </th>
-
-                <th
-                  className={s.priceHeader}
-                  style={{ transform: `translateX(${scrollLeft}px)` }}
-                >
-                  <div className={s.headerCellInner}>
-                    <div className={s.text}>Price per follower</div>
-                  </div>
-                </th>
-
-                {displayOffers.map((offer) => (
-                  <th key={offer.offerId} className={s.offerHeader}>
-                    <div className={s.offerHeaderInner}>
-                      {showSkeleton ? (
-                        <div className={s.skeletonCell} />
-                      ) : (
-                        <>
-                          <div className={s.text} title={offer.title}>
-                            {offer.title}
-                          </div>
-
-                          <Switch
-                            className={s.offerSwitchRoot}
-                            checked={activeOfferIdsSet.has(offer.offerId)}
-                            onCheckedChange={(isActive) =>
-                              onToggleOfferActive?.(offer.offerId, isActive)
-                            }
-                            aria-label={`Toggle ${offer.title} edit mode`}
-                          >
-                            <SwitchThumb className={s.offerSwitchThumb} />
-                          </Switch>
-                        </>
-                      )}
-                    </div>
-                  </th>
-                ))}
-
-                {verticalCanScroll && (
-                  <th className={s.scrollbarHeaderSpacer} />
-                )}
-              </tr>
-              </thead>
-            </table>
-          </div>
-        </div>
-
-        <div className={s.bodyArea}>
-          <div
-            ref={bodyScrollRef}
-            className={s.bodyScroll}
-            style={{ maxHeight: MAX_BODY_HEIGHT }}
-            onScroll={handleBodyScroll}
-          >
-            <div
-              className={s.bodyShift}
-              style={{
-                width: tableWidth,
-                transform: `translateX(${-scrollLeft}px)`,
-              }}
-            >
-              <table className={s.table} style={{ minWidth: tableWidth }}>
-                <colgroup>
-                  <col style={{ width: BRAND_COL_WIDTH }} />
-                  <col style={{ width: FOLLOWERS_COL_WIDTH }} />
-                  <col style={{ width: PRICE_PER_FOLLOWER_COL_WIDTH }} />
-
-                  {displayOffers.map((offer) => (
-                    <col key={offer.offerId} style={{ width: offerColWidth }} />
-                  ))}
-
-                  {verticalCanScroll && (
-                    <col style={{ width: VERTICAL_SCROLLBAR_WIDTH }} />
-                  )}
-                </colgroup>
-
-                <tbody>
-                {showEmpty || showEmptyAccounts ? (
-                  <tr>
-                    <td
-                      className={s.stateCell}
-                      colSpan={
-                        displayOffers.length +
-                        3 +
-                        (verticalCanScroll ? 1 : 0)
-                      }
-                    >
-                      {showEmptyAccounts
-                        ? "No accounts found for this selection"
-                        : "No offers found"}
-                    </td>
-                  </tr>
-                ) : (
-                  displayAccounts.map((account, index, array) => {
-                    const isFirst = index === 0;
-                    const isLast = index === array.length - 1;
-                    const linkedActiveOfferIds = showSkeleton
-                      ? []
-                      : getLinkedActiveOfferIds(account);
-                    const activeOfferCount = activeOfferIds.length;
-                    const isLinkedToAllActiveOffers =
-                      activeOfferCount > 0 &&
-                      linkedActiveOfferIds.length === activeOfferCount;
-                    const isLinkedToSomeActiveOffers =
-                      linkedActiveOfferIds.length > 0 &&
-                      linkedActiveOfferIds.length < activeOfferCount;
-                    const isAccountActionDisabled =
-                      showSkeleton ||
-                      activeOfferCount === 0 ||
-                      !onUpdateAccountOfferLinks ||
-                      Boolean(isUpdatingAccountOfferLinks);
-
-                    return (
-                      <tr key={`${account.influencerId}:${account.accountId}`}>
-                        <th
-                          className={s.brandCell}
-                          style={{
-                            transform: `translateX(${scrollLeft}px)`,
-                            paddingTop: isFirst ? verticalSpacing : undefined,
-                            paddingBottom: isLast
-                              ? verticalSpacing
-                              : undefined,
-                          }}
-                        >
-                          <div className={s.leftCellInner}>
-                            {showSkeleton ? (
-                              <div className={s.skeletonCell} />
-                            ) : (
-                              <>
-                                <button
-                                  className={s.accountOfferAction}
-                                  type="button"
-                                  role="checkbox"
-                                  aria-label={`Update offers for ${account.username}`}
-                                  aria-checked={
-                                    isLinkedToSomeActiveOffers
-                                      ? "mixed"
-                                      : isLinkedToAllActiveOffers
-                                  }
-                                  data-state={
-                                    isLinkedToSomeActiveOffers
-                                      ? "mixed"
-                                      : isLinkedToAllActiveOffers
-                                        ? "checked"
-                                        : "unchecked"
-                                  }
-                                  onClick={() =>
-                                    handleAccountOfferLinksToggle(account)
-                                  }
-                                  disabled={isAccountActionDisabled}
-                                />
-
-                                <div
-                                  className={s.text}
-                                  title={account.username}
-                                >
-                                  {account.username}
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </th>
-
-                        <td
-                          className={s.followersCell}
-                          style={{
-                            transform: `translateX(${scrollLeft}px)`,
-                            paddingTop: isFirst ? verticalSpacing : undefined,
-                            paddingBottom: isLast
-                              ? verticalSpacing
-                              : undefined,
-                          }}
-                        >
-                          <div className={s.leftCellInner}>
-                            {showSkeleton ? (
-                              <div className={s.skeletonCell} />
-                            ) : (
-                              account.followers
-                            )}
-                          </div>
-                        </td>
-
-                        <td
-                          className={s.priceCell}
-                          style={{
-                            transform: `translateX(${scrollLeft}px)`,
-                            paddingTop: isFirst ? verticalSpacing : undefined,
-                            paddingBottom: isLast
-                              ? verticalSpacing
-                              : undefined,
-                          }}
-                        >
-                          <div className={s.leftCellInner}>
-                            {showSkeleton ? (
-                              <div className={s.skeletonCell} />
-                            ) : (
-                              account.pricePerFollower
-                            )}
-                          </div>
-                        </td>
-
-                        {displayOffers.map((offer) => {
-                          const link = linksMap.get(
-                            getOfferAccountLinkKey({
-                              offerId: offer.offerId,
-                              influencerId: account.influencerId,
-                              accountId: account.accountId,
-                            }),
-                          );
-
-                          return (
-                            <td
-                              key={offer.offerId}
-                              className={s.cell}
-                              style={{
-                                paddingTop: isFirst
-                                  ? verticalSpacing
-                                  : undefined,
-                                paddingBottom: isLast
-                                  ? verticalSpacing
-                                  : undefined,
-                              }}
-                            >
-                              {showSkeleton ? (
-                                <div className={s.skeletonCell} />
-                              ) : (
-                                <OffersMatrixCell
-                                  link={link}
-                                  price={account.price}
-                                />
-                              )}
-                            </td>
-                          );
-                        })}
-
-                        {verticalCanScroll && (
-                          <td className={s.scrollbarBodySpacer} />
-                        )}
-                      </tr>
-                    );
-                  })
-                )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {verticalCanScroll && (
-            <div className={s.verticalScrollbarGutter}>
-              <div
-                className={s.verticalTrack}
-                onPointerDown={handleVerticalTrackPointerDown}
-              >
-                <div
-                  className={s.verticalThumb}
-                  style={{
-                    height: verticalThumbHeight,
-                    transform: `translateY(${verticalThumbTop}px)`,
-                  }}
-                  onPointerDown={handleVerticalThumbPointerDown}
-                  onPointerMove={handleVerticalThumbPointerMove}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className={s.scrollFooter}>
-          <div
-            className={s.scrollSpacerLeft}
-            style={{ width: LEFT_COLUMNS_WIDTH }}
+        {!showSkeleton && (
+          <OffersMatrixBusinessFooter
+            displayOffers={displayOffers}
+            scrollLeft={scrollLeft}
+            offerColWidth={offerColWidth}
+            offersWidth={offersWidth}
+            visibleOffersWidth={visibleOffersWidth}
+            verticalCanScroll={verticalCanScroll}
+            showEmptyOfferArea={showEmptyOfferArea}
+            onUpdateOfferPrice={onUpdateOfferPrice}
+            updatingOfferPriceId={updatingOfferPriceId}
+            onDeleteOffer={onDeleteOffer}
+            deletingOfferId={deletingOfferId}
           />
+        )}
 
-          <div className={s.footerArea}>
-            <div
-              ref={footerScrollRef}
-              className={s.footerScroll}
-              onScroll={handleFooterScroll}
-            >
-              <div
-                className={s.footerScrollContent}
-                style={{
-                  width: Math.max(offersWidth, visibleOffersWidth),
-                }}
-              />
-            </div>
-
-            {horizontalCanScroll && (
-              <div
-                className={s.horizontalTrack}
-                onPointerDown={handleHorizontalTrackPointerDown}
-              >
-                <div
-                  className={s.horizontalThumb}
-                  style={{
-                    width: horizontalThumbWidth,
-                    transform: `translateX(${horizontalThumbLeft}px)`,
-                  }}
-                  onPointerDown={handleHorizontalThumbPointerDown}
-                  onPointerMove={handleHorizontalThumbPointerMove}
-                />
-              </div>
-            )}
-          </div>
-
-          {verticalCanScroll && (
-            <div
-              className={s.footerGutter}
-              style={{ width: VERTICAL_SCROLLBAR_WIDTH }}
-            />
-          )}
-        </div>
+        <OffersMatrixHorizontalScrollbar
+          footerScrollRef={footerScrollRef}
+          offersWidth={offersWidth}
+          visibleOffersWidth={visibleOffersWidth}
+          verticalCanScroll={verticalCanScroll}
+          horizontalCanScroll={horizontalCanScroll}
+          horizontalThumbWidth={horizontalThumbWidth}
+          horizontalThumbLeft={horizontalThumbLeft}
+          onFooterScroll={handleFooterScroll}
+          onHorizontalTrackPointerDown={handleHorizontalTrackPointerDown}
+          onHorizontalThumbPointerDown={handleHorizontalThumbPointerDown}
+          onHorizontalThumbPointerMove={handleHorizontalThumbPointerMove}
+        />
       </div>
     </div>
   );

@@ -10,10 +10,9 @@ export const usePublishInfluencersOffersMutation = () => {
     mutationFn: (request: IPublishInfluencersOffersRequest) =>
       publishInfluencersOfferApi(request),
 
-    onSettled: () => {
-      void queryClient.invalidateQueries({
+    onSuccess: () =>
+      queryClient.invalidateQueries({
         queryKey: influencersOffersQueryKeys.matrixRoot(),
-      });
-    },
+      }),
   });
 };

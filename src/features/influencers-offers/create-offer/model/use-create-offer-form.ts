@@ -27,22 +27,21 @@ export const useCreateOfferForm = ({
     mode: "onChange",
   });
 
-  const { mutate, isPending, isError } = useCreateInfluencersOfferMutation();
+  const { mutateAsync, isPending, isError } = useCreateInfluencersOfferMutation();
 
-  const onSubmit: SubmitHandler<TCreateOfferFormValues> = (values) => {
-    mutate(
-      {
+  const onSubmit: SubmitHandler<TCreateOfferFormValues> = async (values) => {
+    try {
+      await mutateAsync({
         socialMedia,
         genre,
         offerName: values.offerName.trim(),
-      },
-      {
-        onSuccess: () => {
-          methods.reset();
-          onClose();
-        },
-      },
-    );
+      });
+
+      methods.reset();
+      onClose();
+    } catch {
+      // The mutation error state is rendered by the modal.
+    }
   };
 
   return {
