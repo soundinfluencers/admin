@@ -7,6 +7,7 @@ export interface IOfferHeader {
   isPublished: boolean;
   offerPrice: number;
   costPrice: number;
+  combinedFollowers: number;
   createdAt: string;
 }
 
@@ -82,4 +83,35 @@ export interface IDeleteInfluencersOfferRequest {
 export interface IInfluencersOfferMutationResponse {
   statusCode: number;
   message: string;
+}
+
+export interface IAccount {
+  accountId: string;
+  influencerId: string;
+  username: string;
+  logoUrl: string;
+  followers: number;
+}
+
+export interface IOffersClients {
+  _id: string;
+  title: string;
+  socialMedia: TOfferSocialMedia;
+  connectedAccounts: IAccount[];
+  price: number;
+  genre: TOfferGenre;
+  combinedFollowers: number;
+  networksAmount: string;
+  storyAndPostDetails: string;
+}
+
+export interface IGetOffersClientsParams {
+  socialMedia: TOfferSocialMedia;
+  genre: TOfferGenre;
+}
+
+export interface IGetOffersClientsResponse {
+  statusCode: number;
+  message: string;
+  data: IOffersClients[];
 }

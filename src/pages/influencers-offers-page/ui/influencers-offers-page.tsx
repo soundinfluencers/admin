@@ -11,7 +11,9 @@ import {
 import {
   useInfluencersOffersInfiniteQuery,
 } from "@/pages/influencers-offers-page/model/use-influencers-offers.query.ts";
+import { useClientsOffersQuery } from "@/pages/influencers-offers-page/model/use-clients-offers.query.ts";
 import { OffersMatrix } from "@/widgets/influencers-offers/offers-matrix";
+import { OfferCarousel } from "@/widgets/influencers-offers";
 import { OffersFilterByPlatform } from "@/features/influencers-offers/offers-filter-by-platform";
 import { OffersFilterByGenres } from "@/features/influencers-offers/offers-filter-by-genres";
 import { CreateOfferModal } from "@/features/influencers-offers/create-offer";
@@ -61,8 +63,9 @@ export const InfluencersOffersPage = () => {
   const isDeleteSubmittingRef = useRef(false);
   const [inactiveOfferIdsByFilter, setInactiveOfferIdsByFilter] =
     useState<TInactiveOfferIdsByFilter>({});
+
   const {
-    mutate: updateOfferLinks,
+    mutateAsync: updateOfferLinksAsync,
     isPending: isUpdatingOfferLinks,
   } = useUpdateInfluencersOfferLinksMutation();
   const {
@@ -99,6 +102,15 @@ export const InfluencersOffersPage = () => {
     fetchNextAccountsPage,
     fetchNextOffersPage,
   } = useInfluencersOffersInfiniteQuery(queryParams);
+
+  const {
+    data,
+    isPending: isClientPending,
+    isError: isClientError,
+  } = useClientsOffersQuery({
+    socialMedia: platform,
+    genre,
+  });
 
   const matrixData = matrix ?? EMPTY_INFLUENCERS_OFFERS_MATRIX;
   const filterKey = `${platform}:${genre}`;
@@ -275,6 +287,9 @@ export const InfluencersOffersPage = () => {
     isPublishingOffers ||
     matrixData.offerHeaders.length === 0;
 
+  const isInitialLoading = isClientPending && !data;
+  const offers = data ?? [];
+
   return (
     <div className={s.offersPage}>
       <PageBreadcrumbs
@@ -328,7 +343,7 @@ export const InfluencersOffersPage = () => {
                 onAddOffer={() => setIsCreateOfferModalOpen(true)}
                 activeOfferIds={activeOfferIds}
                 onToggleOfferActive={handleToggleOfferActive}
-                onUpdateAccountOfferLinks={updateOfferLinks}
+                onUpdateAccountOfferLinks={updateOfferLinksAsync}
                 isUpdatingAccountOfferLinks={isUpdatingOfferLinks}
                 onUpdateOfferPrice={updateOfferPrice}
                 updatingOfferPriceId={
@@ -346,7 +361,11 @@ export const InfluencersOffersPage = () => {
             )
             :
             (
-              <div>Card view</div>
+              <OfferCarousel
+                offers={offers}
+                isLoading={isInitialLoading}
+                isError={isClientError}
+              />
             )
           }
         </div>

@@ -5,7 +5,10 @@ import type {
   IOfferHeader,
   IOfferLink,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
-import { getOfferAccountLinkKey } from "@/pages/influencers-offers-page/model/influencers-offers-page.helpers.ts";
+import {
+  getOfferAccountLinkKey,
+  getOfferAccountRowKey,
+} from "@/pages/influencers-offers-page/model/influencers-offers-page.helpers.ts";
 import {
   BRAND_COL_WIDTH,
   FOLLOWERS_COL_WIDTH,
@@ -13,6 +16,7 @@ import {
   PRICE_PER_FOLLOWER_COL_WIDTH,
   VERTICAL_SCROLLBAR_WIDTH,
 } from "@/widgets/influencers-offers/offers-matrix/model/offers-matrix.config.ts";
+import { CircleLoader } from "@/shared/ui/circle-loader/circle-loader.tsx";
 import { OffersMatrixCell } from "@/widgets/influencers-offers/offers-matrix/ui/offers-matrix-cell.tsx";
 
 import s from "./offers-matrix.module.scss";
@@ -42,6 +46,7 @@ interface OffersMatrixBodyProps {
   onAccountOfferLinksToggle: (account: IOfferAccountRow) => void;
   canUpdateAccountOfferLinks: boolean;
   isUpdatingAccountOfferLinks?: boolean;
+  updatingAccountKey?: string | null;
 }
 
 export const OffersMatrixBody = ({
@@ -69,6 +74,7 @@ export const OffersMatrixBody = ({
   onAccountOfferLinksToggle,
   canUpdateAccountOfferLinks,
   isUpdatingAccountOfferLinks,
+  updatingAccountKey,
 }: OffersMatrixBodyProps) => {
   return (
     <div className={s.bodyArea}>
@@ -121,6 +127,7 @@ export const OffersMatrixBody = ({
                 </tr>
               ) : (
                 displayAccounts.map((account, index, array) => {
+                  const accountKey = getOfferAccountRowKey(account);
                   const isFirst = index === 0;
                   const isLast = index === array.length - 1;
                   const linkedActiveOfferIds = showSkeleton
@@ -138,9 +145,12 @@ export const OffersMatrixBody = ({
                     activeOfferCount === 0 ||
                     !canUpdateAccountOfferLinks ||
                     Boolean(isUpdatingAccountOfferLinks);
+                  const isCurrentAccountUpdating =
+                    Boolean(isUpdatingAccountOfferLinks) &&
+                    updatingAccountKey === accountKey;
 
                   return (
-                    <tr key={`${account.influencerId}:${account.accountId}`}>
+                    <tr key={accountKey}>
                       <th
                         className={s.brandCell}
                         style={{
@@ -154,29 +164,32 @@ export const OffersMatrixBody = ({
                             <div className={s.skeletonCell} />
                           ) : (
                             <>
-                              <button
-                                className={s.accountOfferAction}
-                                type="button"
-                                role="checkbox"
-                                aria-label={`Update offers for ${account.username}`}
-                                aria-checked={
-                                  isLinkedToSomeActiveOffers
-                                    ? "mixed"
-                                    : isLinkedToAllActiveOffers
-                                }
-                                data-state={
-                                  isLinkedToSomeActiveOffers
-                                    ? "mixed"
-                                    : isLinkedToAllActiveOffers
-                                      ? "checked"
-                                      : "unchecked"
-                                }
-                                onClick={() =>
-                                  onAccountOfferLinksToggle(account)
-                                }
-                                disabled={isAccountActionDisabled}
-                              />
-
+                              {isCurrentAccountUpdating ? (
+                                <CircleLoader />
+                              ) : (
+                                <button
+                                  className={s.accountOfferAction}
+                                  type="button"
+                                  role="checkbox"
+                                  aria-label={`Update offers for ${account.username}`}
+                                  aria-checked={
+                                    isLinkedToSomeActiveOffers
+                                      ? "mixed"
+                                      : isLinkedToAllActiveOffers
+                                  }
+                                  data-state={
+                                    isLinkedToSomeActiveOffers
+                                      ? "mixed"
+                                      : isLinkedToAllActiveOffers
+                                        ? "checked"
+                                        : "unchecked"
+                                  }
+                                  onClick={() =>
+                                    onAccountOfferLinksToggle(account)
+                                  }
+                                  disabled={isAccountActionDisabled}
+                                />
+                              )}
                               <div className={s.text} title={account.username}>
                                 {account.username}
                               </div>

@@ -134,6 +134,11 @@
   text-align: center;
 }
 
+.active {
+  color: var(--white);
+  background: var(--black-blue);
+}
+
 .deleteSlot {
   display: flex;
   height: 22px;

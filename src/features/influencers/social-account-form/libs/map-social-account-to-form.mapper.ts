@@ -116,7 +116,7 @@ export const mapSocialAccountToFormMapper = (
     countries: mapCountriesToForm(socialAccount.countries),
 
     currency: socialAccount.currency,
-    price: toFormString(socialAccount.price),
+    price: toFormString(socialAccount.initialPrice),
     engagementRate: toFormString(socialAccount.engagementRate),
     averageViews: toFormString(socialAccount.averageViews),
   };

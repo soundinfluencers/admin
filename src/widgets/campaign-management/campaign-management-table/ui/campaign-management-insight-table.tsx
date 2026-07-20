@@ -665,7 +665,12 @@ export const CampaignManagementInsightTable = ({
                             <div className="whatsapp-preview__content">
                                 {whatsAppModal.data.promos.map((promo, index) => {
                                     const fields = [
-                                        { label: "Platform", value: promo.platform },
+                                        {
+                                          label: "Platform",
+                                          value: promo.platform === "instagram"
+                                            ? `${promo.platform} (1 post + 1 story)`
+                                            : promo.platform,
+                                        },
                                         { label: "Page", value: promo.page },
                                         { label: "Content", value: promo.content },
                                         {
@@ -694,10 +699,14 @@ export const CampaignManagementInsightTable = ({
                                                     key={`promo-${index}-${field.label}`}
                                                     className="whatsapp-preview__row"
                                                 >
-                                                    <h4>{field.label}:</h4>
-                                                    <p title={field.value}>
+                                                  {Boolean(field.value) && (
+                                                    <>
+                                                      <h4>{field.label}:</h4>
+                                                      <p title={field.value}>
                                                         {field.value || "—"}
-                                                    </p>
+                                                      </p>
+                                                    </>
+                                                  )}
                                                 </div>
                                             ))}
                                         </div>

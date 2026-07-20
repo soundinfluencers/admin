@@ -1,0 +1,263 @@
+@use "@/app/styles/utils/mixins" as mixins;
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+@use '@/app/styles/utils/variables' as variables;
+
+.card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  border-radius: variables.$radius-md;
+
+  user-select: none;
+
+  &:not(.selected) {
+    @include mixins.hover {
+      .header {
+        &::after {
+          opacity: 1;
+        }
+      }
+
+      .top {
+        border-color: #0E74DC;
+      }
+
+      .button {
+        background-color: #0E74DC;
+      }
+
+      .wrapper {
+        border-color: #0E74DC;
+      }
+    }
+  }
+}
+
+.top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px;
+
+  border-radius: variables.$radius-md;
+  border: 1px solid var(--white-gray-20);
+  background: var(--white-50);
+
+  transition: border-color var(--transition-base);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @include breakpoints.tablet {
+    gap: 8px;
+  }
+}
+
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+
+  min-height: 156px;
+
+  border-radius: variables.$radius-sm;
+  background: var(--gradient-2);
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--brightest-gradient);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @include breakpoints.tablet {
+    min-height: 140px;
+  }
+}
+
+.title {
+  color: var(--gray-dark);
+  font-size: 24px;
+  font-weight: 500;
+
+  @include breakpoints.tablet {
+    font-size: 16px;
+  }
+}
+
+.price {
+  color: var(--gray-dark);
+  font-size: 36px;
+  line-height: 100%;
+
+  @include breakpoints.tablet {
+    font-size: 32px;
+  }
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-inline: 16px;
+
+  >p {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--black);
+
+    @include breakpoints.tablet {
+      font-size: 15px;
+    }
+  }
+}
+
+.button {
+  width: 100%;
+
+  transition: background-color var(--transition-base);
+}
+
+.wrapper {
+  position: relative;
+  z-index: 1;
+  margin-top: -30px;
+  padding: 54px 16px 26px 16px;
+
+  border: 1px solid var(--white-gray-20);
+  border-top: 0;
+
+  background: var(--white-50);
+  border-radius: 0 0 variables.$radius-md variables.$radius-md;
+
+  transition: border-color var(--transition-base);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 252px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    min-height: 50px;
+    border-radius: 4px;
+    background: var(--blue);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--white-gray-20);
+    border-radius: 4px;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+
+  min-width: 0;
+  padding-right: 16px;
+
+  >p {
+    flex-shrink: 0;
+    color: var(--black);
+    font-size: 13px;
+
+    @include breakpoints.tablet {
+      font-size: 12px;
+    }
+  }
+}
+
+.account {
+  min-width: 0;
+  flex: 1 1 auto;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  >p {
+    color: var(--black);
+    font-size: 15px;
+
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    user-select: none;
+
+    @include breakpoints.tablet {
+      font-size: 14px;
+    }
+  }
+}
+
+.logo {
+  flex: 0 0 32px;
+
+  display: block;
+  width: 32px;
+  height: 32px;
+  aspect-ratio: 1 / 1;
+
+  border-radius: 999px;
+  object-fit: cover;
+  overflow: hidden;
+
+  @include breakpoints.tablet {
+    flex-basis: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.selected {
+  .header {
+    &::after {
+      opacity: 1;
+    }
+  }
+
+  .top {
+    border-color: #0E74DC;
+  }
+
+  .button {
+    background-color: #0E74DC;
+
+    @include mixins.hover {
+      background-color: #0E74DC;
+    }
+  }
+
+  .wrapper {
+    border-color: #0E74DC;
+  }
+}

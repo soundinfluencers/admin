@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
+import clsx from "clsx";
 import { toast } from "react-toastify";
 
 import type {
@@ -6,6 +7,7 @@ import type {
   IUpdateInfluencersOfferPriceRequest,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 import { useClickOutside } from "@/shared/hooks/use-click-outside.ts";
+import { formatCompactNumber } from "@/shared/libs/format/format-compact-number.ts";
 import { TableFieldEditor } from "@/shared/ui/table-field-editor";
 import {
   LEFT_COLUMNS_WIDTH,
@@ -17,6 +19,7 @@ import s from "./offers-matrix-business-footer.module.scss";
 
 interface OffersMatrixBusinessFooterProps {
   displayOffers: IOfferHeader[];
+  activeOfferIdsSet: Set<string>;
   scrollLeft: number;
   offerColWidth: number;
   offersWidth: number;
@@ -144,6 +147,7 @@ const OfferPriceEditor = ({
 
 export const OffersMatrixBusinessFooter = ({
   displayOffers,
+  activeOfferIdsSet,
   scrollLeft,
   offerColWidth,
   offersWidth,
@@ -209,12 +213,18 @@ export const OffersMatrixBusinessFooter = ({
                     </div>
                   </div>
 
-                  <div className={s.followersLabel}>Followers</div>
+                  <div className={clsx(s.followersLabel, {
+                    [s.active]: activeOfferIdsSet.has(offer.offerId)
+                  })}>
+                    Followers
+                  </div>
 
                   <div
                     className={s.followersValue}
-                    aria-label="Followers total is unavailable"
-                  />
+                    aria-label="Followers total"
+                  >
+                    {formatCompactNumber(offer.combinedFollowers)}
+                  </div>
 
                   <div
                     className={s.deleteSlot}
