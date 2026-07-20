@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteInfluencersOfferApi } from "@/entities/influencers-offers/api/influencers-offers.api.ts";
-import { influencersOffersQueryKeys } from "@/entities/influencers-offers/model/influencers-offers.query-keys.ts";
+import {
+  influencerClientOffersQueryKeys,
+  influencersOffersQueryKeys,
+} from "@/entities/influencers-offers/model/influencers-offers.query-keys.ts";
 import type { IDeleteInfluencersOfferRequest } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 
 export const useDeleteInfluencersOfferMutation = () => {
@@ -11,8 +14,13 @@ export const useDeleteInfluencersOfferMutation = () => {
       deleteInfluencersOfferApi(request),
 
     onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: influencersOffersQueryKeys.matrixRoot(),
-      }),
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: influencersOffersQueryKeys.matrixRoot(),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: influencerClientOffersQueryKeys.lists(),
+        }),
+      ]),
   });
 };

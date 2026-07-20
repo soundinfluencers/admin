@@ -14,50 +14,54 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   offer,
 }) => {
   return (
-    <article className={clsx(s.card)}>
-      <div className={s.top}>
-        <div className={s.info}>
-          <div className={s.header}>
-            <p className={s.title}>{offer.title}</p>
-            <p className={s.price}>{offer.price}{"\u20AC"}</p>
+    <div className={s.container}>
+      <p>Pages Included: {offer.networksAmount}</p>
+      <p>Followers: {offer.combinedFollowers}</p>
+      <article className={clsx(s.card)}>
+        <div className={s.top}>
+          <div className={s.info}>
+            <div className={s.header}>
+              <p className={s.title}>{offer.title}</p>
+              <p className={s.price}>{offer.price}{"\u20AC"}</p>
+            </div>
+            <div className={s.details}>
+              <p>{offer.storyAndPostDetails}</p>
+              <p>{offer.networksAmount} networks with</p>
+              <p>{formatCompactNumber(Number(offer.combinedFollowers))}+ Followers Combined</p>
+            </div>
           </div>
-          <div className={s.details}>
-            <p>{offer.storyAndPostDetails}</p>
-            <p>{offer.networksAmount} networks with</p>
-            <p>{formatCompactNumber(Number(offer.combinedFollowers))}+ Followers Combined</p>
-          </div>
+
+          <Button
+            className={s.button}
+            variant="primary"
+            size="large"
+          >
+            Choose
+          </Button>
         </div>
 
-        <Button
-          className={s.button}
-          variant="primary"
-          size="large"
-        >
-          Choose
-        </Button>
-      </div>
-
-      <div className={s.wrapper}>
-        <ul className={s.list}>
-          {offer.connectedAccounts.map((account) => (
-            <li key={account.accountId} className={s.item}>
-              <div className={s.account}>
-                <img
-                  className={s.logo}
-                  src={account.logoUrl}
-                  alt=""
-                  decoding="async"
-                  loading="lazy"
-                  width={32}
-                  height={32}
-                />
-                <p title={account.username}>{account.username}</p>
-              </div>
-              <p>{formatCompactNumber(account.followers)}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </article>
+        <div className={s.wrapper}>
+          <ul className={s.list}>
+            {offer.connectedAccounts.map((account) => (
+              <li key={account.accountId} className={s.item}>
+                <div className={s.account}>
+                  <img
+                    className={s.logo}
+                    src={account.logoUrl}
+                    alt=""
+                    decoding="async"
+                    loading="lazy"
+                    width={32}
+                    height={32}
+                  />
+                  <p title={account.username}>{account.username}</p>
+                </div>
+                <p>{formatCompactNumber(account.followers)}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </article>
+    </div>
   );
 }
