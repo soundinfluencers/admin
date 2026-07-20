@@ -14,7 +14,10 @@ import type {
   IOfferHeader,
   IUpdateInfluencersOfferPriceRequest,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
-import { getOfferAccountLinkKey } from "@/pages/influencers-offers-page/model/influencers-offers-page.helpers.ts";
+import {
+  getOfferAccountLinkKey,
+  getOfferAccountRowKey,
+} from "@/pages/influencers-offers-page/model/influencers-offers-page.helpers.ts";
 import { createInfluencersOffersLinksMap } from "@/widgets/influencers-offers/offers-matrix/model/create-influencers-offers-links-map.ts";
 import {
   ADD_OFFER_ACTION_WIDTH,
@@ -46,7 +49,9 @@ interface OffersMatrixProps {
   onAddOffer?: () => void;
   activeOfferIds?: string[];
   onToggleOfferActive?: (offerId: string, isActive: boolean) => void;
-  onUpdateAccountOfferLinks?: (requests: IInfluencersOfferLinkRequest[]) => void;
+  onUpdateAccountOfferLinks?: (
+    requests: IInfluencersOfferLinkRequest[],
+  ) => Promise<unknown> | void;
   isUpdatingAccountOfferLinks?: boolean;
   onUpdateOfferPrice?: (request: IUpdateInfluencersOfferPriceRequest) => void;
   updatingOfferPriceId?: string;
@@ -81,6 +86,9 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
   );
 
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [updatingAccountKey, setUpdatingAccountKey] = useState<string | null>(
+    null,
+  );
 
   const [bodyMetrics, setBodyMetrics] = useState<ScrollMetrics>({
     scrollLeft: 0,
@@ -381,8 +389,14 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
   );
 
   const handleAccountOfferLinksToggle = useCallback(
-    (account: IOfferAccountRow) => {
-      if (!activeOfferIds.length || isUpdatingAccountOfferLinks) return;
+    async (account: IOfferAccountRow) => {
+      if (
+        !activeOfferIds.length ||
+        isUpdatingAccountOfferLinks ||
+        !onUpdateAccountOfferLinks
+      ) {
+        return;
+      }
 
       const linkedActiveOfferIds = getLinkedActiveOfferIds(account);
       const missingOfferIds = activeOfferIds.filter(
@@ -406,7 +420,15 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
 
       if (!requests.length) return;
 
-      onUpdateAccountOfferLinks?.(requests);
+      setUpdatingAccountKey(getOfferAccountRowKey(account));
+
+      try {
+        await onUpdateAccountOfferLinks(requests);
+      } catch {
+        // Mutation state/error handling stays in React Query; this only owns row UI cleanup.
+      } finally {
+        setUpdatingAccountKey(null);
+      }
     },
     [
       activeOfferIds,
@@ -445,6 +467,7 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
       isPublished: false,
       offerPrice: 0,
       costPrice: 0,
+      combinedFollowers: 0,
       createdAt: "",
     }))
     : data.offerHeaders;
@@ -496,11 +519,13 @@ export const OffersMatrix: React.FC<OffersMatrixProps> = ({
           onAccountOfferLinksToggle={handleAccountOfferLinksToggle}
           canUpdateAccountOfferLinks={Boolean(onUpdateAccountOfferLinks)}
           isUpdatingAccountOfferLinks={isUpdatingAccountOfferLinks}
+          updatingAccountKey={updatingAccountKey}
         />
 
         {!showSkeleton && (
           <OffersMatrixBusinessFooter
             displayOffers={displayOffers}
+            activeOfferIdsSet={activeOfferIdsSet}
             scrollLeft={scrollLeft}
             offerColWidth={offerColWidth}
             offersWidth={offersWidth}

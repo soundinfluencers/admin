@@ -1,0 +1,319 @@
+@use "@/app/styles/utils/breakpoints" as breakpoints;
+@use "@/app/styles/utils/variables" as variables;
+
+$card-width: 288px;
+$container-max-width: 1224px;
+
+.carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: $container-max-width;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  @include breakpoints.tablet {
+    justify-content: space-between;
+  }
+
+  @include breakpoints.mobile {
+    justify-content: center;
+    gap: 3px;
+    padding: 0;
+  }
+}
+
+.content {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.swiper {
+  min-width: 0;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: $container-max-width;
+
+  @include breakpoints.tablet {
+    width: calc(100% - 64px);
+    max-width: ($card-width * 2) + 16px;
+  }
+
+  @include breakpoints.mobile {
+    width: $card-width;
+    max-width: none;
+  }
+}
+
+.slides {
+  display: flex;
+  gap: 24px;
+  overflow: hidden;
+
+  @include breakpoints.tablet {
+    gap: 16px;
+  }
+}
+
+.slide {
+  width: $card-width;
+  height: auto;
+  display: flex;
+  flex: 0 0 $card-width;
+  box-sizing: border-box;
+}
+
+.skeletonBase {
+  position: relative;
+  overflow: hidden;
+  display: block;
+  flex-shrink: 0;
+  contain: paint;
+
+  background: var(--skeleton-bg);
+  border-radius: 8px;
+}
+
+.skeletonBase::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 60%),
+    transparent
+  );
+
+  animation: skeleton-loading 1.4s infinite;
+  will-change: transform;
+}
+
+.card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: variables.$radius-md;
+  user-select: none;
+}
+
+.top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 8px;
+
+  border-radius: variables.$radius-md;
+  border: 1px solid var(--white-gray-20);
+  background: var(--white-50);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  @include breakpoints.tablet {
+    gap: 8px;
+  }
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+
+  min-height: 156px;
+
+  border-radius: variables.$radius-sm;
+  background: var(--light-blue);
+  overflow: hidden;
+
+  @include breakpoints.tablet {
+    min-height: 140px;
+  }
+}
+
+.titleSkeleton {
+  @extend .skeletonBase;
+
+  width: 90px;
+  height: 32px;
+
+  @include breakpoints.tablet {
+    width: 70px;
+    height: 22px;
+  }
+}
+
+.priceSkeleton {
+  @extend .skeletonBase;
+
+  width: 120px;
+  height: 36px;
+
+  @include breakpoints.tablet {
+    width: 100px;
+    height: 32px;
+  }
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-inline: 16px;
+}
+
+.detailSkeleton,
+.detailSkeletonWide {
+  @extend .skeletonBase;
+
+  height: 22px;
+
+  @include breakpoints.tablet {
+    height: 21px;
+  }
+}
+
+.detailSkeleton {
+  width: 70%;
+}
+
+.detailSkeletonWide {
+  width: 88%;
+}
+
+.buttonSkeleton {
+  @extend .skeletonBase;
+
+  width: 100%;
+  height: 46px;
+  border-radius: 999px;
+
+  @include breakpoints.tablet {
+    height: 38px;
+  }
+
+  @include breakpoints.mobile {
+    height: 46px;
+  }
+}
+
+.wrapper {
+  position: relative;
+  z-index: 1;
+  margin-top: -30px;
+  padding: 54px 16px 26px;
+
+  border: 1px solid var(--white-gray-20);
+  border-top: 0;
+
+  background: var(--white-50);
+  border-radius: 0 0 variables.$radius-md variables.$radius-md;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  overflow: hidden;
+  max-height: 252px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-right: 16px;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.logoSkeleton {
+  @extend .skeletonBase;
+
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+
+  @include breakpoints.tablet {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.accountNameSkeleton {
+  @extend .skeletonBase;
+
+  width: 92px;
+  height: 22px;
+
+  @include breakpoints.tablet {
+    width: 82px;
+    height: 18px;
+  }
+}
+
+.followersSkeleton {
+  @extend .skeletonBase;
+
+  width: 38px;
+  height: 17px;
+
+  @include breakpoints.tablet {
+    height: 16px;
+  }
+}
+
+.paginationSkeleton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+
+  margin-top: 16px;
+}
+
+.bulletSkeleton,
+.bulletNextSkeleton,
+.bulletActiveSkeleton {
+  @extend .skeletonBase;
+
+  height: 5px;
+  border-radius: 999px;
+}
+
+.bulletSkeleton {
+  width: 5px;
+}
+
+.bulletNextSkeleton {
+  width: 10px;
+}
+
+.bulletActiveSkeleton {
+  width: 50px;
+}
+
+@keyframes skeleton-loading {
+  100% {
+    transform: translateX(100%);
+  }
+}

@@ -3,6 +3,8 @@ import type {
   ICreateInfluencersOfferRequest,
   IDeleteInfluencersOfferRequest,
   IGetInfluencersOffersMatrixParams,
+  IGetOffersClientsParams,
+  IGetOffersClientsResponse,
   IInfluencersOfferLinkRequest,
   IInfluencersOfferMutationResponse,
   IInfluencersOffersMatrixResponse,
@@ -11,16 +13,12 @@ import type {
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 
 export const getInfluencersOffersMatrixApi = async (params: IGetInfluencersOffersMatrixParams) => {
-  console.log('get influencers offers matrix with params: ', params);
-
-  const { data } = await $api.get<IInfluencersOffersMatrixResponse>("/admin/offers", {
+  const { data } = await $api.get<IInfluencersOffersMatrixResponse>("/admin/offers/matrix-view", {
     params: params,
   });
 
-  console.log('get influencers offers matrix response: ', data.data);
-
   return data.data;
-}
+};
 
 export const createInfluencersOfferApi = async (dto: ICreateInfluencersOfferRequest) => {
   const { data } = await $api.post<IInfluencersOfferMutationResponse>(
@@ -80,3 +78,11 @@ export const deleteInfluencersOfferApi = async ({
 
   return data;
 };
+
+export const getClientsOffersApi = async (params: IGetOffersClientsParams) => {
+  const { data } = await $api.get<IGetOffersClientsResponse>("/admin/offers/client-view", {
+    params: params,
+  });
+
+  return data.data;
+}
