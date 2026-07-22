@@ -9,10 +9,12 @@ import type {
 export const getEmptyCampaignFiltersBody = (): CampaignFiltersRequestBody => ({
     socialMedias: [],
     profileTypes: [],
-    musicGenres: [],
+    communityMusicGenres: [],
+    creatorMusicGenres: [],
     musicGenresFilterMethod: "or",
     countries: [],
-    additionalTopics: [],
+    communityThemeTopics: [],
+    creatorContentFocus: [],
     musicCategories: [],
     entertainmentCategories: [],
 });
@@ -82,9 +84,19 @@ export const toggleCampaignFilterSelection = ({
 
     if (checked) {
         if (item.children?.length) {
-            collectDeepIds(item).forEach((id) => next.add(id));
+            if (item.selectionMode === "children-only") {
+                next.delete(item.id);
+            }
+
+            const ids = item.selectionMode === "children-only"
+                ? item.children.flatMap((child) => collectDeepIds(child))
+                : collectDeepIds(item);
+
+            ids.forEach((id) => next.add(id));
         } else if (parent) {
-            next.add(parent.id);
+            if (parent.selectionMode !== "children-only") {
+                next.add(parent.id);
+            }
             next.add(item.id);
         } else {
             next.add(item.id);
@@ -94,7 +106,13 @@ export const toggleCampaignFilterSelection = ({
     }
 
     if (item.children?.length) {
-        collectDeepIds(item).forEach((id) => next.delete(id));
+        next.delete(item.id);
+
+        const ids = item.selectionMode === "children-only"
+            ? item.children.flatMap((child) => collectDeepIds(child))
+            : collectDeepIds(item);
+
+        ids.forEach((id) => next.delete(id));
         return Array.from(next);
     }
 
@@ -106,7 +124,7 @@ export const toggleCampaignFilterSelection = ({
             (id) => id !== item.id && next.has(id),
         );
 
-        if (!hasSelectedSibling) {
+        if (!hasSelectedSibling && parent.selectionMode !== "children-only") {
             next.delete(parent.id);
         }
     }
@@ -163,44 +181,6 @@ const findSelectedLeafItemsByGroup = (
     );
 };
 
-export const buildSelectedGenreValues = (
-    sections: CampaignFilterSection[],
-    selectedIds: string[],
-): string[] => {
-    const selectedGenreItems = findSelectedItemsByGroup(
-        sections,
-        selectedIds,
-        "genres",
-    );
-
-    const selectedGenreLeaves = selectedGenreItems.filter(
-        (item) => !item.children?.length,
-    );
-
-    return selectedGenreLeaves.map((item) => {
-        const parent = findCampaignFilterParent(
-            sections.flatMap((section) => section.filters),
-            item.id,
-        );
-
-        const childValue =
-            item.apiValue?.trim() ||
-            item.rawId?.trim() ||
-            item.filterName.trim();
-
-        if (!parent) {
-            return childValue;
-        }
-
-        const parentValue =
-            parent.rawId?.trim() ||
-            parent.apiValue?.trim() ||
-            parent.filterName.trim();
-
-        return `${parentValue} ${childValue}`.trim();
-    });
-};
-
 export const buildCampaignFiltersRequestBody = ({
                                                     sections,
                                                     selectedIds,
@@ -222,7 +202,24 @@ export const buildCampaignFiltersRequestBody = ({
         "profileType",
     ).map((item) => item.apiValue || item.rawId || item.filterName);
 
-    const musicGenres = buildSelectedGenreValues(sections, selectedIds);
+    const selectedItems = buildSelectedCampaignFilters(sections, selectedIds);
+    const getBackendValues = (
+        group:
+            | "communityMusicGenres"
+            | "creatorMusicGenres"
+            | "communityThemeTopics"
+            | "creatorContentFocus",
+    ): string[] =>
+        Array.from(
+            new Set(
+                selectedItems
+                    .map((item) => item.backendValues?.[group])
+                    .filter((value): value is string => Boolean(value)),
+            ),
+        );
+
+    const communityMusicGenres = getBackendValues("communityMusicGenres");
+    const creatorMusicGenres = getBackendValues("creatorMusicGenres");
 
     const countries = findSelectedLeafItemsByGroup(
         sections,
@@ -230,11 +227,8 @@ export const buildCampaignFiltersRequestBody = ({
         "countries",
     ).map((item) => item.apiValue || item.rawId || item.filterName);
 
-    const additionalTopics = findSelectedLeafItemsByGroup(
-        sections,
-        selectedIds,
-        "addTopics",
-    ).map((item) => item.apiValue || item.rawId || item.filterName);
+    const communityThemeTopics = getBackendValues("communityThemeTopics");
+    const creatorContentFocus = getBackendValues("creatorContentFocus");
 
     const musicCategories = findSelectedLeafItemsByGroup(
         sections,
@@ -251,10 +245,12 @@ export const buildCampaignFiltersRequestBody = ({
     return {
         socialMedias,
         profileTypes,
-        musicGenres,
+        communityMusicGenres,
+        creatorMusicGenres,
         musicGenresFilterMethod,
         countries,
-        additionalTopics,
+        communityThemeTopics,
+        creatorContentFocus,
         musicCategories,
         entertainmentCategories,
     };
@@ -278,7 +274,6 @@ export const buildPromoAccountsFiltersBody = ({
         selectedIds,
         musicGenresFilterMethod,
     });
-    //@ts-ignore
     return {
         ...base,
         ...(budget && budget > 0
