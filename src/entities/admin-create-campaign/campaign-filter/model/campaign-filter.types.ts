@@ -16,8 +16,16 @@ export type CampaignFilterItem = {
     group: string;
     filterName: string;
     count: number;
+    backendValues?: Partial<Record<CampaignBackendFilterGroup, string>>;
+    selectionMode?: "children-only";
     children?: CampaignFilterItem[];
 };
+
+export type CampaignBackendFilterGroup =
+    | "communityMusicGenres"
+    | "creatorMusicGenres"
+    | "communityThemeTopics"
+    | "creatorContentFocus";
 
 export type CampaignFilterMethod = "and" | "or";
 
@@ -51,15 +59,17 @@ export type CampaignCardsViewMode = "grid" | "table";
 export type CampaignFiltersRequestBody = {
     socialMedias: string[];
     profileTypes: string[];
-    musicGenres: string[];
+    communityMusicGenres: string[];
+    creatorMusicGenres: string[];
     musicGenresFilterMethod: CampaignFilterMethod;
     countries: string[];
-    additionalTopics: string[];
+    communityThemeTopics: string[];
+    creatorContentFocus: string[];
     musicCategories: string[];
     entertainmentCategories: string[];
 };
 
 export type PromoAccountsFiltersBody = CampaignFiltersRequestBody & {
     budget?: number;
-    budgetCurrency: string;
+    budgetCurrency?: string;
 };

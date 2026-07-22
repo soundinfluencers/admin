@@ -33,7 +33,7 @@ const isProfileTypeSection = (section: CampaignFilterSection) => {
 };
 
 const isHiddenForCommunitySection = (section: CampaignFilterSection) => {
-    return ["music-categories", "additional-topics"].includes(section.id);
+    return section.id === "music-categories";
 };
 
 const isCommunityFilterItem = (item: CampaignFilterItem) => {

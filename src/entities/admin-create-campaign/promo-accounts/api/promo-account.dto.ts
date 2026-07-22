@@ -46,12 +46,14 @@ export type SearchPromoAccountsResponseDto = {
 export type FilterPromoAccountsBodyDto = {
     socialMedias: string[];
     profileTypes: string[];
-    musicGenres: string[];
+    communityMusicGenres: string[];
+    creatorMusicGenres: string[];
     musicGenresFilterMethod: string;
     countries: string[];
-    additionalTopics: string[];
-    budget: number;
-    budgetCurrency: string;
+    communityThemeTopics: string[];
+    creatorContentFocus: string[];
+    budget?: number;
+    budgetCurrency?: string;
     musicCategories: string[];
     entertainmentCategories: string[];
 };

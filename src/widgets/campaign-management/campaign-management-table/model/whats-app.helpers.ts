@@ -58,7 +58,12 @@ const escapeHtml = (value: string) => {
 
 const getPromoFields = (promo: WhatsAppPromoData): PromoField[] => {
     return [
-        { label: "Platform", value: promo.platform },
+        {
+            label: "Platform",
+            value: promo.platform === "instagram"
+              ? `${promo.platform} (1 post + 1 story)`
+              : promo.platform,
+        },
         { label: "Page", value: promo.page },
         { label: "Content", value: promo.content },
         { label: "Description", value: promo.description },
@@ -264,8 +269,8 @@ export const buildWhatsAppInfluencerPromoMessage = (
 
     const promoLines = data.promos.flatMap((promo, index) => {
         const lines = getPromoFields(promo).map(
-            (field) => `*${field.label}:* ${field.value || "—"}`,
-        );
+            (field) => field.value && `*${field.label}:* ${field.value}`,
+        ).filter(line => line);
 
         if (index < data.promos.length - 1) {
             return [...lines, ""];
