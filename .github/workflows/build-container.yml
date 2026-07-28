@@ -1,11 +1,18 @@
-name: Build container
+name: Build and publish container
 
 on:
-  push:
-    branches:
-      - main
-      - feat/ai-agent
   workflow_dispatch:
+    inputs:
+      source_ref:
+        description: "Branch, tag or full commit SHA to build"
+        required: true
+        type: string
+      release_channel:
+        description: "Release channel used as Docker tag prefix"
+        required: true
+        type: choice
+        options:
+          - main
 
 permissions:
   contents: read
@@ -15,15 +22,60 @@ env:
   REGISTRY_IMAGE: ghcr.io/${{ github.repository_owner }}/soundinfluencers-admin
 
 jobs:
-  verify-and-publish:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 0
+
+      - name: Validate source ref and release channel
+        id: release
+        shell: bash
+        env:
+          SOURCE_REF: ${{ inputs.source_ref }}
+          RELEASE_CHANNEL: ${{ inputs.release_channel }}
+        run: |
+          set -Eeuo pipefail
+
+          if [[ "$RELEASE_CHANNEL" != "main" ]]; then
+            printf 'ERROR: admin supports only the main release channel\n' >&2
+            exit 1
+          fi
+
+          if [[ "$SOURCE_REF" == "feat/ai-agent" || "$SOURCE_REF" == "refs/heads/feat/ai-agent" ]]; then
+            printf 'ERROR: admin has no ai-agent source branch; use main or a commit from main\n' >&2
+            exit 1
+          fi
+
+          if [[ "$SOURCE_REF" =~ ^[0-9a-fA-F]{7,39}$ ]]; then
+            printf 'ERROR: abbreviated commit SHA is not allowed; use the full commit SHA\n' >&2
+            exit 1
+          fi
+
+          git fetch --no-tags origin \
+            "+refs/heads/main:refs/remotes/origin/main"
+
+          built_sha="$(git rev-parse HEAD)"
+          short_sha="$(git rev-parse --short=7 HEAD)"
+
+          if ! git merge-base --is-ancestor "$built_sha" "origin/main"; then
+            printf 'ERROR: commit %s from source_ref is not in the history of origin/main\n' \
+              "$built_sha" >&2
+            exit 1
+          fi
+
+          {
+            printf 'built_sha=%s\n' "$built_sha"
+            printf 'short_sha=%s\n' "$short_sha"
+            printf 'immutable_tag=main-%s\n' "$short_sha"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
@@ -31,18 +83,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint (non-blocking legacy debt)
-        continue-on-error: true
-        run: npm run lint
-
-      - name: Build
+      - name: Build production application
         run: npm run build
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Log in to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -50,22 +98,21 @@ jobs:
 
       - name: Extract image metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY_IMAGE }}
           tags: |
-            type=raw,value=main,enable=${{ github.ref == 'refs/heads/main' }}
-            type=sha,prefix=main-,format=short,enable=${{ github.ref == 'refs/heads/main' }}
-            type=raw,value=ai-agent,enable=${{ github.ref == 'refs/heads/feat/ai-agent' }}
-            type=sha,prefix=ai-agent-,format=short,enable=${{ github.ref == 'refs/heads/feat/ai-agent' }}
+            type=raw,value=${{ steps.release.outputs.immutable_tag }}
+            type=raw,value=main
           labels: |
             org.opencontainers.image.title=SoundInfluencers Admin
             org.opencontainers.image.description=Production admin SPA for SoundInfluencers
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.revision=${{ steps.release.outputs.built_sha }}
+            org.opencontainers.image.version=${{ steps.release.outputs.immutable_tag }}
 
       - name: Build and push image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
@@ -74,3 +121,20 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Write publication summary
+        env:
+          SOURCE_REF: ${{ inputs.source_ref }}
+          BUILT_SHA: ${{ steps.release.outputs.built_sha }}
+          IMMUTABLE_TAG: ${{ steps.release.outputs.immutable_tag }}
+        run: |
+          {
+            printf '## Published container image\n\n'
+            printf -- '- Repository: %s\n' "$GITHUB_REPOSITORY"
+            printf -- '- Source ref: %s\n' "$SOURCE_REF"
+            printf -- '- Commit SHA: %s\n' "$BUILT_SHA"
+            printf -- '- Release channel: main\n'
+            printf -- '- Image: %s\n' "$REGISTRY_IMAGE"
+            printf -- '- Immutable tag: %s:%s\n' "$REGISTRY_IMAGE" "$IMMUTABLE_TAG"
+            printf -- '- Branch alias: %s:main\n' "$REGISTRY_IMAGE"
+          } >> "$GITHUB_STEP_SUMMARY"
