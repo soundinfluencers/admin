@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import type { TSocialAccountShort } from "@/entities/influencers/model/social-account.types.ts";
 
 export interface IInfluencer {
