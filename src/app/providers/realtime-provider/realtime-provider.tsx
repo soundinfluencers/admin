@@ -13,6 +13,7 @@ import type {
 } from "@/app/providers/realtime-provider/realtime.types.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { influencersQueryKeys } from "@/entities/influencers/api/influencers.query-keys.ts";
+import { API_URL } from "@/shared/config/runtime-config.ts";
 
 const SOCKET_CLIENT_ID_KEY = "soundinfluencers-admin:socket-client-id";
 const WHATSAPP_SUCCESS_TOAST_ID = "whatsapp-success-once";
@@ -78,7 +79,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
 
     const nextClientId = getSocketClientId();
 
-    const nextSocket = io(import.meta.env.VITE_SERVER, {
+    const nextSocket = io(API_URL, {
       path: "/socket.io",
       auth: {
         token: accessToken,

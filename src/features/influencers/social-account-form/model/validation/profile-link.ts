@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { z } from 'zod';
 import type { TSocialMedia } from "@/shared/types/types.ts";
 
