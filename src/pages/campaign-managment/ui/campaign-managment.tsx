@@ -1,5 +1,6 @@
 import {useEffect, useState, useCallback, useMemo} from "react";
 import { useSearchParams } from "react-router-dom";
+import { ObjectId } from "bson";
 
 import styles from "./campaign-managment.module.scss";
 
@@ -383,6 +384,12 @@ export const CampaignManagment = () => {
                             acc.selectedCampaignContentItem.campaignContentItemId,
                             descriptionId:
                             acc.selectedCampaignContentItem.descriptionId,
+                            ...(acc.selectedCampaignContentItem.additionalBriefId
+                                ? {
+                                    additionalBriefId:
+                                        acc.selectedCampaignContentItem.additionalBriefId,
+                                }
+                                : {}),
                         }
                         : null,
                     dateRequest: acc.dateRequest,
@@ -398,7 +405,14 @@ export const CampaignManagment = () => {
                     })),
                     taggedUser: item.taggedUser,
                     taggedLink: item.taggedLink,
-                    additionalBrief: item.additionalBrief,
+                    additionalBrief: item.additionalBriefOptions?.length
+                        ? item.additionalBriefOptions
+                        : item.additionalBrief.trim()
+                            ? [{
+                                _id: new ObjectId().toHexString(),
+                                additionalBrief: item.additionalBrief,
+                            }]
+                            : [],
                 })),
             }
             : {

@@ -24,6 +24,7 @@ export interface CampaignContentItem {
 export interface SelectedContentRef {
     campaignContentItemId: Id;
     descriptionId: Id;
+    additionalBriefId?: Id;
 }
 
 export interface SelectedContentItemFlat {
@@ -114,6 +115,7 @@ export interface CampaignAddedAccount {
 export interface SelectedContentRef {
     campaignContentItemId: Id;
     descriptionId: Id;
+    additionalBriefId?: Id;
 }
 export interface Campaign {
     campaignId: Id;

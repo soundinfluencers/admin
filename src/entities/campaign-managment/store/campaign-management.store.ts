@@ -7,6 +7,7 @@ import { getGroupBySocial } from "@/entities/campaign-managment/model/campaign-m
 type SelectedCampaignContentItem = {
     campaignContentItemId: string;
     descriptionId: string;
+    additionalBriefId?: string;
 };
 
 export enum AdminPromoStatusLabelEnum {
@@ -37,6 +38,10 @@ export type EditableAccount = {
     currency?: string;
     statusLabel?: keyof typeof AdminPromoStatusLabelEnum | string;
     selectedCampaignContentItem: SelectedCampaignContentItem | null;
+    selectedContentItem?: {
+        additionalBrief?: string;
+        [key: string]: unknown;
+    } | null;
     dateRequest: string;
 
     postLink?: string;
@@ -58,6 +63,11 @@ export type EditableDescription = {
     description: string;
 };
 
+export type EditableAdditionalBrief = {
+    _id: string;
+    additionalBrief: string;
+};
+
 export type EditableCampaignContentItem = {
     _id: string;
     socialMedia: string;
@@ -73,6 +83,7 @@ export type EditableCampaignContentItem = {
     taggedUser: string;
     taggedLink: string;
     additionalBrief: string;
+    additionalBriefOptions?: EditableAdditionalBrief[];
 };
 
 export type EditableCampaign = {
@@ -133,6 +144,35 @@ export type CampaignResponse = {
 
 const toStringSafe = (v: unknown) => String(v ?? "");
 
+const normalizeAdditionalBriefOptions = (
+    value: unknown,
+): EditableAdditionalBrief[] => {
+    if (!Array.isArray(value)) return [];
+
+    return value.map((brief) => {
+        const candidate =
+            brief && typeof brief === "object"
+                ? (brief as { _id?: unknown; additionalBrief?: unknown })
+                : {};
+
+        return {
+            _id: toStringSafe(candidate._id),
+            additionalBrief: toStringSafe(candidate.additionalBrief),
+        };
+    });
+};
+
+const normalizeAdditionalBriefText = (value: unknown) => {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) {
+        return toStringSafe(value[0]?.additionalBrief);
+    }
+    if (value && typeof value === "object") {
+        return toStringSafe((value as { additionalBrief?: unknown }).additionalBrief);
+    }
+    return "";
+};
+
 const objectId = () => {
     const bytes = new Uint8Array(12);
 
@@ -188,6 +228,20 @@ const getFinalBudget = (editable: EditableCampaign) => {
         ? Number(editable.price ?? 0)
         : getAutoBudgetFromAccounts(editable.addedAccounts);
 };
+
+const buildAdditionalBriefPayload = (item: EditableCampaignContentItem) => {
+    if (item.additionalBriefOptions?.length) {
+        return item.additionalBriefOptions.map((brief) => ({
+            _id: brief._id,
+            additionalBrief: brief.additionalBrief,
+        }));
+    }
+
+    const additionalBrief = item.additionalBrief.trim();
+    return additionalBrief
+        ? [{ _id: objectId(), additionalBrief }]
+        : [];
+};
 export const normalizeCampaignForEdit = (
     data: CampaignResponse,
 ): EditableCampaign => {
@@ -221,6 +275,18 @@ export const normalizeCampaignForEdit = (
                         selected?.campaignContentItemId,
                     ),
                     descriptionId: toStringSafe(selected?.descriptionId),
+                    additionalBriefId: toStringSafe(
+                        selected?.additionalBriefId,
+                    ),
+                }
+                : null,
+
+            selectedContentItem: acc?.selectedContentItem
+                ? {
+                    ...acc.selectedContentItem,
+                    additionalBrief: normalizeAdditionalBriefText(
+                        acc.selectedContentItem.additionalBrief,
+                    ),
                 }
                 : null,
 
@@ -298,20 +364,29 @@ export const normalizeCampaignForEdit = (
 
         addedAccounts: normalizedAccounts,
 
-        campaignContent: (data.campaignContent ?? []).map((item) => ({
-            _id: toStringSafe(item?._id),
-            socialMedia: toStringSafe(item?.socialMedia).toLowerCase(),
-            socialMediaGroup: toStringSafe(item?.socialMediaGroup),
-            mainLink: toStringSafe(item?.mainLink),
-            mediaCache: item?.mediaCache ?? undefined,
-            descriptions: (item?.descriptions ?? []).map((desc: any) => ({
-                _id: toStringSafe(desc?._id),
-                description: toStringSafe(desc?.description),
-            })),
-            taggedUser: toStringSafe(item?.taggedUser),
-            taggedLink: toStringSafe(item?.taggedLink),
-            additionalBrief: toStringSafe(item?.additionalBrief),
-        })),
+        campaignContent: (data.campaignContent ?? []).map((item) => {
+            const additionalBriefOptions = normalizeAdditionalBriefOptions(
+                item?.additionalBrief,
+            );
+
+            return {
+                _id: toStringSafe(item?._id),
+                socialMedia: toStringSafe(item?.socialMedia).toLowerCase(),
+                socialMediaGroup: toStringSafe(item?.socialMediaGroup),
+                mainLink: toStringSafe(item?.mainLink),
+                mediaCache: item?.mediaCache ?? undefined,
+                descriptions: (item?.descriptions ?? []).map((desc: any) => ({
+                    _id: toStringSafe(desc?._id),
+                    description: toStringSafe(desc?.description),
+                })),
+                taggedUser: toStringSafe(item?.taggedUser),
+                taggedLink: toStringSafe(item?.taggedLink),
+                additionalBrief: normalizeAdditionalBriefText(
+                    item?.additionalBrief,
+                ),
+                additionalBriefOptions,
+            };
+        }),
     };
 };
 // const EDITABLE_STATUSES = ["proposal", "pending", "distributing"] as const;
@@ -384,6 +459,27 @@ const isEditableNow = ({
 const buildBasePayload = (editable: EditableCampaign) => {
     const finalBudget = getFinalBudget(editable);
 
+    const campaignContent = editable.campaignContent.map((item) => ({
+        _id: item._id,
+        socialMedia: item.socialMedia,
+        socialMediaGroup: item.socialMediaGroup,
+        mainLink: item.mainLink,
+        descriptions: item.descriptions.map((desc) => ({
+            _id: desc._id,
+            description: desc.description,
+        })),
+        taggedUser: item.taggedUser,
+        taggedLink: item.taggedLink,
+        additionalBrief: buildAdditionalBriefPayload(item),
+    }));
+
+    const firstBriefIdByContentId = new Map(
+        campaignContent.map((item) => [
+            item._id,
+            item.additionalBrief[0]?._id,
+        ]),
+    );
+
     const payload = {
         campaignName: editable.campaignName,
 
@@ -404,6 +500,18 @@ const buildBasePayload = (editable: EditableCampaign) => {
                     campaignContentItemId:
                     acc.selectedCampaignContentItem.campaignContentItemId,
                     descriptionId: acc.selectedCampaignContentItem.descriptionId,
+                    ...(acc.selectedCampaignContentItem.additionalBriefId ||
+                    firstBriefIdByContentId.get(
+                        acc.selectedCampaignContentItem.campaignContentItemId,
+                    )
+                        ? {
+                            additionalBriefId:
+                                acc.selectedCampaignContentItem.additionalBriefId ||
+                                firstBriefIdByContentId.get(
+                                    acc.selectedCampaignContentItem.campaignContentItemId,
+                                ),
+                        }
+                        : {}),
                 }
                 : null,
             dateRequest: acc.dateRequest,
@@ -436,19 +544,7 @@ const buildBasePayload = (editable: EditableCampaign) => {
                     : undefined,
         })),
 
-        campaignContent: editable.campaignContent.map((item) => ({
-            _id: item._id,
-            socialMedia: item.socialMedia,
-            socialMediaGroup: item.socialMediaGroup,
-            mainLink: item.mainLink,
-            descriptions: item.descriptions.map((desc) => ({
-                _id: desc._id,
-                description: desc.description,
-            })),
-            taggedUser: item.taggedUser,
-            taggedLink: item.taggedLink,
-            additionalBrief: item.additionalBrief,
-        })),
+        campaignContent,
 
         displayCurrency: editable.displayCurrency,
     };
@@ -529,6 +625,8 @@ type CampaignManagementStore = {
         contentId: string,
         field: "mainLink" | "taggedUser" | "taggedLink" | "additionalBrief",
         value: string,
+        additionalBriefId?: string,
+        accountKey?: string,
     ) => void;
     setContentDescriptions: (
         contentId: string,
@@ -828,24 +926,80 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
             set((state) => {
                 if (!state.editable) return state;
 
+                const selectedContent = selected
+                    ? state.editable.campaignContent.find(
+                        (item) =>
+                            String(item._id) ===
+                            String(selected.campaignContentItemId),
+                    )
+                    : null;
                 return {
                     editable: {
                         ...state.editable,
-                        addedAccounts: state.editable.addedAccounts.map((acc) =>
-                            getAccountKey(acc) === String(accountKey)
-                                ? {
+                        addedAccounts: state.editable.addedAccounts.map((acc) => {
+                            if (getAccountKey(acc) !== String(accountKey)) {
+                                return acc;
+                            }
+
+                            if (!selected || !selectedContent) {
+                                return {
                                     ...acc,
-                                    selectedCampaignContentItem: selected
-                                        ? {
-                                            campaignContentItemId: toStringSafe(
-                                                selected.campaignContentItemId,
-                                            ),
-                                            descriptionId: toStringSafe(selected.descriptionId),
-                                        }
-                                        : null,
-                                }
-                                : acc,
-                        ),
+                                    selectedCampaignContentItem: null,
+                                    selectedContentItem: null,
+                                };
+                            }
+
+                            const isSameContent =
+                                acc.selectedCampaignContentItem
+                                    ?.campaignContentItemId ===
+                                toStringSafe(selected.campaignContentItemId);
+                            const additionalBriefId =
+                                selected.additionalBriefId ||
+                                (isSameContent
+                                    ? acc.selectedCampaignContentItem
+                                        ?.additionalBriefId
+                                    : undefined) ||
+                                selectedContent.additionalBriefOptions?.[0]?._id;
+                            const selectedBrief =
+                                selectedContent.additionalBriefOptions?.find(
+                                    (brief) => brief._id === additionalBriefId,
+                                ) ??
+                                selectedContent.additionalBriefOptions?.[0];
+                            const selectedDescription =
+                                selectedContent.descriptions.find(
+                                    (description) =>
+                                        description._id ===
+                                        toStringSafe(selected.descriptionId),
+                                ) ?? selectedContent.descriptions[0];
+
+                            return {
+                                ...acc,
+                                selectedCampaignContentItem: {
+                                    campaignContentItemId: toStringSafe(
+                                        selected.campaignContentItemId,
+                                    ),
+                                    descriptionId: toStringSafe(
+                                        selected.descriptionId,
+                                    ),
+                                    ...(additionalBriefId
+                                        ? { additionalBriefId }
+                                        : {}),
+                                },
+                                selectedContentItem: {
+                                    _id: selectedContent._id,
+                                    socialMedia: selectedContent.socialMedia,
+                                    socialMediaGroup:
+                                        selectedContent.socialMediaGroup,
+                                    mainLink: selectedContent.mainLink,
+                                    description:
+                                        selectedDescription?.description ?? "",
+                                    taggedUser: selectedContent.taggedUser,
+                                    taggedLink: selectedContent.taggedLink,
+                                    additionalBrief:
+                                        selectedBrief?.additionalBrief ?? "",
+                                },
+                            };
+                        }),
                     },
                 };
             }),
@@ -973,17 +1127,99 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
                 };
             }),
 
-        setContentField: (contentId, field, value) =>
+        setContentField: (
+            contentId,
+            field,
+            value,
+            additionalBriefId,
+            accountKey,
+        ) =>
             set((state) => {
                 if (!state.editable) return state;
+
+                if (field !== "additionalBrief" || !accountKey) {
+                    return {
+                        editable: {
+                            ...state.editable,
+                            campaignContent: state.editable.campaignContent.map((item) =>
+                                String(item._id) === String(contentId)
+                                    ? { ...item, [field]: value }
+                                    : item,
+                            ),
+                        },
+                    };
+                }
+
+                const targetAccount = state.editable.addedAccounts.find(
+                    (account) => getAccountKey(account) === String(accountKey),
+                );
+                const targetContent = state.editable.campaignContent.find(
+                    (item) => String(item._id) === String(contentId),
+                );
+                const fallbackBriefId =
+                    targetContent?.additionalBriefOptions?.[0]?._id;
+                const selectedBriefId =
+                    targetAccount?.selectedCampaignContentItem?.additionalBriefId ||
+                    additionalBriefId ||
+                    fallbackBriefId;
+                const selectedByAccountsCount = selectedBriefId
+                    ? state.editable.addedAccounts.filter(
+                        (account) =>
+                            account.selectedCampaignContentItem?.campaignContentItemId ===
+                            String(contentId) &&
+                            (account.selectedCampaignContentItem?.additionalBriefId ||
+                                fallbackBriefId) ===
+                            selectedBriefId,
+                    ).length
+                    : 0;
+                const nextBriefId =
+                    !selectedBriefId || selectedByAccountsCount > 1
+                        ? objectId()
+                        : selectedBriefId;
 
                 return {
                     editable: {
                         ...state.editable,
                         campaignContent: state.editable.campaignContent.map((item) =>
                             String(item._id) === String(contentId)
-                                ? { ...item, [field]: value }
+                                ? {
+                                    ...item,
+                                    additionalBriefOptions:
+                                        item.additionalBriefOptions?.some(
+                                            (brief) => brief._id === nextBriefId,
+                                        )
+                                            ? item.additionalBriefOptions.map((brief) =>
+                                                brief._id === nextBriefId
+                                                    ? { ...brief, additionalBrief: value }
+                                                    : brief,
+                                            )
+                                            : [
+                                                ...(item.additionalBriefOptions ?? []),
+                                                {
+                                                    _id: nextBriefId,
+                                                    additionalBrief: value,
+                                                },
+                                            ],
+                                }
                                 : item,
+                        ),
+                        addedAccounts: state.editable.addedAccounts.map((account) =>
+                            getAccountKey(account) === String(accountKey)
+                                ? {
+                                    ...account,
+                                    selectedCampaignContentItem:
+                                        account.selectedCampaignContentItem
+                                            ? {
+                                                ...account.selectedCampaignContentItem,
+                                                additionalBriefId: nextBriefId,
+                                            }
+                                            : null,
+                                    selectedContentItem: {
+                                        ...(account.selectedContentItem ?? {}),
+                                        additionalBrief: value,
+                                    },
+                                }
+                                : account,
                         ),
                     },
                 };

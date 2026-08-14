@@ -10,6 +10,7 @@ type AddAdminProposalOptionBody = {
         selectedCampaignContentItem: {
             campaignContentItemId: string;
             descriptionId: string;
+            additionalBriefId?: string;
         } | null;
         dateRequest: string;
     }>;
@@ -24,7 +25,10 @@ type AddAdminProposalOptionBody = {
         }>;
         taggedUser: string;
         taggedLink: string;
-        additionalBrief: string;
+        additionalBrief: Array<{
+            _id: string;
+            additionalBrief: string;
+        }>;
     }>;
 };
 
