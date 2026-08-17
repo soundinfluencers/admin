@@ -1,6 +1,7 @@
 import { $api } from "@/app/api/http";
 
 type SendWhatsAppOnePayload = {
+    campaignId: string;
     influencerId: string;
     accountId: string;
     socialMedia: string;

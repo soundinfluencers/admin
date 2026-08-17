@@ -413,6 +413,7 @@ export const CampaignManagementInsightTable = ({
 
       const message = buildWhatsAppInfluencerPromoMessage(whatsAppModal.data);
       const payload = {
+        campaignId,
         influencerId: String(firstAccount.influencerId ?? ""),
         accountId: String(
           firstAccount.socialAccountId ??
@@ -446,7 +447,7 @@ export const CampaignManagementInsightTable = ({
 
       toast.error("Failed to send WhatsApp message");
     }
-  }, [whatsAppModal, realtimeClientId, isConnected]);
+  }, [campaignId, whatsAppModal, realtimeClientId, isConnected]);
 
   const columns = React.useMemo(
     () =>

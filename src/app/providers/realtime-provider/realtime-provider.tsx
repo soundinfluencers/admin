@@ -99,21 +99,21 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       setIsConnected(false);
     });
 
-    nextSocket.on(
-      "whatsappMessageStatusUpdate",
-      (payload: WhatsappMessageStatusUpdate) => {
-        setLastWhatsappStatus(payload);
+    const handleWhatsappStatusUpdate = (payload: WhatsappMessageStatusUpdate) => {
+      setLastWhatsappStatus(payload);
 
-        if (payload.status !== "sent") return;
-        if (hasShownWhatsappSuccessRef.current) return;
+      if (payload.status !== "sent") return;
+      if (hasShownWhatsappSuccessRef.current) return;
 
-        hasShownWhatsappSuccessRef.current = true;
+      hasShownWhatsappSuccessRef.current = true;
 
-        toast.success("WhatsApp messages sent successfully", {
-          toastId: WHATSAPP_SUCCESS_TOAST_ID,
-        });
-      },
-    );
+      toast.success("WhatsApp messages sent successfully", {
+        toastId: WHATSAPP_SUCCESS_TOAST_ID,
+      });
+    };
+
+    nextSocket.on("whatsappMessageStatusUpdate", handleWhatsappStatusUpdate);
+    nextSocket.on("whatsappBulkStatusUpdate", handleWhatsappStatusUpdate);
 
     const handleActiveAccountAccountsUpdates = (
       payload: ActiveAccountAccountsUpdate[],
@@ -198,6 +198,9 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         "notificationFinishedRefreshingAccounts",
         handleNotificationFinishedRefreshingAccounts,
       );
+
+      nextSocket.off("whatsappMessageStatusUpdate", handleWhatsappStatusUpdate);
+      nextSocket.off("whatsappBulkStatusUpdate", handleWhatsappStatusUpdate);
 
     };
   }, [accessToken, queryClient, status]);

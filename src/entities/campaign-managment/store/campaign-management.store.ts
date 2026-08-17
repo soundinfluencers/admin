@@ -37,6 +37,8 @@ export type EditableAccount = {
     }>;
     currency?: string;
     statusLabel?: keyof typeof AdminPromoStatusLabelEnum | string;
+    whatsappStatus?: "not_sent" | "sent" | "failed";
+    whatsappLastAttemptAt?: string;
     selectedCampaignContentItem: SelectedCampaignContentItem | null;
     selectedContentItem?: {
         additionalBrief?: string;
@@ -248,6 +250,7 @@ export const normalizeCampaignForEdit = (
     const normalizedAccountsRaw = (data.addedAccounts ?? []).map((acc) => {
         const selected =
             acc?.selectedCampaignContentItem ?? acc?.selectedContent ?? null;
+        const whatsappStatus = toStringSafe(acc?.whatsappStatus).toLowerCase();
 
         return {
             addedAccountsId: toStringSafe(acc?.addedAccountsId),
@@ -267,6 +270,10 @@ export const normalizeCampaignForEdit = (
             genres: Array.isArray(acc?.genres) ? acc.genres : [],
             countries: Array.isArray(acc?.countries) ? acc.countries : [],
             statusLabel: toStringSafe(acc?.statusLabel).trim(),
+            whatsappStatus: ["not_sent", "sent", "failed"].includes(whatsappStatus)
+                ? whatsappStatus as EditableAccount["whatsappStatus"]
+                : "not_sent",
+            whatsappLastAttemptAt: toStringSafe(acc?.whatsappLastAttemptAt),
             phoneNumber: toStringSafe(acc?.phoneNumber ?? ""),
 
             selectedCampaignContentItem: selected
