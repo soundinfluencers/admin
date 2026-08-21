@@ -46,12 +46,13 @@ export function BaseImageUpload<T extends FieldValues>({
       name={name}
       label={label}
       placeholder={placeholder}
-      value={(value ?? null) as string | null}
+      value={value ?? ""}
       error={fieldState.error?.message}
       disabled={disabled}
       isPending={isPending}
       onFileSelect={handleFileSelect}
       onRemove={handleRemove}
+      size="sm"
     />
   );
 }

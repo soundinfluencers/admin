@@ -1,4 +1,4 @@
-import type { TGetSocialAccountParams } from "@/entities/influencers/model/social-account.types.ts";
+import type { IGetSocialAccountRequest } from "@/entities/influencers/social-account/model/social-account.types.ts";
 
 export const influencersQueryKeys = {
   all: ["influencers"] as const,
@@ -14,6 +14,6 @@ export const influencerAccountsQueryKeys = {
   all: ["influencer-accounts"] as const,
 
   details: () => ["influencer-accounts", "detail"] as const,
-  detail: (params: TGetSocialAccountParams) =>
+  detail: (params: IGetSocialAccountRequest) =>
     ["influencer-accounts", "detail", params] as const,
 };

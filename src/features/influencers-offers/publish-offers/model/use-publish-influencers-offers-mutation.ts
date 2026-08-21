@@ -14,7 +14,7 @@ export const usePublishInfluencersOffersMutation = () => {
     mutationFn: (request: IPublishInfluencersOffersRequest) =>
       publishInfluencersOfferApi(request),
 
-    onSuccess: () => async () => {
+    onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: influencersOffersQueryKeys.matrixRoot(),
@@ -28,7 +28,7 @@ export const usePublishInfluencersOffersMutation = () => {
         type: "success",
         position: "top-right",
         autoClose: 3000,
-      })
+      });
     },
   });
 };

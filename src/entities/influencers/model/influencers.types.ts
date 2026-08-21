@@ -1,4 +1,4 @@
-import type { TSocialAccountShort } from "@/entities/influencers/model/social-account.types.ts";
+import type { TSocialAccountShort } from "@/entities/influencers/social-account/model/social-account.types.ts";
 
 export interface IInfluencer {
   influencerId: string;

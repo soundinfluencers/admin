@@ -24,7 +24,10 @@ type AddAdminProposalOptionBody = {
         }>;
         taggedUser: string;
         taggedLink: string;
-        additionalBrief: string;
+        additionalBrief: Array<{
+            _id: string;
+            additionalBrief: string;
+        }>;
     }>;
 };
 

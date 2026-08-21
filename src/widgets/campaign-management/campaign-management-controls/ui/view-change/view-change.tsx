@@ -2,7 +2,6 @@ import React from "react";
 import styles from "./view-change.module.scss";
 import edit from "./assets/edit.svg";
 import proview from "./assets/Vector (15).svg";
-import liveview from "./assets/Vector (16).svg";
 import type { ViewMode } from "@/entities/campaign-managment/model/campaign-management-table.types";
 
 interface Props {

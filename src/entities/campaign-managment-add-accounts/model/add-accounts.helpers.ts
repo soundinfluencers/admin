@@ -149,7 +149,7 @@ export const ensureContentForAccounts = ({
             mainLink: "Paste here your link",
             taggedUser: "",
             taggedLink: "",
-            additionalBrief: "",
+            additionalBrief: [],
             descriptions: [{
                 _id: crypto.randomUUID().replace(/-/g, "").slice(0, 24),
                 description: "Change your description",
