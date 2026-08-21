@@ -7,15 +7,17 @@ type Props = {
     contentId?: string;
     field: StoreField;
     value?: string;
+    additionalBriefId?: string;
     placeholder?: string;
 };
 
 export const ExtraFieldCellEdit = React.memo(function ExtraFieldCellEdit({
-                                                                             contentId,
-                                                                             field,
-                                                                             value,
-                                                                             placeholder,
-                                                                         }: Props) {
+                                                                              contentId,
+                                                                              field,
+                                                                              value,
+                                                                              additionalBriefId,
+                                                                              placeholder,
+                                                                          }: Props) {
     const setContentField = useCampaignManagementStore((s) => s.setContentField);
 
     if (!contentId) {
@@ -30,7 +32,14 @@ export const ExtraFieldCellEdit = React.memo(function ExtraFieldCellEdit({
         <>
             <input className='hidden-text'
                 value={String(value ?? "")}
-                onChange={(e) => setContentField(contentId, field, e.target.value)}
+                onChange={(e) =>
+                    setContentField(
+                        contentId,
+                        field,
+                        e.target.value,
+                        additionalBriefId,
+                    )
+                }
                 placeholder={placeholder ?? field}
             />
         </>

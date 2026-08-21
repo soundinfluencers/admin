@@ -7,6 +7,12 @@ import { getGroupBySocial } from "@/entities/campaign-managment/model/campaign-m
 type SelectedCampaignContentItem = {
     campaignContentItemId: string;
     descriptionId: string;
+    additionalBriefId?: string;
+};
+
+type AdditionalBriefVersion = {
+    _id: string;
+    additionalBrief: string;
 };
 
 export enum AdminPromoStatusLabelEnum {
@@ -72,7 +78,7 @@ export type EditableCampaignContentItem = {
     descriptions: EditableDescription[];
     taggedUser: string;
     taggedLink: string;
-    additionalBrief: string;
+    additionalBrief: AdditionalBriefVersion[];
 };
 
 export type EditableCampaign = {
@@ -221,6 +227,7 @@ export const normalizeCampaignForEdit = (
                         selected?.campaignContentItemId,
                     ),
                     descriptionId: toStringSafe(selected?.descriptionId),
+                    additionalBriefId: toStringSafe(selected?.additionalBriefId),
                 }
                 : null,
 
@@ -310,7 +317,10 @@ export const normalizeCampaignForEdit = (
             })),
             taggedUser: toStringSafe(item?.taggedUser),
             taggedLink: toStringSafe(item?.taggedLink),
-            additionalBrief: toStringSafe(item?.additionalBrief),
+            additionalBrief: (item?.additionalBrief ?? []).map((brief) => ({
+                _id: toStringSafe(brief?._id),
+                additionalBrief: toStringSafe(brief?.additionalBrief),
+            })),
         })),
     };
 };
@@ -404,6 +414,7 @@ const buildBasePayload = (editable: EditableCampaign) => {
                     campaignContentItemId:
                     acc.selectedCampaignContentItem.campaignContentItemId,
                     descriptionId: acc.selectedCampaignContentItem.descriptionId,
+                    additionalBriefId: acc.selectedCampaignContentItem.additionalBriefId,
                 }
                 : null,
             dateRequest: acc.dateRequest,
@@ -447,7 +458,10 @@ const buildBasePayload = (editable: EditableCampaign) => {
             })),
             taggedUser: item.taggedUser,
             taggedLink: item.taggedLink,
-            additionalBrief: item.additionalBrief,
+            additionalBrief: item.additionalBrief.map((brief) => ({
+                _id: brief._id,
+                additionalBrief: brief.additionalBrief,
+            })),
         })),
 
         displayCurrency: editable.displayCurrency,
@@ -529,6 +543,7 @@ type CampaignManagementStore = {
         contentId: string,
         field: "mainLink" | "taggedUser" | "taggedLink" | "additionalBrief",
         value: string,
+        additionalBriefId?: string,
     ) => void;
     setContentDescriptions: (
         contentId: string,
@@ -841,6 +856,7 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
                                                 selected.campaignContentItemId,
                                             ),
                                             descriptionId: toStringSafe(selected.descriptionId),
+                                            additionalBriefId: toStringSafe(selected.additionalBriefId),
                                         }
                                         : null,
                                 }
@@ -881,10 +897,11 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
                         null;
 
                     const defaultSelected =
-                        defaultItem?._id && defaultItem?.descriptions?.[0]?._id
+                        defaultItem?._id && defaultItem?.descriptions?.[0]?._id && defaultItem.additionalBrief?.[0]._id
                             ? {
                                 campaignContentItemId: String(defaultItem._id),
                                 descriptionId: String(defaultItem.descriptions[0]._id),
+                                additionalBriefId: String(defaultItem.additionalBrief?.[0]._id),
                             }
                             : null;
 
@@ -973,18 +990,36 @@ export const useCampaignManagementStore = create<CampaignManagementStore>(
                 };
             }),
 
-        setContentField: (contentId, field, value) =>
+        setContentField: (contentId, field, value, additionalBriefId) =>
             set((state) => {
                 if (!state.editable) return state;
 
                 return {
                     editable: {
                         ...state.editable,
-                        campaignContent: state.editable.campaignContent.map((item) =>
-                            String(item._id) === String(contentId)
-                                ? { ...item, [field]: value }
-                                : item,
-                        ),
+                        campaignContent: state.editable.campaignContent.map((item) => {
+                            if (String(item._id) !== String(contentId)) return item;
+
+                            if (field !== "additionalBrief") {
+                                return { ...item, [field]: value };
+                            }
+
+                            const selectedBriefId = String(additionalBriefId ?? "");
+                            const hasSelectedBrief = item.additionalBrief.some(
+                                (brief) => String(brief._id) === selectedBriefId,
+                            );
+
+                            if (!selectedBriefId || !hasSelectedBrief) return item;
+
+                            return {
+                                ...item,
+                                additionalBrief: item.additionalBrief.map((brief) =>
+                                    String(brief._id) === selectedBriefId
+                                        ? { ...brief, additionalBrief: value }
+                                        : brief,
+                                ),
+                            };
+                        }),
                     },
                 };
             }),

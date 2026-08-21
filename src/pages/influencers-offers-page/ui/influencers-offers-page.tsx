@@ -324,6 +324,7 @@ export const InfluencersOffersPage = () => {
         <div className={s.tableWrapper}>
           <OffersMatrixActions
             mode={mode}
+            platform={platform}
             onToggleOffersView={handleModeChange}
             isDisabled={isPending || isError}
             onPublishOffers={handlePublishOffers}

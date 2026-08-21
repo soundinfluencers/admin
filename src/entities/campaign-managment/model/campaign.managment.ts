@@ -17,13 +17,17 @@ export interface CampaignContentItem {
     descriptions: any[];
     taggedUser: string;
     taggedLink: string;
-    additionalBrief: string;
+    additionalBrief: Array<{
+        _id: Id;
+        additionalBrief: string;
+    }>;
     mediaCache: any;
 }
 
 export interface SelectedContentRef {
     campaignContentItemId: Id;
     descriptionId: Id;
+    additionalBriefId?: Id;
 }
 
 export interface SelectedContentItemFlat {
@@ -114,6 +118,7 @@ export interface CampaignAddedAccount {
 export interface SelectedContentRef {
     campaignContentItemId: Id;
     descriptionId: Id;
+    additionalBriefId?: Id;
 }
 export interface Campaign {
     campaignId: Id;
