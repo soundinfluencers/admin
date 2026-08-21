@@ -10,6 +10,7 @@ type AddAdminProposalOptionBody = {
         selectedCampaignContentItem: {
             campaignContentItemId: string;
             descriptionId: string;
+            additionalBriefId?: string;
         } | null;
         dateRequest: string;
     }>;

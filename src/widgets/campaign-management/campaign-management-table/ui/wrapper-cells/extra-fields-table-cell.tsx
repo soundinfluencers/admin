@@ -72,24 +72,26 @@ export const ExtraFieldsTableCell: React.FC<Props> = ({
     }
 
     if (field === "brief" || field === "tracktitle") {
-        const selectedBriefId = String(
-            row.account.selectedCampaignContentItem?.additionalBriefId ?? "",
-        );
-        const selectedBrief = item.additionalBrief.find(
-            (brief) => String(brief._id) === selectedBriefId,
-        );
-        const selectedBriefText = selectedBrief?.additionalBrief ?? "";
+        const selectedAdditionalBriefId =
+            row.account.selectedCampaignContentItem?.additionalBriefId;
+        const selectedAdditionalBrief =
+            row.account.selectedContentItem?.additionalBrief ??
+            item.additionalBriefOptions?.find(
+                (brief) => brief._id === selectedAdditionalBriefId,
+            )?.additionalBrief ??
+            item.additionalBrief;
 
         return canEdit ? (
             <ExtraFieldCellEdit
                 contentId={item._id}
                 field="additionalBrief"
-                value={selectedBriefText}
-                additionalBriefId={selectedBrief?._id}
+                value={selectedAdditionalBrief}
+                additionalBriefId={selectedAdditionalBriefId}
+                accountKey={row.accountKey}
                 placeholder={field === "tracktitle" ? "Track title" : "Additional brief"}
             />
         ) : (
-            <p className="hidden-text">{selectedBriefText || "—"}</p>
+            <p className="hidden-text">{selectedAdditionalBrief || "—"}</p>
         );
     }
 

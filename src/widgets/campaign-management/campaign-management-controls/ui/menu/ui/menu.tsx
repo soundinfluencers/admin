@@ -40,8 +40,11 @@ import {
 const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-const formatSendDate = () => {
-    return new Date().toLocaleString("en-US", {
+const formatSendDate = (value: string | Date = new Date()) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    return date.toLocaleString("en-US", {
         month: "2-digit",
         day: "2-digit",
         year: "numeric",
@@ -70,7 +73,7 @@ export const Menu = ({
     const previousCampaignIdRef = React.useRef<string | null>(null);
 
     const editable = useCampaignManagementStore((s) => s.editable);
-    const { clientId, isConnected } = useRealtime();
+    const { clientId, isConnected, lastWhatsappStatus } = useRealtime();
 
     const normalizedStatus = String(status ?? "").toLowerCase();
 
@@ -137,6 +140,7 @@ export const Menu = ({
             targetInfluencerId: string,
             nextStatus: WhatsAppSendStatus,
             fallbackRows: WhatsAppSendRow[] = [],
+            date?: string,
         ) => {
             if (!targetInfluencerId) return;
 
@@ -148,7 +152,7 @@ export const Menu = ({
                         ? {
                             ...row,
                             status: nextStatus,
-                            date: nextStatus ? formatSendDate() : "",
+                            date: date ?? formatSendDate(),
                         }
                         : row,
                 );
@@ -156,6 +160,28 @@ export const Menu = ({
         },
         [],
     );
+
+    React.useEffect(() => {
+        if (!lastWhatsappStatus) return;
+        if (lastWhatsappStatus.campaignId !== campaignId) return;
+
+        const nextStatus: WhatsAppSendStatus =
+            lastWhatsappStatus.status === "sending"
+                ? "SENDING"
+                : lastWhatsappStatus.status === "sent"
+                    ? "SENT"
+                    : "FAILED";
+        const fallbackRows = buildInitialWhatsAppRows({
+            accounts: editable?.addedAccounts ?? [],
+        });
+
+        updateRowStatus(
+            lastWhatsappStatus.influencerId,
+            nextStatus,
+            fallbackRows,
+            formatSendDate(lastWhatsappStatus.date),
+        );
+    }, [campaignId, editable?.addedAccounts, lastWhatsappStatus, updateRowStatus]);
 
     const handleDownloadPdf = async () => {
         if (!campaignId || isLoading) return;
@@ -211,6 +237,11 @@ export const Menu = ({
 
     const handleSendAllWhatsApp = async () => {
         if (isLoading) return;
+
+        if (!campaignId) {
+            toast.error("Campaign is not selected");
+            return;
+        }
 
         if (!canSendWhatsApp) {
             toast.error("WhatsApp is available only for distributing campaigns");
@@ -282,6 +313,7 @@ export const Menu = ({
                     const message = buildWhatsAppInfluencerPromoMessage(data);
 
                     await sendCampaignWhatsAppOne({
+                        campaignId,
                         influencerId,
                         accountId,
                         socialMedia,

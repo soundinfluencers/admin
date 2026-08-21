@@ -14,6 +14,7 @@ type UpdateCampaignProps = {
             selectedCampaignContentItem: {
                 campaignContentItemId: string;
                 descriptionId: string;
+                additionalBriefId?: string;
             } | null;
             dateRequest: string;
         }>;
@@ -28,7 +29,10 @@ type UpdateCampaignProps = {
             }>;
             taggedUser: string;
             taggedLink: string;
-            additionalBrief: string;
+            additionalBrief: Array<{
+                _id: string;
+                additionalBrief: string;
+            }>;
         }>;
         isCpmAndResultHidden: boolean;
         isPriceHidden: boolean;

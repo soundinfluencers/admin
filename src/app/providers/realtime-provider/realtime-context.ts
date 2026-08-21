@@ -8,6 +8,8 @@ import type {
 export type WhatsappMessageStatus = "sending" | "sent" | "failed";
 
 export type WhatsappMessageStatusUpdate = {
+  campaignId: string;
+  influencerId: string;
   phone: string;
   status: WhatsappMessageStatus;
   date: string;
