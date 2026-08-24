@@ -10,7 +10,7 @@ import soundcloudIcon from "@/assets/icons/campaigns/social-media/soundcloud.svg
 import pressIcon from "@/assets/icons/campaigns/social-media/press.svg";
 import multipromoIcon from "@/assets/icons/campaigns/social-media/multipromo.svg";
 
-import instagramIconPost from "@/assets/icons/campaigns/social-media/Instagram1.svg";
+import instagramIconPost from "@/assets/icons/campaigns/social-media/instagram1.svg";
 import tiktokIconPost from "@/assets/icons/campaigns/social-media/tiktok1.svg";
 import facebookIconPost from "@/assets/icons/campaigns/social-media/facebook.1.svg";
 import youtubeIconPost from "@/assets/icons/campaigns/social-media/youtube1.svg";
