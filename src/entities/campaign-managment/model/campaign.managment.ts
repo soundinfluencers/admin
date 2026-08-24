@@ -17,10 +17,7 @@ export interface CampaignContentItem {
     descriptions: any[];
     taggedUser: string;
     taggedLink: string;
-    additionalBrief: Array<{
-        _id: Id;
-        additionalBrief: string;
-    }>;
+    additionalBrief: string;
     mediaCache: any;
 }
 

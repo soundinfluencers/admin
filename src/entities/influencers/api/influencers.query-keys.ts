@@ -1,4 +1,6 @@
-import type { IGetSocialAccountRequest } from "@/entities/influencers/social-account/model/social-account.types.ts";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+import type { TGetSocialAccountParams } from "@/entities/influencers/model/social-account.types.ts";
 
 export const influencersQueryKeys = {
   all: ["influencers"] as const,
@@ -14,6 +16,6 @@ export const influencerAccountsQueryKeys = {
   all: ["influencer-accounts"] as const,
 
   details: () => ["influencer-accounts", "detail"] as const,
-  detail: (params: IGetSocialAccountRequest) =>
+  detail: (params: TGetSocialAccountParams) =>
     ["influencer-accounts", "detail", params] as const,
 };

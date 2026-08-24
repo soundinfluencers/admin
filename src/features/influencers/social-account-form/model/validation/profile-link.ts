@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { z } from 'zod';
-import type { TPlatform } from "@/shared/types/types.ts";
+import type { TSocialMedia } from "@/shared/types/types.ts";
 
 const withHttps = (value: string) =>
   /^https?:\/\//i.test(value) ? value : `https://${value}`;
@@ -14,7 +14,7 @@ const PLATFORM_DOMAIN_MAP = {
   facebook: ['facebook.com', 'fb.com'],
   spotify: ['spotify.com'],
   soundcloud: ['soundcloud.com'],
-} satisfies Partial<Record<TPlatform, readonly string[]>>;
+} satisfies Partial<Record<TSocialMedia, readonly string[]>>;
 
 const isAllowedHost = (host: string, domains: readonly string[]) => {
   return domains.some((domain) => {
@@ -22,7 +22,7 @@ const isAllowedHost = (host: string, domains: readonly string[]) => {
   });
 };
 
-export const createProfileLinkSchema = (platform: TPlatform) =>
+export const createProfileLinkSchema = (platform: TSocialMedia) =>
   z
   .string()
   .trim()

@@ -1,9 +1,9 @@
 import type { RowSelectionState } from "@tanstack/react-table";
 import type {
     CampaignContentDescription,
-    CampaignContentItem,
     SelectedCampaignAccount, SelectedCampaignContentRef
 } from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.types.ts";
+import type {CampaignContentItem} from "@/entities/campaign-managment/model/campaign.managment.ts";
 
 
 export type StrategyGroup = "main" | "music" | "press";

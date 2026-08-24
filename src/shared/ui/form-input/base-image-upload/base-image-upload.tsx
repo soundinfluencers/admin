@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { type FieldValues, type Path, useController, useFormContext } from "react-hook-form";
 import { ImageUpload } from "@/shared/ui/image-upload";
 import { useUploadImageMutation } from "@/entities/file/model/use-upload-image-mutation.ts";
@@ -48,13 +46,12 @@ export function BaseImageUpload<T extends FieldValues>({
       name={name}
       label={label}
       placeholder={placeholder}
-      value={value ?? ""}
+      value={(value ?? "") as string}
       error={fieldState.error?.message}
       disabled={disabled}
       isPending={isPending}
       onFileSelect={handleFileSelect}
       onRemove={handleRemove}
-      size="sm"
     />
   );
 }
