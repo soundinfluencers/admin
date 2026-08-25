@@ -1,0 +1,67 @@
+@use '@/app/styles/utils/variables' as variables;
+
+.accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  padding: 16px;
+
+  border-radius: variables.$radius-sm;
+  border: 1px solid #E5E7EB;
+  background: #F5FAFF;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+
+  box-shadow: inset 0 -1px 0 0 var(--white-gray-20);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  aspect-ratio: 1 / 1;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: clamp(93px, 20vw, 130px) auto;
+  align-items: first baseline;
+  column-gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  font-size: 15px;
+  color: var(--navy-blue);
+}

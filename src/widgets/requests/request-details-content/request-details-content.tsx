@@ -5,6 +5,7 @@ import { CampaignRequestDetails } from "./campaign-request-details/campaign-requ
 import { PriceChangeRequestDetails } from "./price-change-request-details/price-change-request-details.tsx";
 import { NewInfluencerRequestDetails } from "./new-influencer-request-details/ui/new-influencer-request-details.tsx";
 import { NewSocialAccountRequestDetails } from "./new-social-account-request-details/ui/new-social-account-request-details.tsx";
+import { NewBundleRequestDetails } from "./new-bundle-request-details/ui/new-bundle-request-details.tsx";
 import type { IRequest, TAdminRequestDetails } from "@/entities/requests/model/requests.types.ts";
 
 interface RequestDetailsContentProps {
@@ -82,6 +83,14 @@ export const RequestDetailsContent: React.FC<RequestDetailsContentProps> = ({
           data={data}
           onCloseModal={onCloseModal}
           onToggleNegotiatePanel={onToggleNegotiatePanel}
+        />
+      );
+
+    case "NEW_BUNDLE_REQUEST":
+      return (
+        <NewBundleRequestDetails
+          request={request}
+          data={data}
         />
       );
 

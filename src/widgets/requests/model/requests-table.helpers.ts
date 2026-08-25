@@ -7,6 +7,7 @@ export const REQUEST_TYPE = {
   BESPOKE_CAMPAIGN_REQUEST: "Bespoke Campaign Request",
   NEW_SOCIAL_ACCOUNT_REQUEST: "Additional Social Account",
   PRICE_UPDATE_REQUEST: "Rate Change Request",
+  NEW_BUNDLE_REQUEST: "Bundle Review Request",
 } as const satisfies Record<TRequestType, string>;
 
 export const REQUEST_SPECIFIED_STATUS = {
