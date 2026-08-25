@@ -139,7 +139,12 @@ const OfferPriceEditor = ({
           sanitizeValue={sanitizeOfferPriceInput}
         />
       ) : (
-        <span className={s.priceValue}>{formatOfferPrice(offer.offerPrice)}</span>
+        <span
+          className={s.priceValue}
+          title={String(offer.offerPrice)}
+        >
+          {formatOfferPrice(offer.offerPrice)}
+        </span>
       )}
     </div>
   );
@@ -198,7 +203,7 @@ export const OffersMatrixBusinessFooter = ({
                   <div className={s.priceSummary}>
                     <div className={s.costBlock}>
                       <div className={s.priceLabel}>our cost</div>
-                      <div className={s.priceValue}>
+                      <div className={s.priceValue} title={String(offer.costPrice)}>
                         {formatOfferPrice(offer.costPrice)}
                       </div>
                     </div>
