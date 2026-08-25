@@ -20,7 +20,7 @@ interface ImageUploadProps {
   isPending?: boolean;
   onFileSelect: (file: File) => void;
   onRemove: () => void;
-  size: 'sm' | 'lg';
+  size?: 'sm' | 'lg';
 }
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -35,7 +35,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   isPending = false,
   onFileSelect,
   onRemove,
-  size,
+  size = "sm",
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const hasPreview = Boolean(value);

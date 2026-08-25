@@ -5,6 +5,7 @@ import {
   influencersOffersQueryKeys,
 } from "@/entities/influencers-offers/model/influencers-offers.query-keys.ts";
 import type { IPublishInfluencersOffersRequest } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
+import { toast } from "react-toastify";
 
 export const usePublishInfluencersOffersMutation = () => {
   const queryClient = useQueryClient();
@@ -13,14 +14,21 @@ export const usePublishInfluencersOffersMutation = () => {
     mutationFn: (request: IPublishInfluencersOffersRequest) =>
       publishInfluencersOfferApi(request),
 
-    onSuccess: () =>
-      Promise.all([
+    onSuccess: async () => {
+      await Promise.all([
         queryClient.invalidateQueries({
           queryKey: influencersOffersQueryKeys.matrixRoot(),
         }),
         queryClient.invalidateQueries({
           queryKey: influencerClientOffersQueryKeys.lists(),
         }),
-      ]),
+      ]);
+
+      toast("Offers published successfully", {
+        type: "success",
+        position: "top-right",
+        autoClose: 3000,
+      });
+    },
   });
 };

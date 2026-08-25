@@ -665,10 +665,15 @@ export const CampaignManagementInsightTable = ({
 
               <div className="whatsapp-preview__content">
                 {whatsAppModal.data.promos.map((promo, index) => {
+                  const postAndStory =
+                  promo.platform === 'instagram'
+                  || promo.platform === 'facebook'
+                  || promo.platform === 'tiktok';
+
                   const fields = [
                     {
                       label: "Platform",
-                      value: promo.platform === "instagram"
+                      value: postAndStory
                         ? `${promo.platform} (1 post + 1 story)`
                         : promo.platform,
                     },

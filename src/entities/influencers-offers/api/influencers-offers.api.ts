@@ -11,6 +11,7 @@ import type {
   IPublishInfluencersOffersRequest,
   IUpdateInfluencersOfferPriceRequest,
 } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
+import type { TOfferSocialMedia } from "@/features/influencers-offers/offers-filter-by-platform";
 
 export const getInfluencersOffersMatrixApi = async (params: IGetInfluencersOffersMatrixParams) => {
   const { data } = await $api.get<IInfluencersOffersMatrixResponse>("/admin/offers/matrix-view", {
@@ -49,6 +50,16 @@ export const publishInfluencersOfferApi = async ({
   const { data } = await $api.patch<IInfluencersOfferMutationResponse>(
     `/admin/offers/change-published-status/${socialMedia}/${genre}`,
   );
+
+  return data;
+};
+
+export const exportInfluencersOffersXlsxApi = async (
+  socialMedia: TOfferSocialMedia,
+) => {
+  const { data } = await $api.get<Blob>(`/admin/offers/${socialMedia}/xlsx`, {
+    responseType: "blob",
+  });
 
   return data;
 };

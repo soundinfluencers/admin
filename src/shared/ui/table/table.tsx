@@ -1,5 +1,6 @@
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useMediaQuery } from "@/shared/hooks/use-media-query.ts";
+import clsx from "clsx";
 
 import styles from './table.module.scss';
 
@@ -13,6 +14,8 @@ interface TableProps<TData> {
   minWidth?: number;
   tableLayout?: "fixed" | "auto";
   skeletonRows?: number;
+
+  scrollWrapperClassName?: string;
 }
 
 export function Table<TData>({
@@ -25,6 +28,7 @@ export function Table<TData>({
   minWidth = 1220,
   tableLayout = "fixed",
   skeletonRows = 10,
+  scrollWrapperClassName = "",
 }: TableProps<TData>) {
   "use no memo";
 
@@ -48,7 +52,9 @@ export function Table<TData>({
   return (
     <div className={styles.tableWrapper}>
 
-      <div className={styles.scrollWrapper}>
+      <div
+        className={clsx(styles.tableWrapper, scrollWrapperClassName)}
+      >
 
         <div
           className={styles.tableInner}

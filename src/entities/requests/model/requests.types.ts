@@ -8,6 +8,7 @@ export const ADMIN_REQUEST_TYPES = [
   'BESPOKE_CAMPAIGN_REQUEST',
   'NEW_SOCIAL_ACCOUNT_REQUEST',
   'PRICE_UPDATE_REQUEST',
+  'NEW_BUNDLE_REQUEST',
 ] as const;
 
 export type TRequestType = typeof ADMIN_REQUEST_TYPES[number];
@@ -186,6 +187,31 @@ export interface INewInfluencerAccountRequestDetailsDto {
   accountDetails: TInfluencerAccount;
 }
 
+// New bundle request
+export interface IBundleAccount {
+  accountId: string;
+  socialMedia: Exclude<TSocialMedia, 'multipromo'>;
+  username: string;
+}
+
+export interface INewBundleRequestDetailsDto {
+  requestId: string;
+  group: TRequestFilterStatus;
+  type: "NEW_BUNDLE_REQUEST";
+  date: string;
+  influencerId: string;
+  bundleId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  price: number;
+  publicPrice: number;
+  initialPrice: number;
+  currency: TCurrency;
+  accounts: IBundleAccount[];
+}
+
 export interface IAdminRequestDetailsByType {
   NEW_CLIENT_REQUEST: INewClientRequestDetailsDto;
   NEW_INFLUENCER_REQUEST: INewInfluencerRequestDetailsDto;
@@ -194,6 +220,7 @@ export interface IAdminRequestDetailsByType {
   // PROPOSAL_CAMPAIGN_REQUEST: any;
   NEW_SOCIAL_ACCOUNT_REQUEST: INewInfluencerAccountRequestDetailsDto;
   PRICE_UPDATE_REQUEST: IPriceUpdateRequestDetailsDto;
+  NEW_BUNDLE_REQUEST: INewBundleRequestDetailsDto;
 }
 
 export type TAdminRequestDetails =

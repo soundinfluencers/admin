@@ -39,3 +39,15 @@ export const requestAnswerApi = async ({
 
   console.log('Successfully answered request');
 }
+
+export const closeRequestApi = async ({
+  requestId,
+}: {
+  requestId: string;
+}): Promise<void> => {
+  console.log('Fetching requests with params:', requestId);
+
+  await $api.patch(`/admin/requests/${requestId}`);
+
+  console.log('Successfully answered request');
+};
