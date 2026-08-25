@@ -1,4 +1,4 @@
-.menu{
+.menu {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,10 +10,12 @@
   width: 100%;
   padding: 8px 16px;
   height: 38px;
-  p{
+
+  p {
     font-size: 15px;
   }
 }
+
 .drawerRoot {
   position: fixed;
   inset: 0;
@@ -42,7 +44,7 @@
   transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
-  
+
 }
 
 .open {
@@ -64,30 +66,36 @@
   align-items: center;
   justify-content: center;
 }
-.drawerBody{
-  padding: 0px 16px;
-  &__block{
+
+.drawerBody {
+  padding: 0 16px;
+
+  &__block {
     display: flex;
     justify-content: space-between;
     gap: 8px;
-    .drawerBodyButton{
+
+    .drawerBodyButton {
       max-width: 260px;
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      height: 40px;border-radius: 8px;
+      height: 40px;
+      border-radius: 8px;
       border: 1px solid #EBECFF;
     }
 
   }
-  &__content{
+
+  &__content {
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
 }
+
 .title {
   margin: 0;
   font-size: 28px;
@@ -108,13 +116,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  
+
   img {
     width: 24px;
     height: 24px;
   }
 }
-
 
 
 .stub {
@@ -142,6 +149,7 @@
     font-size: 24px;
   }
 }
+
 .whatsAppCell {
   padding: 4px 14px;
   width: 100%;
@@ -151,8 +159,45 @@
   font-size: 14px;
   line-height: 18px;
   color: #111827;
-text-align: center;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
+}
 
+//.whatsAppTable {
+//  position: relative;
+//  box-sizing: border-box;
+//  max-height: calc(100vh - 250px);
+//
+//  overflow-y: auto;
+//
+//  &::-webkit-scrollbar {
+//    width: 4px;
+//  }
+//
+//  &::-webkit-scrollbar-thumb {
+//    background: var(--blue);
+//  }
+//
+//  &::-webkit-scrollbar-track {
+//    background: var(--white-gray-20);
+//  }
+//}
+
+.scrollWrapper {
+  overflow-y: auto;
+  padding-bottom: 0;
+  max-height: calc(100vh - 250px);
+
+  //&::-webkit-scrollbar {
+  //  width: 4px;
+  //}
+  //
+  //&::-webkit-scrollbar-thumb {
+  //  background: var(--blue);
+  //}
+  //
+  //&::-webkit-scrollbar-track {
+  //  background: var(--white-gray-20);
+  //}
 }
