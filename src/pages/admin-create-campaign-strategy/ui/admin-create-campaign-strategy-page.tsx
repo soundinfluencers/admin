@@ -25,7 +25,19 @@ import {
 } from "@/widgets/admin-create-campaign-strategy/admin-create-campaign-strategy-table/ui/check-box-row/ui/checkbox";
 import {useCreateAdminCampaign} from "@/pages/admin-create-campaign-strategy/model/use-create-admin-campaign.ts";
 import {useProposalLink} from "@/pages/admin-create-campaign-strategy/model/proposal-share-link.ts";
+import {CAMPAIGN_CURRENCY_OPTIONS} from "@/features/admin-create-campaign/build-campaign-filters/model/build-campaign-params.constants.ts";
 
+const getCurrencyCode = (symbol: string) => {
+    const currency = CAMPAIGN_CURRENCY_OPTIONS.find(
+        (option) => option.key === symbol,
+    )?.currency;
+
+    if (!currency) {
+        throw new Error(`Unsupported campaign currency symbol: ${symbol}`);
+    }
+
+    return currency;
+};
 
 
 export const AdminCreateCampaignStrategyPage = () => {
@@ -36,6 +48,7 @@ export const AdminCreateCampaignStrategyPage = () => {
     const content = useCampaignBuilderStore((s) => s.campaignContent);
     const totalPrice = useCampaignBuilderStore((s) => s.totalPrice);
     const selectedCurrency = useCampaignBuilderStore((s) => s.selectedCurrency);
+    const displayCurrency = getCurrencyCode(selectedCurrency);
 
     const reset = useCampaignBuilderStore((s) => s.actions.reset);
 
@@ -88,7 +101,7 @@ export const AdminCreateCampaignStrategyPage = () => {
                 submittedAt: new Date(),
                 currency: selectedCurrency
             }),
-        [totalPrice, accounts, content],
+        [totalPrice, accounts, content, selectedCurrency],
     );
 
     const {
@@ -100,6 +113,7 @@ export const AdminCreateCampaignStrategyPage = () => {
     } = useCreateAdminCampaign({
         campaignName,
         totalPrice,
+        displayCurrency,
         accounts,
         content,
     });
@@ -120,7 +134,10 @@ export const AdminCreateCampaignStrategyPage = () => {
                 <PageBreadcrumbs
                     items={[
                         { label: "Dashboard", to: "/dashboard" },
-                        { label: "Create campaign", to: "/dashboard/create-new-campaign" },
+                        {
+                            label: "Create campaign",
+                            to: `/dashboard/create-new-campaign?currency=${displayCurrency}`,
+                        },
                         { label: "Content", to: "/dashboard/create-new-campaign/content" },
                         { label: "Strategy"}
                     ]}

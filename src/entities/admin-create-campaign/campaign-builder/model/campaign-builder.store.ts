@@ -4,6 +4,9 @@ import type {
     CampaignBuilderStore,
     SelectedCampaignAccount,
 } from "./campaign-builder.types";
+import type {
+    CampaignCurrencyCode,
+} from "@/entities/admin-create-campaign/campaign-filter/model/campaign-filter.types";
 
 const initialState = {
     campaignName: "",
@@ -19,6 +22,21 @@ const initialState = {
 const calcTotal = (accounts: SelectedCampaignAccount[]) =>
     accounts.reduce((sum, item) => sum + Number(item.price ?? 0), 0);
 
+const getExactPresetPrice = (
+    account: SelectedCampaignAccount,
+    currency: CampaignCurrencyCode,
+) => {
+    const price = account.prices?.[currency];
+
+    if (typeof price !== "number" || !Number.isFinite(price)) {
+        throw new Error(
+            `Missing ${currency} preset price for account ${account.accountId}`,
+        );
+    }
+
+    return price;
+};
+
 export const useCampaignBuilderStore = create<CampaignBuilderStore>()(
     persist(
         (set) => ({
@@ -26,7 +44,19 @@ export const useCampaignBuilderStore = create<CampaignBuilderStore>()(
 
             actions: {
                 setCampaignName: (value) => set({ campaignName: value }),
-                setSelectedCurrency: (value) => set({ selectedCurrency: value }),
+                setSelectedCurrency: ({ currency, key }) =>
+                    set((state) => {
+                        const selectedAccounts = state.selectedAccounts.map((account) => ({
+                            ...account,
+                            price: getExactPresetPrice(account, currency),
+                        }));
+
+                        return {
+                            selectedCurrency: key,
+                            selectedAccounts,
+                            totalPrice: calcTotal(selectedAccounts),
+                        };
+                    }),
                 setSelectedPromoCardIds: (ids) => set({ selectedPromoCardIds: ids }),
 
                 togglePromoCardId: (id) =>
@@ -171,7 +201,28 @@ export const useCampaignBuilderStore = create<CampaignBuilderStore>()(
                 blocksDraft: state.blocksDraft,
                 selectedCurrency: state.selectedCurrency,
             }),
-            version: 1,
+            version: 2,
+            migrate: (persistedState, version) => {
+                const state = persistedState as Partial<CampaignBuilderStore>;
+                const hasIncompatibleSelectedAccounts =
+                    version < 2 &&
+                    Array.isArray(state.selectedAccounts) &&
+                    state.selectedAccounts.some((account) => !account.prices);
+
+                if (!hasIncompatibleSelectedAccounts) {
+                    return state as CampaignBuilderStore;
+                }
+
+                return {
+                    ...state,
+                    selectedPromoCardIds: [],
+                    selectedAccounts: [],
+                    campaignContent: [],
+                    totalPrice: 0,
+                    postContentDraft: null,
+                    blocksDraft: null,
+                } as CampaignBuilderStore;
+            },
         },
     ),
 );

@@ -7,24 +7,8 @@ import type {
 export const getAllCampaigns = async (params: TGetCampaignParams) => {
   console.log('Fetching campaigns with params:', params);
 
-  const requestParams: Record<string, string | number> = {
-    limit: params.limit,
-  };
-
-  if (params.status) {
-    requestParams.status = params.status;
-  }
-
-  if ("search" in params && params.search && !params.status) {
-    requestParams.search = params.search;
-  }
-
-  if ("page" in params && params.page !== undefined) {
-    requestParams.page = params.page;
-  }
-
   const { data } = await $api.get<ICampaignListResponse>('/admin/campaigns', {
-    params: requestParams,
+    params,
   });
 
   console.log('Successfully fetched campaigns', data);

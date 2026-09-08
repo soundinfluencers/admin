@@ -20,6 +20,24 @@ import type {
 
 const oid = () => new ObjectId().toHexString();
 
+const buildAdditionalBrief = (value?: string) => {
+    const additionalBrief = String(value ?? "").trim();
+
+    return additionalBrief
+        ? [{ _id: oid(), additionalBrief }]
+        : [];
+};
+
+const getAdditionalBriefText = (
+    value?: string | Array<{ _id: string; additionalBrief: string }> | null,
+) => {
+    if (Array.isArray(value)) {
+        return String(value[0]?.additionalBrief ?? "");
+    }
+
+    return String(value ?? "");
+};
+
 export const normalizeSocial = (value: string) =>
     String(value || "").toLowerCase();
 
@@ -448,7 +466,7 @@ export const buildCampaignContentFromBlocks = (
                 })),
                 taggedUser: block.fields.taggedUser.trim(),
                 taggedLink: block.fields.taggedLink.trim(),
-                additionalBrief: block.fields.additionalBrief.trim(),
+                additionalBrief: buildAdditionalBrief(block.fields.additionalBrief),
                 meta: {
                     blockId: block.id,
                     platform: block.platform,
@@ -481,7 +499,7 @@ export const buildCampaignContentFromBlocks = (
                     })),
                     taggedUser: "",
                     taggedLink: "",
-                    additionalBrief: block.fields.additionalBrief.trim(),
+                    additionalBrief: buildAdditionalBrief(block.fields.additionalBrief),
                     meta: {
                         blockId: block.id,
                         platform: block.platform,
@@ -514,7 +532,7 @@ export const buildCampaignContentFromBlocks = (
                 })),
                 taggedUser: "",
                 taggedLink: block.fields.taggedLink.trim(),
-                additionalBrief: block.fields.additionalBrief.trim(),
+                additionalBrief: buildAdditionalBrief(block.fields.additionalBrief),
                 meta: {
                     blockId: block.id,
                     platform: block.platform,
@@ -583,6 +601,8 @@ export const buildAddedAccountsFromBlocks = ({
 
             if (!contentItem) return null;
 
+            const additionalBriefId = contentItem.additionalBrief[0]?._id;
+
             return {
                 socialAccountId: String(account.accountId),
                 influencerId: String(account.influencerId),
@@ -591,6 +611,7 @@ export const buildAddedAccountsFromBlocks = ({
                 selectedCampaignContentItem: {
                     campaignContentItemId: contentItem._id,
                     descriptionId: contentItem.descriptions[0]?._id ?? "",
+                    ...(additionalBriefId ? { additionalBriefId } : {}),
                 },
                 profileType: account.profileType,
                 dateRequest: account.dateRequest ?? "ASAP",
@@ -789,7 +810,12 @@ export const buildBlocksFromCampaignContent = ({
         descriptions: { _id: string; description: string }[];
         taggedUser: string;
         taggedLink: string;
-        additionalBrief: string;
+        additionalBrief:
+            | string
+            | Array<{
+                _id: string;
+                additionalBrief: string;
+            }>;
         profileType?: "creator" | "community";
     }>;
 }): CampaignPostContentBlock[] => {
@@ -833,7 +859,8 @@ export const buildBlocksFromCampaignContent = ({
             aDescriptions === bDescriptions &&
             String(a.taggedUser ?? "").trim() === String(b.taggedUser ?? "").trim() &&
             String(a.taggedLink ?? "").trim() === String(b.taggedLink ?? "").trim() &&
-            String(a.additionalBrief ?? "").trim() === String(b.additionalBrief ?? "").trim()
+            getAdditionalBriefText(a.additionalBrief).trim() ===
+            getAdditionalBriefText(b.additionalBrief).trim()
         );
     };
 
@@ -873,7 +900,7 @@ export const buildBlocksFromCampaignContent = ({
                     descriptions: normalizeDescriptions(creatorItem.descriptions ?? []),
                     taggedUser: String(creatorItem.taggedUser ?? ""),
                     taggedLink: String(creatorItem.taggedLink ?? ""),
-                    additionalBrief: String(creatorItem.additionalBrief ?? ""),
+                    additionalBrief: getAdditionalBriefText(creatorItem.additionalBrief),
                 },
             });
 
@@ -895,7 +922,7 @@ export const buildBlocksFromCampaignContent = ({
                 descriptions: normalizeDescriptions(creatorItem.descriptions ?? []),
                 taggedUser: String(creatorItem.taggedUser ?? ""),
                 taggedLink: String(creatorItem.taggedLink ?? ""),
-                additionalBrief: String(creatorItem.additionalBrief ?? ""),
+                additionalBrief: getAdditionalBriefText(creatorItem.additionalBrief),
             },
         });
     });
@@ -918,7 +945,7 @@ export const buildBlocksFromCampaignContent = ({
                 descriptions: normalizeDescriptions(communityItem.descriptions ?? []),
                 taggedUser: String(communityItem.taggedUser ?? ""),
                 taggedLink: String(communityItem.taggedLink ?? ""),
-                additionalBrief: String(communityItem.additionalBrief ?? ""),
+                additionalBrief: getAdditionalBriefText(communityItem.additionalBrief),
             },
         });
     });
@@ -936,7 +963,7 @@ export const buildBlocksFromCampaignContent = ({
                 descriptions: normalizeDescriptions(item.descriptions ?? []),
                 taggedUser: "",
                 taggedLink: "",
-                additionalBrief: String(item.additionalBrief ?? ""),
+                additionalBrief: getAdditionalBriefText(item.additionalBrief),
             },
         });
     });
@@ -954,7 +981,7 @@ export const buildBlocksFromCampaignContent = ({
                 descriptions: normalizeDescriptions(item.descriptions ?? []),
                 taggedUser: "",
                 taggedLink: String(item.taggedLink ?? ""),
-                additionalBrief: String(item.additionalBrief ?? ""),
+                additionalBrief: getAdditionalBriefText(item.additionalBrief),
             },
         });
     });

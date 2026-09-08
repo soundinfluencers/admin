@@ -169,7 +169,7 @@ export const ContentTableCell: React.FC<Props> = ({
                 ],
                 taggedUser: "",
                 taggedLink: "",
-                additionalBrief: "",
+                additionalBrief: [],
                 profileType: selectedItem?.profileType,
             },
             selectedItem?._id,

@@ -23,6 +23,7 @@ import {
 import {
     useCampaignBuilderStore
 } from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.store.ts";
+import {toast} from "react-toastify";
 
 const DEFAULT_PROMO_CARDS_LIMIT = 24;
 
@@ -62,7 +63,7 @@ const collectSectionFilterIds = (section: CampaignFilterSection) => {
     return collectFilterIds(section.filters);
 };
 
-export const useBuildCampaignView = () => {
+export const useBuildCampaignView = (isAttachMode = false) => {
     const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
     const ddRef = React.useRef<HTMLDivElement | null>(null);
     const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
@@ -103,8 +104,18 @@ export const useBuildCampaignView = () => {
         setSelectedFilterIds,
     } = useBuildCampaignParams();
     React.useEffect(() => {
-        setSelectedCurrencyToStore(selectedCurrency?.key ?? "€");
-    }, [selectedCurrency, setSelectedCurrencyToStore]);
+        if (isAttachMode) return;
+
+        try {
+            setSelectedCurrencyToStore(selectedCurrency);
+        } catch (error) {
+            toast.error(
+                error instanceof Error
+                    ? error.message
+                    : "Failed to update campaign currency",
+            );
+        }
+    }, [isAttachMode, selectedCurrency, setSelectedCurrencyToStore]);
     const [initialSections, setInitialSections] = React.useState<
         CampaignFilterSection[]
     >([]);
@@ -264,7 +275,7 @@ export const useBuildCampaignView = () => {
 
     React.useEffect(() => {
         setIsDropdownOpen(isSearchMode);
-    }, [isSearchMode]);
+    }, [isSearchMode, normalizedSearch]);
 
     React.useEffect(() => {
         if (!isDropdownOpen) return;

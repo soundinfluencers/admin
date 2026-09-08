@@ -2,7 +2,11 @@ import React from "react";
 import { TableRowCard } from "./table-row-card";
 import { PromoCardGrid } from "./promo-card-grid";
 import styles from "./cards-container.module.scss";
-import type { CampaignCardsViewMode } from "@/entities/admin-create-campaign/campaign-filter/model/campaign-filter.types";
+import type {
+    CampaignCardsViewMode,
+    CampaignCurrencyCode,
+} from "@/entities/admin-create-campaign/campaign-filter/model/campaign-filter.types";
+import { toast } from "react-toastify";
 import type { PromoAccount } from "@/entities/admin-create-campaign/promo-accounts/model/promo-account.types";
 import { TableCardSkeleton } from "@/shared/ui/skeletons/table-card-skeleton";
 import { CardSkeleton } from "@/shared/ui/skeletons/card-skeleton";
@@ -18,7 +22,23 @@ interface Props {
     isFetchingMore: boolean;
     isRefetching: boolean;
     isAttachMode: boolean;
+    selectedCurrencyCode: CampaignCurrencyCode;
 }
+
+const getExactPresetPrice = (
+    card: PromoAccount,
+    currency: CampaignCurrencyCode,
+) => {
+    const price = card.prices[currency];
+
+    if (typeof price !== "number" || !Number.isFinite(price)) {
+        throw new Error(
+            `Missing ${currency} preset price for account ${card.accountId}`,
+        );
+    }
+
+    return price;
+};
 
 export const CardsContainer: React.FC<Props> = ({
                                                     view,
@@ -29,6 +49,7 @@ export const CardsContainer: React.FC<Props> = ({
                                                     isFetchingMore,
                                                     isRefetching,
                                                     isAttachMode,
+                                                    selectedCurrencyCode,
                                                 }) => {
     const dimStyle = isRefetching ? { opacity: 0.6 } : undefined;
     const selectedCards = useCampaignManagementAddAccountsStore((s) => s.selectedCards);
@@ -57,21 +78,30 @@ export const CardsContainer: React.FC<Props> = ({
                 return;
             }
 
-            togglePromoCard({
-                accountId: card.accountId,
-                influencerId: card.influencerId,
-                socialMedia: card.socialMedia,
-                username: card.username,
-                profileType: card.profileType,
-                price: Number(card.prices?.EUR ?? 0),
-                dateRequest: "ASAP",
-                followers: card.followers,
-                countries: card.countries,
-                genres: card.musicGenres,
-                logoUrl: card.logoUrl,
-            });
+            try {
+                togglePromoCard({
+                    accountId: card.accountId,
+                    influencerId: card.influencerId,
+                    socialMedia: card.socialMedia,
+                    username: card.username,
+                    profileType: card.profileType,
+                    price: getExactPresetPrice(card, selectedCurrencyCode),
+                    prices: card.prices,
+                    dateRequest: "ASAP",
+                    followers: card.followers,
+                    countries: card.countries,
+                    genres: card.musicGenres,
+                    logoUrl: card.logoUrl,
+                });
+            } catch (error) {
+                toast.error(
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to select campaign account",
+                );
+            }
         },
-        [isAttachMode, toggleCard, togglePromoCard],
+        [isAttachMode, selectedCurrencyCode, toggleCard, togglePromoCard],
     );
 
     return (

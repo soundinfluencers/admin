@@ -119,13 +119,17 @@ export const CampaignPostContentSelection: React.FC<Props> = ({
         return (
             <div key={item.accountId} className={styles.accountRow}>
                 <div className={styles.accountMain}>
-                    <div className={styles.accountAvatar}>
-                        {item.logoUrl ? <img src={item.logoUrl} alt="" /> : null}
-                    </div>
+                    {item.logoUrl ? (
+                      <img
+                        className={styles.accountAvatar}
+                        src={item.logoUrl}
+                        alt=""
+                      />
+                    ) : null}
 
-                    <div className={styles.accountInfo}>
-                        <p>{item.username}</p>
-                    </div>
+                    <p className={styles.accountInfo}>
+                        {item.username}
+                    </p>
                 </div>
 
                 <div className={styles.accountMeta}>

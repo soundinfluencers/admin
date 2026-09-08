@@ -5,18 +5,27 @@ import {
     buildAdminCreateCampaignPayload
 } from "@/pages/admin-create-campaign-strategy/model/build-admin-create-campaign-payload.ts";
 import {createAdminCampaign} from "@/entities/admin-create-campaign/campaign-builder/api/create-admin-campaign.ts";
+import type {
+    CampaignContentItem,
+    SelectedCampaignAccount,
+} from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.types.ts";
+import type {
+    CampaignCurrencyCode,
+} from "@/entities/admin-create-campaign/campaign-filter/model/campaign-filter.types.ts";
 
 
 type Params = {
     campaignName: string;
     totalPrice: number;
-    accounts: any[];
-    content: any[];
+    displayCurrency: CampaignCurrencyCode;
+    accounts: SelectedCampaignAccount[];
+    content: CampaignContentItem[];
 };
 
 export const useCreateAdminCampaign = ({
                                            campaignName,
                                            totalPrice,
+                                           displayCurrency,
                                            accounts,
                                            content,
                                        }: Params) => {
@@ -31,6 +40,7 @@ export const useCreateAdminCampaign = ({
             const payload = buildAdminCreateCampaignPayload({
                 campaignName,
                 totalPrice,
+                displayCurrency,
                 accounts,
                 content,
             });
@@ -62,7 +72,7 @@ export const useCreateAdminCampaign = ({
         } finally {
             setIsCreating(false);
         }
-    }, [campaignName, totalPrice, accounts, content]);
+    }, [campaignName, totalPrice, displayCurrency, accounts, content]);
 
     return {
         isCreating,
