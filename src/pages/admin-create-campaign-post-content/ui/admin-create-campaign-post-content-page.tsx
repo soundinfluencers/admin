@@ -6,6 +6,19 @@ import styles from "./admin-create-campaign-post-content.module.scss";
 
 import {PageBreadcrumbs} from "@/widgets/page-breadcrumbs";
 import {CampaignPostContentPage} from "@/widgets/admin-create-campaign-post-content/ui/campaign-post-content-page.tsx";
+import {CAMPAIGN_CURRENCY_OPTIONS} from "@/features/admin-create-campaign/build-campaign-filters/model/build-campaign-params.constants.ts";
+
+const getCurrencyCode = (symbol: string) => {
+    const currency = CAMPAIGN_CURRENCY_OPTIONS.find(
+        (option) => option.key === symbol,
+    )?.currency;
+
+    if (!currency) {
+        throw new Error(`Unsupported campaign currency symbol: ${symbol}`);
+    }
+
+    return currency;
+};
 
 export const AdminCreateCampaignPostContentPage = () => {
     const navigate = useNavigate();
@@ -14,6 +27,7 @@ export const AdminCreateCampaignPostContentPage = () => {
     const campaignName = useCampaignBuilderStore((s) => s.campaignName);
     const campaignContent = useCampaignBuilderStore((s) => s.campaignContent);
     const totalPrice = useCampaignBuilderStore((s) => s.totalPrice);
+    const selectedCurrency = useCampaignBuilderStore((s) => s.selectedCurrency);
     const blocksDraft = useCampaignBuilderStore((s) => s.blocksDraft);
     const setCampaignContent = useCampaignBuilderStore(
         (s) => s.actions.setCampaignContent,
@@ -45,7 +59,10 @@ export const AdminCreateCampaignPostContentPage = () => {
                 <PageBreadcrumbs
                     items={[
                         { label: "Dashboard", to: "/dashboard" },
-                        { label: "Create campaign", to: "/dashboard/create-new-campaign" },
+                        {
+                            label: "Create campaign",
+                            to: `/dashboard/create-new-campaign?currency=${getCurrencyCode(selectedCurrency)}`,
+                        },
                         { label: "Content" },
 
                     ]}

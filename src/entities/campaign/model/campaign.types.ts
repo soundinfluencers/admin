@@ -27,18 +27,11 @@ export interface ICampaign {
   affiliatePaid: string;
 }
 
-export type TGetCampaignParams =
-  | {
-  limit: number;
-  search: string;
-  status?: TCampaignStatus;
-  page?: never;
-}
-  | {
+export type TGetCampaignParams = {
   limit: number;
   page: number;
+  search?: string;
   status?: TCampaignStatus;
-  search?: never;
 };
 
 export interface ICampaignListPayload {

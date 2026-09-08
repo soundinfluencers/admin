@@ -1,14 +1,21 @@
 import type { RowSelectionState } from "@tanstack/react-table";
 import type {
+    CampaignContentItem,
     CampaignContentDescription,
     SelectedCampaignAccount, SelectedCampaignContentRef
 } from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.types.ts";
-import type {CampaignContentItem} from "@/entities/campaign-managment/model/campaign.managment.ts";
 
 
 export type StrategyGroup = "main" | "music" | "press";
 export type StrategyMode = "readonly" | "readonlyDate" | "edit";
 export type MainProfileGroup = "creator" | "community";
+
+export type StrategyDisplayCampaignContentItem = Omit<
+    CampaignContentItem,
+    "additionalBrief"
+> & {
+    additionalBrief: string;
+};
 
 export type StrategyCampaign = {
     campaignName: string;
@@ -23,7 +30,7 @@ export type StrategyRow = {
     account: SelectedCampaignAccount;
     group: StrategyGroup;
     platformItems: CampaignContentItem[];
-    selectedItem: CampaignContentItem | null;
+    selectedItem: StrategyDisplayCampaignContentItem | null;
     selectedDescription: CampaignContentDescription | null;
     selectedContentIndex: number;
     selectedDescriptionIndex: number;

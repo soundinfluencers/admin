@@ -38,23 +38,7 @@ export const useCampaignsPageState = () => {
   const [searchValue, setSearchValue] = useState(query);
   const debouncedSearchValue = useDebounce(searchValue, 400);
 
-  const isSearchDisabled = !!status;
-
   useEffect(() => {
-    if (isSearchDisabled && searchValue !== "") {
-      setSearchValue("");
-    }
-  }, [isSearchDisabled, searchValue]);
-
-  useEffect(() => {
-    if (isSearchDisabled && query !== "") {
-      void setQuery("", { history: "replace" });
-    }
-  }, [isSearchDisabled, query, setQuery]);
-
-  useEffect(() => {
-    if (isSearchDisabled) return;
-
     const normalizedSearch = debouncedSearchValue.trim();
     const normalizedQuery = query.trim();
 
@@ -68,7 +52,6 @@ export const useCampaignsPageState = () => {
   }, [
     debouncedSearchValue,
     query,
-    isSearchDisabled,
     page,
     setQuery,
     setPage,
@@ -100,14 +83,12 @@ export const useCampaignsPageState = () => {
     void setPage(1, { history: "replace" });
   };
 
-  const queryParams: TGetCampaignParams =
-    query.trim() && !status
-      ? { limit, search: query.trim() }
-      : {
-        page,
-        limit,
-        ...(status ? { status } : {}),
-      };
+  const queryParams: TGetCampaignParams = {
+    page,
+    limit,
+    ...(status ? { status } : {}),
+    ...(query.trim() ? { search: query.trim() } : {}),
+  };
 
   return {
     page,
@@ -116,7 +97,6 @@ export const useCampaignsPageState = () => {
     status,
     query,
     searchValue,
-    isSearchDisabled,
     queryParams,
 
     setPage,

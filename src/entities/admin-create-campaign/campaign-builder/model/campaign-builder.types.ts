@@ -1,6 +1,14 @@
+import type {
+    CampaignCurrencyOption,
+} from "@/entities/admin-create-campaign/campaign-filter/model/campaign-filter.types";
+import type {
+    PromoAccountPrices,
+} from "@/entities/admin-create-campaign/promo-accounts/model/promo-account.types";
+
 export type SelectedCampaignContentRef = {
     campaignContentItemId: string;
     descriptionId: string;
+    additionalBriefId?: string;
 };
 
 export type SelectedCampaignAccount = {
@@ -11,6 +19,7 @@ export type SelectedCampaignAccount = {
     logoUrl?: string;
     followers?: number;
     price?: number;
+    prices?: PromoAccountPrices;
     dateRequest?: string;
     selectedCampaignContentItem?: SelectedCampaignContentRef | null;
     profileType?: "creator" | "community";
@@ -27,6 +36,11 @@ export type CampaignContentDescription = {
     description: string;
 };
 
+export type CampaignContentAdditionalBrief = {
+    _id: string;
+    additionalBrief: string;
+};
+
 export type CampaignContentItem = {
     _id: string;
     socialMedia: string;
@@ -35,7 +49,7 @@ export type CampaignContentItem = {
     descriptions: CampaignContentDescription[];
     taggedUser: string;
     taggedLink: string;
-    additionalBrief: string;
+    additionalBrief: CampaignContentAdditionalBrief[];
     accountId?: string;
     profileType?: "creator" | "community";
     mediaCache?: any;
@@ -67,7 +81,7 @@ export type CampaignBuilderActions = {
         accountId: string,
         selectedCampaignContentItem: SelectedCampaignContentRef,
     ) => void;
-    setSelectedCurrency: (value: string) => void;
+    setSelectedCurrency: (value: CampaignCurrencyOption) => void;
     setAccountDateRequest: (accountId: string, dateRequest: string) => void;
 
     setCampaignContent: (items: CampaignContentItem[]) => void;
@@ -80,6 +94,7 @@ export type CampaignBuilderActions = {
             selectedCampaignContentItem?: {
                 campaignContentItemId: string;
                 descriptionId: string;
+                additionalBriefId?: string;
             } | null;
             dateRequest?: string;
             profileType?: "creator" | "community";

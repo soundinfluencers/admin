@@ -16,6 +16,11 @@ export type CampaignPostContentFields = {
     additionalBrief: string;
 };
 
+export type BuiltCampaignContentAdditionalBrief = {
+    _id: string;
+    additionalBrief: string;
+};
+
 export type CampaignPostContentAccount = {
     accountId: string;
     influencerId: string;
@@ -52,7 +57,7 @@ export type BuiltCampaignContentItem = {
     }>;
     taggedUser: string;
     taggedLink: string;
-    additionalBrief: string;
+    additionalBrief: BuiltCampaignContentAdditionalBrief[];
 };
 
 export type BuiltCampaignContentWithMeta = BuiltCampaignContentItem & {
@@ -74,6 +79,7 @@ export type BuiltAddedAccount = {
     selectedCampaignContentItem: {
         campaignContentItemId: string;
         descriptionId: string;
+        additionalBriefId?: string;
     };
     dateRequest: string;
 };

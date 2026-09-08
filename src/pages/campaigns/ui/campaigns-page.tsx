@@ -15,7 +15,6 @@ export const CampaignsPage = () => {
     status,
     mode,
     searchValue,
-    isSearchDisabled,
     queryParams,
     setPage,
     handleStatusChange,
@@ -45,7 +44,6 @@ export const CampaignsPage = () => {
           <CampaignsToolbar
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
-            searchDisabled={isSearchDisabled}
             status={status}
             onStatusChange={handleStatusChange}
           />
