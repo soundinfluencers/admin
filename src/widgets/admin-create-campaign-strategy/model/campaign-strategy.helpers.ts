@@ -176,6 +176,16 @@ export const getPlatformItemsForAccount = ({
     );
 };
 
+const getAdditionalBriefDisplayText = (
+    value?: CampaignContentItem["additionalBrief"] | string | null,
+) => {
+    if (Array.isArray(value)) {
+        return String(value[0]?.additionalBrief ?? "");
+    }
+
+    return String(value ?? "");
+};
+
 export const buildStrategyRows = ({
                                       accounts,
                                       items,
@@ -199,6 +209,14 @@ export const buildStrategyRows = ({
         if (selectedContentIndex < 0) selectedContentIndex = 0;
 
         const selectedItem = platformItems[selectedContentIndex] ?? null;
+        const selectedItemForDisplay = selectedItem
+            ? {
+                ...selectedItem,
+                additionalBrief: getAdditionalBriefDisplayText(
+                    selectedItem.additionalBrief,
+                ),
+            }
+            : null;
         const descriptions = selectedItem?.descriptions ?? [];
 
         let selectedDescriptionIndex = descriptions.findIndex(
@@ -217,7 +235,7 @@ export const buildStrategyRows = ({
             account,
             group,
             platformItems,
-            selectedItem,
+            selectedItem: selectedItemForDisplay,
             selectedDescription,
             selectedContentIndex,
             selectedDescriptionIndex,

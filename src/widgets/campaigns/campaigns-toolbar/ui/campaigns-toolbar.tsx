@@ -14,7 +14,6 @@ import s from './campaigns-toolbar.module.scss';
 interface CampaignsToolbarProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
-  searchDisabled: boolean;
   status: TCampaignStatus | null;
   onStatusChange: (value: TCampaignStatus | null) => void;
 }
@@ -22,7 +21,6 @@ interface CampaignsToolbarProps {
 export const CampaignsToolbar: React.FC<CampaignsToolbarProps> = ({
   searchValue,
   onSearchChange,
-  searchDisabled,
   status,
   onStatusChange,
 }) => {
@@ -96,7 +94,6 @@ export const CampaignsToolbar: React.FC<CampaignsToolbarProps> = ({
           value={searchValue}
           onChange={onSearchChange}
           className={s.search}
-          disabled={searchDisabled}
         />
       </div>
 

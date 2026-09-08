@@ -12,8 +12,23 @@ import { ViewSwitch } from "@/features/admin-create-campaign/build-campaign-filt
 import { FilterPanel } from "@/features/admin-create-campaign/build-campaign-filters/ui/filter-panel";
 import { getSocialMediaIcon } from "@/shared/libs/get-social-media-icon";
 import type { SocialMedia } from "@/entities/campaign-managment/model/campaign.managment";
+import type {
+    CampaignCurrencyCode,
+} from "@/entities/admin-create-campaign/campaign-filter/model/campaign-filter.types";
+import type {
+    PromoAccount,
+} from "@/entities/admin-create-campaign/promo-accounts/model/promo-account.types";
 import { NoData } from "@/shared/ui/no-array/no-data";
 import { CardsContainer } from "@/widgets/admin-create-campaign/build-campaign/components/cards-container";
+
+const getExactPresetPrice = (
+    account: PromoAccount,
+    currency: CampaignCurrencyCode,
+) => {
+    const price = account.prices[currency];
+
+    return typeof price === "number" && Number.isFinite(price) ? price : null;
+};
 
 export const BuildCampaign = () => {
     const [searchParams] = useSearchParams();
@@ -39,6 +54,7 @@ export const BuildCampaign = () => {
         setPanelOpen,
         selectedBudget,
         selectedCurrency,
+        selectedCurrencyCode,
         setBudget,
         setCurrency,
         selectedSort,
@@ -62,7 +78,23 @@ export const BuildCampaign = () => {
         isFetchingMore,
         isRefetching,
         promoFetching,
-    } = useBuildCampaignView();
+    } = useBuildCampaignView(isAttachMode);
+
+    const selectableSearchResults = isAttachMode
+        ? searchResults
+        : searchResults.filter(
+            (account) => getExactPresetPrice(account, selectedCurrencyCode) !== null,
+        );
+    const selectableDisplayCards = isAttachMode
+        ? displayCards
+        : displayCards.filter(
+            (account) => getExactPresetPrice(account, selectedCurrencyCode) !== null,
+        );
+    const hasNoSelectableCards =
+        !isAttachMode &&
+        !isInitialLoading &&
+        displayCards.length > 0 &&
+        selectableDisplayCards.length === 0;
 
     return (
         <div className={styles.root}>
@@ -107,8 +139,8 @@ export const BuildCampaign = () => {
                                             Failed to search
                                             <button onClick={() => searchRefetch()}>Retry</button>
                                         </div>
-                                    ) : searchResults.length > 0 ? (
-                                        searchResults.map((account) => (
+                                    ) : selectableSearchResults.length > 0 ? (
+                                        selectableSearchResults.map((account) => (
                                             <div
                                                 key={account.accountId}
                                                 className={styles.searchDropdownItem}
@@ -126,7 +158,13 @@ export const BuildCampaign = () => {
                                                     <p>{account.username}</p>
                                                 </div>
                                                 <div className={styles.price}>
-                                                    {account.prices.EUR ?? 0}€
+                                                    {isAttachMode
+                                                        ? account.prices.EUR ?? 0
+                                                        : getExactPresetPrice(
+                                                            account,
+                                                            selectedCurrencyCode,
+                                                        )}
+                                                    {isAttachMode ? "€" : selectedCurrency.key}
                                                 </div>
                                             </div>
                                         ))
@@ -183,14 +221,14 @@ export const BuildCampaign = () => {
                         />
                     )}
 
-                    {promoError || isEmpty ? (
+                    {promoError || isEmpty || hasNoSelectableCards ? (
                         <NoData>
                             <h2>No SocialAccounts for this filter right now</h2>
                             <p>Please change filters or search again.</p>
                         </NoData>
                     ) : (
                         <CardsContainer
-                            promosCards={displayCards}
+                            promosCards={selectableDisplayCards}
                             isSmall={isSmall}
                             setIsSmall={setIsSmall}
                             view={view}
@@ -198,6 +236,7 @@ export const BuildCampaign = () => {
                             isFetchingMore={isFetchingMore}
                             isRefetching={isRefetching}
                             isAttachMode={isAttachMode}
+                            selectedCurrencyCode={selectedCurrencyCode}
                         />
                     )}
                 </div>
