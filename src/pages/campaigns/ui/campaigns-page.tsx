@@ -14,10 +14,12 @@ export const CampaignsPage = () => {
     page,
     status,
     mode,
+    limit,
     searchValue,
     queryParams,
     setPage,
     handleStatusChange,
+    handleLimitChange,
     handleSearchChange,
     handleModeChange,
   } = useCampaignsPageState();
@@ -29,7 +31,6 @@ export const CampaignsPage = () => {
 
   return (
     <div className={styles.campaignsPage}>
-
       <PageBreadcrumbs
         items={[
           { label: "Dashboard", to: "/dashboard" },
@@ -42,6 +43,8 @@ export const CampaignsPage = () => {
           <PageTitle title={'Campaigns'}/>
 
           <CampaignsToolbar
+            limit={limit}
+            onLimitChange={handleLimitChange}
             searchValue={searchValue}
             onSearchChange={handleSearchChange}
             status={status}

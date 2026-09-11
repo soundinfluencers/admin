@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { SearchByQuery } from "@/features/search";
 import { ImportXlsx } from "@/features/import-xlsx";
 import { FilterCampaignsByStatus } from "@/features/campaigns/filter-campaigns-by-status";
+import { PageLimitSelect } from "@/shared/ui";
+import { CAMPAIGNS_ITEMS_LIMIT } from "@/pages/campaigns/model/use-campaigns-page-state.ts";
 import { toast } from "react-toastify";
 import type { TCampaignStatus } from "@/entities/campaign";
 
@@ -12,6 +14,8 @@ import plus from '@/assets/icons/plus.svg';
 import s from './campaigns-toolbar.module.scss';
 
 interface CampaignsToolbarProps {
+  limit: number;
+  onLimitChange: (limit: number) => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   status: TCampaignStatus | null;
@@ -19,6 +23,8 @@ interface CampaignsToolbarProps {
 }
 
 export const CampaignsToolbar: React.FC<CampaignsToolbarProps> = ({
+  limit,
+  onLimitChange,
   searchValue,
   onSearchChange,
   status,
@@ -94,6 +100,14 @@ export const CampaignsToolbar: React.FC<CampaignsToolbarProps> = ({
           value={searchValue}
           onChange={onSearchChange}
           className={s.search}
+        />
+      </div>
+
+      <div className={s.limit}>
+        <PageLimitSelect
+          value={limit}
+          onValueChange={onLimitChange}
+          options={CAMPAIGNS_ITEMS_LIMIT}
         />
       </div>
 

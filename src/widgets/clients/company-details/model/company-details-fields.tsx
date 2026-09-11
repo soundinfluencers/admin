@@ -54,9 +54,31 @@ export const leftFields = [
       />
     ),
   },
+  {
+    label: "Balance",
+    key: "balance",
+    render: (data: IClientDetails) => (
+      <ClientNoteEditor
+        initialValue={String(data.balance)}
+        clientId={data.clientId}
+        fieldKey="balance"
+      />
+    ),
+  },
 ] satisfies TInfoField<IClientDetails>[];
 
 export const rightFields = [
+  {
+    label: "Company",
+    key: "company",
+    render: (data: IClientDetails) => (
+      <ClientNoteEditor
+        initialValue={data.company}
+        clientId={data.clientId}
+        fieldKey="company"
+      />
+    ),
+  },
   {
     label: "Company type",
     key: "companyType",

@@ -29,6 +29,10 @@ export const mapPromoAccountDto = (dto: PromoAccountDto): PromoAccount => {
         averageViews: Number(dto.averageViews ?? 0),
         engagementRate: Number(dto.engagementRate ?? 0),
         musicGenres: dto.musicGenres ?? [],
+        creatorMusicGenres: dto.creatorMusicGenres,
+        communityMusicGenres: dto.communityMusicGenres,
+        communityThemeTopics: dto.communityThemeTopics,
+        creatorContentFocus: dto.creatorContentFocus,
         creatorCategories: dto.creatorCategories ?? [],
         categories: dto.categories ?? [],
     };

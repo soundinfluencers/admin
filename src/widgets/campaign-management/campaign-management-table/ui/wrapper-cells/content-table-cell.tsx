@@ -141,7 +141,6 @@ export const ContentTableCell: React.FC<Props> = ({
                 setSelectedContent={setSelectedContent}
                 setSelectedPd={setSelectedPd}
                 socialMedia={row.account.socialMedia}
-                media0={row.selectedItem?.mediaCache?.items?.[0]}
                 group={row.group}
                 status={normalizedStatus}
             />

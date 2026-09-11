@@ -13,7 +13,7 @@ export const MusicGenresCommunity: React.FC = () => {
 
   return (
     <div
-      id="musicGenresCommunity"
+      id="communityMusicGenres"
       className={s.musicGenresCommunity}
     >
       <FormBlockHeader

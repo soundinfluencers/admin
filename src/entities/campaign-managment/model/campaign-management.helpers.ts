@@ -64,7 +64,8 @@ export function formatFollowers(count: number | string): string {
 
     return `${(num / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
 }
-
+// http://localhost:5173/
+// https://go.soundinfluencers.com
 export const buildCampaignManagementShareLink = ({
                                                      id,
                                                      kind,

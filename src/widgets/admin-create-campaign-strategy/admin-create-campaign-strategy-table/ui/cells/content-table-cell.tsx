@@ -450,7 +450,7 @@ export const ContentTableCell: React.FC<Props> = ({
                 <Modal onClose={onClosePreview}>
                     <div className="modal-card">
                         <h2>{label} {previewIndex + 1}</h2>
-                        <input type="text" value={previewLink} readOnly />sef
+                        <input type="text" value={previewLink} readOnly />
                     </div>
                 </Modal>
             )}

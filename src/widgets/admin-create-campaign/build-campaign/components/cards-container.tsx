@@ -90,7 +90,12 @@ export const CardsContainer: React.FC<Props> = ({
                     dateRequest: "ASAP",
                     followers: card.followers,
                     countries: card.countries,
-                    genres: card.musicGenres,
+                    genres: [...new Set([
+                        ...(card.communityMusicGenres ?? []),
+                        ...(card.communityThemeTopics ?? []),
+                        ...(card.creatorMusicGenres ?? []),
+                        ...(card.creatorContentFocus ?? []),
+                    ].filter((key) => key.trim().length > 0))],
                     logoUrl: card.logoUrl,
                 });
             } catch (error) {

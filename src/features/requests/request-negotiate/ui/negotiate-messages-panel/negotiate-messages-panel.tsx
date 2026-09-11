@@ -2,16 +2,14 @@ import React from "react";
 import clsx from "clsx";
 import { NegotiateForm } from "@/features/requests/request-negotiate";
 import { useGetNegotiateQuery } from "@/entities/request-negotiate/api/negotiate.queries.ts";
-import type { TRequestSpecifiedStatus, TRequestType } from "@/entities/requests/model/requests.types.ts";
+import type { IRequest, TRequestSpecifiedStatus } from "@/entities/requests/model/requests.types.ts";
 
 import close from "@/assets/icons/x.svg";
 
 import s from './negotiate-messages-panel.module.scss';
 
 interface NegotiateMessagesPanelProps {
-  requestId: string;
-  requestStatus: TRequestSpecifiedStatus;
-  requestType: TRequestType;
+  request: IRequest;
   onClose?: () => void;
   className?: string;
 }
@@ -21,23 +19,22 @@ const canSendNegotiationMessage = (status: TRequestSpecifiedStatus) => {
 };
 
 export const NegotiateMessagesPanel: React.FC<NegotiateMessagesPanelProps> = ({
-  requestId,
-  requestStatus,
-  requestType,
+  request,
   onClose,
   className = "",
 }) => {
-  const isNegotiation = requestStatus === "NEGOTIATION";
-  const canSendMessage = canSendNegotiationMessage(requestStatus);
+  const { requestId, specifiedStatus, type, submittedBy } = request;
+  const isNegotiation = specifiedStatus === "NEGOTIATION";
+  const canSendMessage = canSendNegotiationMessage(specifiedStatus);
 
   const { data, isLoading, isFetching, isError } = useGetNegotiateQuery({
     requestId,
-    requestStatus,
+    requestStatus: specifiedStatus,
   });
 
   const messages = data?.messages ?? [];
 
-  const shouldShowCreateState = requestStatus === "WAITING_FOR_ADMIN";
+  const shouldShowCreateState = specifiedStatus === "WAITING_FOR_ADMIN";
 
   const shouldShowInitialMessagesLoading =
     isNegotiation && isLoading && !data;
@@ -137,8 +134,9 @@ export const NegotiateMessagesPanel: React.FC<NegotiateMessagesPanelProps> = ({
       {canSendMessage && (
         <NegotiateForm
           requestId={requestId}
-          requestStatus={requestStatus}
-          requestType={requestType}
+          requestStatus={specifiedStatus}
+          requestType={type}
+          submittedBy={submittedBy}
         />
       )}
     </div>

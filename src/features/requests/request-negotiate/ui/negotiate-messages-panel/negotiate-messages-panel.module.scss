@@ -4,18 +4,36 @@
 .root {
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 32px;
+}
+
+.messagesArea {
+  padding-right: 4px;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--blue);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--white-gray-20);
+  }
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 }
 
 .message {
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .field {
@@ -28,6 +46,8 @@
 
   color: var(--gray);
   font-size: var(--text-sm);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .badge {

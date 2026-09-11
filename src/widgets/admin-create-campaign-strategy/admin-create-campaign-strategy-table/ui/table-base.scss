@@ -281,6 +281,11 @@
     max-height: calc(22px * 2 + 6px);
   }
 
+  .td-chips.strategy-genres .chips {
+    max-height: none;
+    overflow: visible;
+  }
+
 .td-chips .chips li {
     flex: 0 0 auto;
 
@@ -652,10 +657,10 @@
 }
 .tagged-link {
   text-decoration: underline;
-  transition: 0.3;
+  transition: 0.3s;
   &:hover {
     text-decoration: underline;
-    transition: 0.3;
+    transition: 0.3s;
     color: rgb(76, 76, 76);
   }
 }

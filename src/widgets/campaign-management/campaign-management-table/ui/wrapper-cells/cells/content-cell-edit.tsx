@@ -7,7 +7,6 @@ import trash from "./assets/trash-2.svg";
 import { useCampaignManagementStore } from "@/entities/campaign-managment/store/campaign-management.store.ts";
 import { Dropdown } from "@/shared/ui/dropdown-table/dropdowns-table";
 import { Modal } from "@/shared/ui/modal/modal.tsx";
-import { VideoPreview } from "@/features/campaigns/preview/preview-video-component.tsx";
 
 type Props = {
   accountKey: string;
@@ -22,7 +21,6 @@ type Props = {
   setSelectedPd: (v: number) => void;
 
   socialMedia?: string;
-  media0?: any;
   group: string;
 };
 
@@ -37,7 +35,6 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
   setSelectedContent,
   setSelectedPd,
   socialMedia,
-  media0,
 }: Props) {
   const addContentItem = useCampaignManagementStore((s) => s.addContentItem);
   const removeContentItem = useCampaignManagementStore((s) => s.removeContentItem);
@@ -48,11 +45,6 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
       .filter(({ item }) => String(item?.mainLink ?? "").trim().length > 0),
     [platformItems],
   );
-  const [popUp, setPopUp] = React.useState(false);
-  const [selectedVideo, setSelectedVideo] = React.useState({
-    index: 1,
-    link: "",
-  });
 
   const [addModal, setAddModal] = React.useState(false);
   const [newLink, setNewLink] = React.useState("");
@@ -61,10 +53,7 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
   const [deleteIdx, setDeleteIdx] = React.useState<number>(-1);
 
   const selectedLink = platformItems?.[selectedContent]?.mainLink ?? "";
-  const setContentField = useCampaignManagementStore((s) => s.setContentField);
-  const currentItem = platformItems?.[selectedContent];
-  const currentContentId = currentItem?._id;
-  const currentLink = currentItem?.mainLink ?? "";
+  const selectedHref = selectedLink.trim() ? selectedLink : undefined;
   const selectContent = React.useCallback(
     (idx: number) => {
       setSelectedContent(idx);
@@ -72,11 +61,6 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
     },
     [setSelectedContent, onOpenChange],
   );
-
-  const onClickVideo = React.useCallback((idx: number, link: string) => {
-    setSelectedVideo({ index: idx + 1, link });
-    setPopUp(true);
-  }, []);
 
   const openAddModal = React.useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -117,10 +101,6 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
   const openDelete = React.useCallback((idx: number) => {
     setDeleteIdx(idx);
     setDeleteModal(true);
-  }, []);
-
-  const closeModalVideo = React.useCallback(() => {
-    setPopUp(false);
   }, []);
 
   const confirmDelete = React.useCallback(() => {
@@ -164,13 +144,6 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
     }
   };
 
-  const onClickHeaderEye = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const link = platformItems?.[selectedContent]?.mainLink ?? "";
-    onClickVideo(selectedContent, link);
-  };
-  const pathLower = media0?.pathLower;
-  const videoUrl = media0?.url ?? null;
   return (
     <>
       <Dropdown
@@ -179,9 +152,17 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
         content
         selected={
           <div className="content-cell-static">
-                        <span onClick={onClickHeaderEye} className="eye">
-                            <img src={eye} alt=""/>
-                        </span>
+            <a
+              href={selectedHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Open ${groupTitle(group)} ${selectedContent + 1} in a new tab`}
+              aria-disabled={!selectedHref || undefined}
+              onClick={(e) => e.stopPropagation()}
+              className="eye"
+            >
+              <img src={eye} alt=""/>
+            </a>
             <p title={selectedLink}>
               {selectedLink
                 ? `${groupTitle(group)} ${selectedContent + 1}`
@@ -200,15 +181,17 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
                 key={item?._id ?? idx}
                 onClick={() => selectContent(idx)}
               >
-                                <span
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onClickVideo(idx, item.mainLink);
-                                  }}
-                                  className="eye"
-                                >
-                                    <img src={eye} alt=""/>
-                                </span>
+                <a
+                  href={item?.mainLink?.trim() ? item.mainLink : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Open ${groupTitle(group)} ${idx + 1} in a new tab`}
+                  aria-disabled={!item?.mainLink?.trim() || undefined}
+                  onClick={(e) => e.stopPropagation()}
+                  className="eye"
+                >
+                  <img src={eye} alt=""/>
+                </a>
 
                 <p
                   className="hidden-text desc-li"
@@ -273,36 +256,6 @@ export const ContentCellEdit = React.memo(function ContentCellEdit({
                 Delete
               </button>
             </div>
-          </div>
-        </Modal>
-      )}
-
-      {popUp && (
-        <Modal onClose={closeModalVideo}>
-          <div className="modal-card">
-            <h2>Video {selectedVideo.index}</h2>
-            {videoUrl || pathLower ? (
-                <input
-                  type="text"
-                  value={selectedVideo.link || selectedLink || ""}
-                  readOnly
-                />
-              // <VideoPreview
-              //   className="modal-card-video"
-              //   videoUrl={videoUrl}
-              //   pathLower={pathLower}
-              // />
-            ) : (
-              <input
-                type="text"
-                value={currentLink}
-                onChange={(e) => {
-                  if (!currentContentId) return;
-                  setContentField(String(currentContentId), "mainLink", e.target.value);
-                }}
-                placeholder="Paste video link..."
-              />
-            )}
           </div>
         </Modal>
       )}

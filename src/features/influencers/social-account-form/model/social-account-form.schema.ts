@@ -53,7 +53,8 @@ export const createSocialAccountFormSchema = (platform: TPlatform) => {
     if (
       isCommunity &&
       config.hasMusicGenresCommunity &&
-      data.communityMusicGenres.length === 0
+      data.communityMusicGenres.length === 0 &&
+      data.communityThemeTopics.length === 0
     ) {
       ctx.addIssue({
         code: 'custom',
