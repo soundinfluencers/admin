@@ -73,9 +73,7 @@ export const RequestDetailsModal: React.FC<RequestDetailsModalProps> = ({
 
       {isOpen && (
         <NegotiateMessagesPanel
-          requestId={request.requestId}
-          requestStatus={request.specifiedStatus}
-          requestType={request.type}
+          request={request}
           className={s.asidePanel}
           onClose={() => setOpenOverride(false)}
         />

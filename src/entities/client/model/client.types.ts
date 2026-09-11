@@ -48,6 +48,7 @@ export interface IClientCampaign {
 
 export interface IClientDetails {
   clientId: string;
+  balance: number;
   company: string;
   firstName: string;
   email: string;
@@ -71,7 +72,7 @@ export interface IClientResponse {
 export type TUpdateClientMetaDto = Partial<
   Pick<
     IClientDetails,
-    'firstName' | 'lastName' | 'email' | 'phone' | 'companyType' | 'isProposalClient' | 'internalNote'
+    'firstName' | 'lastName' | 'email' | 'phone' | 'companyType' | 'isProposalClient' | 'internalNote' | 'company' | 'balance'
   >>;
 
 export interface IUpdateClientParams {

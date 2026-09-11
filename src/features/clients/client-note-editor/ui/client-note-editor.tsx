@@ -20,7 +20,7 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
 
   const isTouchDevice = useMemo(
     () => window.matchMedia("(pointer: coarse)").matches,
-    []
+    [],
   );
 
   const normalizedInitialValue = initialValue ?? "";
@@ -51,7 +51,7 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
       {
         clientId,
         dto: {
-          [fieldKey]: draft,
+          [fieldKey]: fieldKey === 'balance' ? Number(draft) : draft,
         },
       },
       {
@@ -83,10 +83,18 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
     if (fieldKey === "phone") {
       return value.replace(/[a-zA-Zа-яА-ЯёЁ]/g, "");
     }
+
+    if (fieldKey === "balance") {
+      return value.replace(/\D/g, "");
+    }
+
     return value;
   }, [fieldKey]);
 
-  const displayValue = normalizedInitialValue.trim() ? normalizedInitialValue : "—";
+  const displayValue = normalizedInitialValue.trim()
+    ? fieldKey === "balance"
+      ? `${normalizedInitialValue}\u20AC`
+      : normalizedInitialValue : "—";
 
   return (
     <div
@@ -96,17 +104,17 @@ export const ClientNoteEditor: React.FC<ClientNoteEditorProps> = ({ clientId, in
     >
       {isEditorOpen ?
         (<input
-          ref={inputRef}
-          className={s.textInput}
-          type="text"
-          value={draft}
-          placeholder="Enter client field"
-          onChange={(e) => setDraft(sanitize(e.target.value))}
-          onBlur={handleSave}
-          onKeyDown={handleKeyDown}
-          disabled={isPending}
-          autoFocus
-        />
+            ref={inputRef}
+            className={s.textInput}
+            type="text"
+            value={draft}
+            placeholder="Enter client field"
+            onChange={(e) => setDraft(sanitize(e.target.value))}
+            onBlur={handleSave}
+            onKeyDown={handleKeyDown}
+            disabled={isPending}
+            autoFocus
+          />
         ) : (
           <span className={s.text}>{displayValue}</span>
         )

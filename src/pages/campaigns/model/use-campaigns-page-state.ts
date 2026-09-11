@@ -12,8 +12,20 @@ import {
 
 import type { TGetCampaignParams } from "@/entities/campaign";
 
+export const CAMPAIGNS_ITEMS_LIMIT = [
+  { label: "10 per page", value: 10 },
+  { label: "20 per page", value: 20 },
+  { label: "50 per page", value: 50 },
+] as const satisfies {
+  label: string;
+  value: number;
+}[];
+
 export const useCampaignsPageState = () => {
-  const limit = 10;
+  const [limit, setLimit] = useQueryState(
+    "limit",
+    parseAsInteger.withDefault(10),
+  )
 
   const [page, setPage] = useQueryState(
     "page",
@@ -83,6 +95,14 @@ export const useCampaignsPageState = () => {
     void setPage(1, { history: "replace" });
   };
 
+  const handleLimitChange = (nextLimit: number) => {
+    void setLimit(nextLimit, { history: "replace" });
+
+    if (page !== 1) {
+      void setPage(1, { history: "replace" });
+    }
+  };
+
   const queryParams: TGetCampaignParams = {
     page,
     limit,
@@ -101,6 +121,7 @@ export const useCampaignsPageState = () => {
 
     setPage,
     handleModeChange,
+    handleLimitChange,
     handleStatusChange,
     handleSearchChange,
   };

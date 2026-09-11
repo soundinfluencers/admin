@@ -53,7 +53,7 @@ export function Table<TData>({
     <div className={styles.tableWrapper}>
 
       <div
-        className={clsx(styles.tableWrapper, scrollWrapperClassName)}
+        className={clsx(styles.scrollWrapper, scrollWrapperClassName)}
       >
 
         <div
