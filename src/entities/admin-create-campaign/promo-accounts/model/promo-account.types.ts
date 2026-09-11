@@ -18,6 +18,10 @@ export type PromoAccount = {
     averageViews: number;
     engagementRate: number;
     musicGenres: string[];
+    creatorMusicGenres?: string[];
+    communityMusicGenres?: string[];
+    communityThemeTopics?: string[];
+    creatorContentFocus?: string[];
     creatorCategories: string[];
     categories: string[];
 };

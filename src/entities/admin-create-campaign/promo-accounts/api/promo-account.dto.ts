@@ -18,6 +18,10 @@ export type PromoAccountDto = {
     engagementRate: number;
     countries: PromoAccountCountryDto[];
     musicGenres: string[];
+    creatorMusicGenres?: string[];
+    communityMusicGenres?: string[];
+    communityThemeTopics?: string[];
+    creatorContentFocus?: string[];
     creatorCategories: string[];
     categories: string[];
 };

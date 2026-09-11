@@ -10,17 +10,20 @@ interface NegotiateFormProps {
   requestId: string;
   requestStatus: TRequestSpecifiedStatus;
   requestType: TRequestType;
+  submittedBy: string;
 }
 
 export const NegotiateForm: React.FC<NegotiateFormProps> = ({
   requestId,
   requestStatus,
   requestType,
+  submittedBy,
 }) => {
   const { methods, onSubmit, isPending } = useNegotiateForm({
     requestId,
     requestStatus,
     requestType,
+    submittedBy,
   });
 
   return (
@@ -34,6 +37,7 @@ export const NegotiateForm: React.FC<NegotiateFormProps> = ({
         name="message"
         label="Negotiate message"
         placeholder="Enter message here...."
+        className={s.textArea}
       />
 
       <Button

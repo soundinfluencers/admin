@@ -11,7 +11,7 @@ export const MusicGenresCreator: React.FC = () => {
   const { error: musicGenresCreator } = getFieldState("creatorMusicGenres", formState);
 
   return (
-    <div id="musicGenresCreator" className={s.musicGenresCreator}>
+    <div id="creatorMusicGenres" className={s.musicGenresCreator}>
       <FormBlockHeader
         title="Music genres"
         subtitle="Select all the applicable"

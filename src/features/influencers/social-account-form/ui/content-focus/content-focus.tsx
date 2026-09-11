@@ -11,7 +11,7 @@ export const ContentFocus: React.FC = () => {
   const { error: contentFocus } = getFieldState("creatorContentFocus", formState);
 
   return (
-    <div id='contentFocus' className={s.contentFocus}>
+    <div id='creatorContentFocus' className={s.contentFocus}>
       <FormBlockHeader
         title="Content focus"
         subtitle="Select all the applicable"

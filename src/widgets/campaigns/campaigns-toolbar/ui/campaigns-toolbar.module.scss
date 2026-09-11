@@ -3,24 +3,34 @@
 
 .toolbar {
   display: grid;
-  grid-template-columns: auto minmax(260px, 1fr) auto;
-  grid-template-areas: "actions search filters";
+  grid-template-columns: auto auto auto auto;
+  grid-template-areas: "actions search limit filters";
   align-items: center;
-  column-gap: 24px;
+  column-gap: 12px;
 
-  @media screen and (max-width: 1150px) {
+  @media screen and (max-width: 1250px) {
     grid-template-columns: auto minmax(220px, 1fr);
     grid-template-areas:
-      "actions search"
-      "filters filters";
+      "actions search search"
+      "filters filters limit";
     column-gap: 8px;
     row-gap: 16px;
     align-items: center;
   }
 
-  @include breakpoints.mobile {
-    display: flex;
-    flex-direction: column;
+  @media screen and (max-width: 750px) {
+    grid-template-areas:
+      "actions actions"
+      "search search"
+      "filters limit";
+  }
+
+  @media screen and (max-width: 660px) {
+    grid-template-areas:
+      "actions actions"
+      "search search"
+      "filters filters"
+      "limit limit";
     gap: 12px;
   }
 }
@@ -31,7 +41,7 @@
 
   display: flex;
   align-items: stretch;
-  gap: 24px;
+  gap: 12px;
   min-width: 0;
 
   @include breakpoints.tablet {
@@ -61,25 +71,27 @@
   }
 }
 
+.limit {
+  grid-area: limit;
+  height: 100%;
+}
+
 .filtersRow {
   height: 40px;
   grid-area: filters;
   justify-self: end;
 
-  @media screen and (max-width: 1150px) {
+  @media screen and (max-width: 1250px) {
     justify-self: flex-start;
   }
 
-  @include breakpoints.tablet {
-    height: 34px;
-  }
-
-  @include breakpoints.mobile {
+  @media screen and (max-width: 660px) {
     width: 100%;
   }
 }
 
 .search {
+  max-width: 100%;
   padding: 8px 16px 8px 48px;
 
   @include breakpoints.tablet {
