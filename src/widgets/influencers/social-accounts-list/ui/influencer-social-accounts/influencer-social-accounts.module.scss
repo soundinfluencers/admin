@@ -1,6 +1,12 @@
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
 .influencerSocialAccounts {
   max-width: 600px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  @include breakpoints.tablet {
+    max-width: 100%;
+  }
 }

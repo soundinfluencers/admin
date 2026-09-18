@@ -1,4 +1,10 @@
-import type { INewInfluencerAccountRequestDetailsDto, TInfluencerAccount } from "@/entities/requests/model/requests.types.ts";
+import React from "react";
+import type {
+  INewInfluencerAccountRequestDetailsDto,
+  TInfluencerAccount,
+  TRequestType,
+} from "@/entities/requests/model/requests.types.ts";
+import { PriceEditableField } from "@/features/requests/price-editable-field/ui/price-editable-field.tsx";
 
 type TNewAccountRequestField = {
   key: keyof INewInfluencerAccountRequestDetailsDto;
@@ -12,9 +18,14 @@ export const PERSONAL_INFO_FIELDS = [
   { key: "phoneNumber", label: "Phone:" },
 ] as const satisfies readonly TNewAccountRequestField[];
 
-type TAccountInfoField = {
-  key: keyof TInfluencerAccount;
+type TAccountInfoField<T> = {
   label: string;
+  key: keyof T;
+  render?: (
+    data: T,
+    requestType: TRequestType,
+    requestId: string,
+  ) => React.ReactNode;
 }
 
 export const ACCOUNT_INFO_FIELDS = [
@@ -26,8 +37,24 @@ export const ACCOUNT_INFO_FIELDS = [
   { key: "communityMusicGenres", label: "Music genres:"},
   { key: "communityThemeTopics", label: "Theme topics:"},
   { key: "countries", label: "Audience insights:"},
-  { key: "price", label: "Price:"},
-  { key: "initialPrice", label: "Initial Price:"},
+  { label: "Price:", key: "price" },
+  {
+    key: "initialPrice",
+    label: "Initial Price:",
+    render: (
+      data: TInfluencerAccount,
+      requestType: TRequestType,
+      requestId: string,
+    ) => (
+      <PriceEditableField
+        requestId={requestId}
+        requestType={requestType}
+        accountId={data.accountId}
+        accountCurrency={data.currency}
+        initialValue={String(data.initialPrice)}
+      />
+    ),
+  },
   { key: "creatorContentFocus", label: "Content focus:"},
   { key: "creatorMusicGenres", label: "Music genres:"},
-] as const satisfies readonly TAccountInfoField[];
+] satisfies TAccountInfoField<TInfluencerAccount>[];

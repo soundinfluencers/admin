@@ -29,13 +29,18 @@ export const NewSocialAccountRequestDetails: React.FC<NewSocialAccountRequestDet
         <div className={s.content}>
           <PersonalInfo data={data}/>
 
-          <AccountInfo account={data.accountDetails}/>
+          <AccountInfo
+            requestId={data.requestId}
+            account={data.accountDetails}
+            requestType={request.type}
+          />
         </div>
       </div>
 
       {request.lifecycleStatus === "OPEN" && (
         <RequestAnswer
           requestId={data.requestId}
+          requestType={"NEW_SOCIAL_ACCOUNT_REQUEST"}
           onCloseModal={onCloseModal}
           onToggleNegotiatePanel={onToggleNegotiatePanel}
         />

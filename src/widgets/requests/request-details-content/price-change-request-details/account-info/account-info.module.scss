@@ -41,13 +41,13 @@
 }
 
 .field {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: clamp(100px, 20vw, 136px) auto;
+  align-items: first baseline;
   column-gap: 8px;
 }
 
 .label {
-  width: clamp(100px, 20vw, 136px);
   font-size: 14px;
   color: var(--gray);
 }

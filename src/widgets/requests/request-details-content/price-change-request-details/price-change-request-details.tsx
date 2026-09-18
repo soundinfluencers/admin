@@ -29,13 +29,14 @@ export const PriceChangeRequestDetails: React.FC<PriceChangeRequestDetailsProps>
         <div className={s.content}>
           <InfluencerInfo data={data}/>
 
-          <AccountInfo data={data}/>
+          <AccountInfo data={data} requestType={request.type}/>
         </div>
       </div>
 
       {request.lifecycleStatus === "OPEN" && (
         <RequestAnswer
           requestId={data.requestId}
+          requestType={"PRICE_UPDATE_REQUEST"}
           onCloseModal={onCloseModal}
           onToggleNegotiatePanel={onToggleNegotiatePanel}
         />

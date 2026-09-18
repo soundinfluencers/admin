@@ -40,6 +40,7 @@ export const CampaignRequestDetails: React.FC<CampaignRequestDetailsProps> = ({
       {request.lifecycleStatus === "OPEN" && (
         <RequestAnswer
           requestId={data.requestId}
+          requestType={"CAMPAIGN_REQUEST"}
           onCloseModal={onCloseModal}
           onToggleNegotiatePanel={onToggleNegotiatePanel}
         />

@@ -21,7 +21,7 @@ export type TRequestSpecifiedStatus =
 
 export type TRequestFilterStatus = "CLIENT" | "INFLUENCER" | "CAMPAIGN" | "PRICING";
 export type TRequestLifecycleStatus = "OPEN" | "CLOSED";
-export type TResponse = "APPROVE" | "REJECT";
+export type TResponse = "APPROVE" | "REJECT" | "APPROVE_SELECTED";
 
 export interface IRequest {
   requestId: string;
@@ -244,4 +244,14 @@ export interface IGetRequestDetailsResponse<T extends TRequestType = TRequestTyp
 export interface IUpdateRequestStatusParams {
   requestId: string;
   response: TResponse;
+  approvedAccountIds?: string[];
+}
+
+export interface IUpdateSocialAccountRequestPriceDto<T extends TRequestType = TRequestType> {
+  requestId: string;
+  requestType: T;
+  body: {
+    accountId: string;
+    price: number;
+  };
 }

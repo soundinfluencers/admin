@@ -75,6 +75,14 @@ export const updateInfluencerDetails = async ({
   return data.data;
 };
 
+export const deleteInfluencerById = async (influencerId: string) => {
+  console.log("Start delete influencer", influencerId);
+
+  await $api.delete(`/admin/influencers/${influencerId}`);
+
+  console.log('Successfully deleted influencer', influencerId);
+}
+
 // Export influencers-list XLSX
 export const uploadInfluencersXlsx = async ({
   file, socialMedia,

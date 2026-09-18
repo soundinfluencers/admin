@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
-import type { TInfluencerAccount } from "@/entities/requests/model/requests.types.ts";
-import { ACCOUNT_INFO_FIELDS } from '../../model/new-social-account-request.config.ts'
+import type { TInfluencerAccount, TRequestType } from "@/entities/requests/model/requests.types.ts";
+import { ACCOUNT_INFO_FIELDS } from '../../model/new-social-account-request.config.tsx'
 import { SOCIAL_MEDIA_DARK_ICONS, SOCIAL_MEDIA_LABEL_MAP } from "@/widgets/requests/model/social-media.constants.ts";
 import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
 import {
@@ -13,7 +13,9 @@ import {
 import s from './account-info.module.scss';
 
 interface AccountInfoProps {
+  requestId: string;
   account: TInfluencerAccount;
+  requestType: TRequestType;
 }
 
 const CHIP_KEYS = new Set<typeof ACCOUNT_INFO_FIELDS[number]['key']>([
@@ -28,7 +30,11 @@ const CREATOR_HIDDEN: Set<typeof ACCOUNT_INFO_FIELDS[number]['key']> = new Set([
 
 const CHIPS_TOP_THRESHOLD = 3;
 
-export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
+export const AccountInfo: React.FC<AccountInfoProps> = ({
+  requestId,
+  account,
+  requestType,
+}) => {
   const isCommunity = account.profileCategory === 'community';
   const hiddenKeys = isCommunity ? COMMUNITY_HIDDEN : CREATOR_HIDDEN;
 
@@ -137,7 +143,7 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
       </div>
 
       <ul className={s.fields}>
-        {visibleFields.map(({ key, label }) => {
+        {visibleFields.map(({ key, label, render }) => {
           const isChip = CHIP_KEYS.has(key);
           const isCountries = key === 'countries';
           const chipsCount = isChip ? getChipsCount(key) : 0;
@@ -147,7 +153,7 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
             <li key={key} className={clsx(s.field, isTopAlign && s.field_top, key === 'logoUrl' && s.field_center)}>
               <span className={s.label}>{label}</span>
               <span className={clsx(s.value, isCountries && s.value_column)}>
-                {renderValue(key)}
+                {render ? render(account, requestType, requestId) : renderValue(key)}
               </span>
             </li>
           );

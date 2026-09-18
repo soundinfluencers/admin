@@ -35,6 +35,7 @@ export const BespokeCampaignRequestDetails: React.FC<BespokeCampaignRequestDetai
       {request.lifecycleStatus === "OPEN" && (
         <RequestAnswer
           requestId={data.requestId}
+          requestType={"BESPOKE_CAMPAIGN_REQUEST"}
           onCloseModal={onCloseModal}
           onToggleNegotiatePanel={onToggleNegotiatePanel}
         />

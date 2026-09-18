@@ -1,19 +1,25 @@
 import React from "react";
 import clsx from "clsx";
-import type { TInfluencerAccount } from "@/entities/requests/model/requests.types.ts";
-import { ACCOUNT_INFO_FIELDS } from "../../model/new-influencer-request-details.config.ts";
+import { AccountCheckbox } from "./account-checkbox.tsx";
+import { ACCOUNT_INFO_FIELDS } from "../../model/new-influencer-request-details.config.tsx";
+import { SOCIAL_MEDIA_DARK_ICONS, SOCIAL_MEDIA_LABEL_MAP } from "@/widgets/requests/model/social-media.constants.ts";
+import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
 import {
   parseCountries,
   type TParsedCountry,
   parseCommunityMusicGenres, parseThemeTopics, parseCreatorMusicGenres, parseCreatorContentFocus,
 } from "../../model/new-influencer-request-details.parsers.ts";
-import { SOCIAL_MEDIA_DARK_ICONS, SOCIAL_MEDIA_LABEL_MAP } from "@/widgets/requests/model/social-media.constants.ts";
-import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
+import type { TInfluencerAccount, TRequestType } from "@/entities/requests/model/requests.types.ts";
 
 import s from './account-info.module.scss';
 
 interface AccountInfoProps {
   account: TInfluencerAccount;
+  requestId: string;
+  requestType: TRequestType;
+  selectedAccount: boolean;
+  onSelectedAccountChange: (accountId: string) => void;
+  isRequestOpen: boolean;
 }
 
 const CHIP_KEYS = new Set<typeof ACCOUNT_INFO_FIELDS[number]['key']>([
@@ -28,7 +34,14 @@ const CREATOR_HIDDEN: Set<typeof ACCOUNT_INFO_FIELDS[number]['key']> = new Set([
 
 const CHIPS_TOP_THRESHOLD = 6;
 
-export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
+export const AccountInfo: React.FC<AccountInfoProps> = ({
+  account,
+  requestId,
+  requestType,
+  selectedAccount,
+  onSelectedAccountChange,
+  isRequestOpen,
+}) => {
   const isCommunity = account.profileCategory === 'community';
   const hiddenKeys = isCommunity ? COMMUNITY_HIDDEN : CREATOR_HIDDEN;
 
@@ -125,19 +138,29 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
   return (
     <div className={s.root}>
       <div className={s.head}>
-        <img
-          className={s.icon}
-          src={SOCIAL_MEDIA_DARK_ICONS[account.socialMedia]}
-          alt=""
-          width={24}
-          height={24}
-          aria-hidden
-        />
-        <h3 className={s.title}>{SOCIAL_MEDIA_LABEL_MAP[account.socialMedia]}</h3>
+        <div className={s.titleBlock}>
+          <img
+            className={s.icon}
+            src={SOCIAL_MEDIA_DARK_ICONS[account.socialMedia]}
+            alt=""
+            width={24}
+            height={24}
+            aria-hidden
+          />
+          <h3 className={s.title}>{SOCIAL_MEDIA_LABEL_MAP[account.socialMedia]}</h3>
+        </div>
+
+        {isRequestOpen && (
+          <AccountCheckbox
+            accountId={account.accountId}
+            checked={selectedAccount}
+            onCheckedChange={() => onSelectedAccountChange(account.accountId)}
+          />
+        )}
       </div>
 
       <ul className={s.fields}>
-        {visibleFields.map(({ key, label }) => {
+        {visibleFields.map(({ key, label, render }) => {
           const isChip = CHIP_KEYS.has(key);
           const isCountries = key === 'countries';
           const chipsCount = isChip ? getChipsCount(key) : 0;
@@ -147,7 +170,7 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({ account }) => {
             <li key={key} className={clsx(s.field, isTopAlign && s.field_top, key === 'logoUrl' && s.field_center)}>
               <span className={s.label}>{label}</span>
               <span className={clsx(s.value, isCountries && s.value_column)}>
-                {renderValue(key)}
+                {render ? render(account, requestType, requestId) : renderValue(key)}
               </span>
             </li>
           );
