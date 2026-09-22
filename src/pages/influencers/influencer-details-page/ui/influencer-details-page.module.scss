@@ -2,12 +2,14 @@
 @use '@/app/styles/utils/mixins' as mixins;
 
 .influencerDetailsPage {
+  max-width: 600px;
   padding-block: 32px;
   display: flex;
   flex-direction: column;
   gap: 32px;
 
   @include breakpoints.tablet {
+    max-width: 100%;
     padding-block: 16px;
     gap: 24px;
   }

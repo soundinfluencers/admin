@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { RequestAnswer } from "@/features/requests/request-answer";
 import { RequestSummary } from "@/widgets/requests/request-details-content/request-summary/request-summary.tsx";
 import { PersonalInfo } from "./personal-info/personal-info.tsx";
@@ -21,6 +21,26 @@ export const NewInfluencerRequestDetails: React.FC<NewInfluencerRequestDetailsPr
   onCloseModal,
   onToggleNegotiatePanel,
 }) => {
+  const accountIds = data.accounts.map(account => account.accountId);
+
+  const [selectedAccountIds, setSelectedAccountIds] = useState<Set<string>>(() => new Set(accountIds));
+
+  const toggleAccountSelection = (accountId: string) => {
+    setSelectedAccountIds((prevState) => {
+      const next = new Set(prevState);
+
+      if (next.has(accountId)) {
+        next.delete(accountId);
+      } else {
+        next.add(accountId);
+      }
+
+      return next;
+    });
+  };
+
+  const isRequestOpen = request.lifecycleStatus === "OPEN";
+
   return (
     <div className={s.root}>
       <div className={s.wrapper}>
@@ -29,18 +49,26 @@ export const NewInfluencerRequestDetails: React.FC<NewInfluencerRequestDetailsPr
         <div className={s.content}>
           <PersonalInfo data={data}/>
 
-          {data.accounts.map((account, index) => (
+          {data.accounts.map((account) => (
             <AccountInfo
-              key={index}
+              key={account.accountId}
               account={account}
+              requestId={request.requestId}
+              requestType={request.type}
+              selectedAccount={selectedAccountIds.has(account.accountId)}
+              onSelectedAccountChange={toggleAccountSelection}
+              isRequestOpen={isRequestOpen}
             />
           ))}
         </div>
       </div>
 
-      {request.lifecycleStatus === "OPEN" && (
+      {isRequestOpen && (
         <RequestAnswer
           requestId={data.requestId}
+          requestType={"NEW_INFLUENCER_REQUEST"}
+          isPartialApprove={selectedAccountIds.size < data.accounts.length}
+          selectedAccountIds={selectedAccountIds}
           onCloseModal={onCloseModal}
           onToggleNegotiatePanel={onToggleNegotiatePanel}
         />

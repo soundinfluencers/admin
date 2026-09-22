@@ -36,6 +36,7 @@ export const NewClientRequestDetails: React.FC<NewClientRequestDetailsProps> = (
         {request.lifecycleStatus === "OPEN" && (
           <RequestAnswer
             requestId={data.requestId}
+            requestType={"NEW_CLIENT_REQUEST"}
             onCloseModal={onCloseModal}
             onToggleNegotiatePanel={onToggleNegotiatePanel}
           />

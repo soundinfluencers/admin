@@ -1,5 +1,5 @@
 import React from "react";
-import { PERSONAL_INFO_FIELDS } from "../../model/new-social-account-request.config.ts";
+import { PERSONAL_INFO_FIELDS } from "../../model/new-social-account-request.config.tsx";
 import type { INewInfluencerAccountRequestDetailsDto } from "@/entities/requests/model/requests.types.ts";
 
 import s from './personal-info.module.scss';

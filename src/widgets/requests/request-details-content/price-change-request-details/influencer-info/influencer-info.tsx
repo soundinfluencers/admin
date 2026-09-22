@@ -1,5 +1,5 @@
 import React from "react";
-import { INFLUENCER_PERSONAL_INFO_FIELDS } from "../price-change-request-details.config.ts";
+import { INFLUENCER_PERSONAL_INFO_FIELDS } from "../price-change-request-details.config.tsx";
 import type { IPriceUpdateRequestDetailsDto } from "@/entities/requests/model/requests.types.ts";
 
 import s from './influencer-info.module.scss';

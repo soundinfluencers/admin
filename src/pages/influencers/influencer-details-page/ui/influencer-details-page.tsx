@@ -7,6 +7,7 @@ import { InfluencerSocialAccounts } from "@/widgets/influencers/social-accounts-
 import { mapInfluencerProfileToAccounts } from "../model/influencer-social-accounts.mapper.ts";
 
 import s from './influencer-details-page.module.scss';
+import { DeleteInfluencer } from "@/features/influencers/delete-influencer";
 
 export const InfluencerDetailsPage = () => {
   const { influencerId } = useParams();
@@ -51,6 +52,8 @@ export const InfluencerDetailsPage = () => {
       />
 
       <InfluencerSocialAccounts details={accountsDetails}/>
+
+      <DeleteInfluencer influencerId={influencerId}/>
     </div>
   );
 };

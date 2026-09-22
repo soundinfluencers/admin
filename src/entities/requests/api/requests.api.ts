@@ -1,8 +1,9 @@
-import { $api} from "@/app/api/http.ts";
+import { $api } from "@/app/api/http.ts";
 import type {
   IGetListRequestsParams,
   IGetListRequestsResponse, IGetAdminRequestDetailsParams,
   IUpdateRequestStatusParams, IAdminRequestDetailsByType, IGetRequestDetailsResponse, TRequestType,
+  IUpdateSocialAccountRequestPriceDto,
 } from "@/entities/requests/model/requests.types.ts";
 
 export const getRequestsList = async (params: IGetListRequestsParams) => {
@@ -40,6 +41,17 @@ export const requestAnswerApi = async ({
   console.log('Successfully answered request');
 }
 
+export const respondToNewInfluencerRequest = async ({
+  requestId,
+  ...body
+}: IUpdateRequestStatusParams): Promise<void> => {
+  console.log('Received request request with params:', requestId, body);
+
+  await $api.patch(`/admin/requests/new-influencer/${requestId}`, body);
+
+  console.log('Successfully responding request');
+}
+
 export const closeRequestApi = async ({
   requestId,
 }: {
@@ -50,4 +62,15 @@ export const closeRequestApi = async ({
   await $api.patch(`/admin/requests/${requestId}`);
 
   console.log('Successfully answered request');
+};
+
+export const updateInfluencerPrice = async ({
+  requestId,
+  body
+}: IUpdateSocialAccountRequestPriceDto): Promise<void> => {
+  console.log("Updating influencer price", requestId, body);
+
+  await $api.patch(`/admin/requests/${requestId}/price`, body);
+
+  console.log('Successfully updated social account');
 };
