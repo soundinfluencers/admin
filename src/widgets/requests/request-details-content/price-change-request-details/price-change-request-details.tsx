@@ -29,7 +29,7 @@ export const PriceChangeRequestDetails: React.FC<PriceChangeRequestDetailsProps>
         <div className={s.content}>
           <InfluencerInfo data={data}/>
 
-          <AccountInfo data={data} requestType={request.type}/>
+          <AccountInfo data={data}/>
         </div>
       </div>
 
