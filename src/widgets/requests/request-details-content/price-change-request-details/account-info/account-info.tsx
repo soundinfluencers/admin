@@ -2,18 +2,16 @@ import React from "react";
 import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
 import { ACCOUNT_INFO_FIELDS } from "../price-change-request-details.config.tsx";
 import { SOCIAL_MEDIA_DARK_ICONS, SOCIAL_MEDIA_LABEL_MAP } from "@/widgets/requests/model/social-media.constants.ts";
-import type { IPriceUpdateRequestDetailsDto, TRequestType } from "@/entities/requests/model/requests.types.ts";
+import type { IPriceUpdateRequestDetailsDto } from "@/entities/requests/model/requests.types.ts";
 
 import s from './account-info.module.scss';
 
 interface AccountInfoProps {
   data: IPriceUpdateRequestDetailsDto;
-  requestType: TRequestType;
 }
 
 export const AccountInfo: React.FC<AccountInfoProps> = ({
   data,
-  requestType,
 }) => {
   const renderValue = (key: typeof ACCOUNT_INFO_FIELDS[number]['key']) => {
     if (key === 'currentPrice') {
@@ -41,12 +39,10 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({
 
       <ul className={s.fields}>
         {ACCOUNT_INFO_FIELDS.map((field) => {
-          const value = renderValue(field.key);
-
           return (
             <li key={field.key} className={s.field}>
               <span className={s.label}>{field.label}</span>
-              {field.render ? field.render(data, requestType) : value}
+              <span className={s.value}>{renderValue(field.key)}</span>
             </li>
           );
         })}
@@ -54,5 +50,3 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({
     </div>
   );
 };
-
-// <span className={s.value}>{renderValue(key)}</span>

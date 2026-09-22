@@ -1,11 +1,8 @@
-import React from "react";
-import { PriceEditableField } from "@/features/requests/price-editable-field/ui/price-editable-field.tsx";
-import type { IPriceUpdateRequestDetailsDto, TRequestType } from "@/entities/requests/model/requests.types.ts";
+import type { IPriceUpdateRequestDetailsDto } from "@/entities/requests/model/requests.types.ts";
 
 type TInfluencerPersonalRequestField<T> = {
   label: string;
   key: keyof T;
-  render?: (data: T, requestType: TRequestType) => React.ReactNode;
 };
 
 export const INFLUENCER_PERSONAL_INFO_FIELDS = [
@@ -18,17 +15,6 @@ export const INFLUENCER_PERSONAL_INFO_FIELDS = [
 export const ACCOUNT_INFO_FIELDS = [
   { key: "username", label: "Account name:" },
   { key: "profileLink", label: "Link:" },
-  {
-    label: "Current Price:",
-    key: "currentPrice",
-    render: (data: IPriceUpdateRequestDetailsDto, requestType: TRequestType) => (
-      <PriceEditableField
-        requestId={data.requestId}
-        requestType={requestType}
-        accountId={data.accountId}
-        initialValue={String(data.currentPrice)}
-      />
-    ),
-  },
+  { label: "Current Price:", key: "currentPrice" },
   { key: "newPrice", label: "Requested New Price:" },
 ] satisfies TInfluencerPersonalRequestField<IPriceUpdateRequestDetailsDto>[];
