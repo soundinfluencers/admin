@@ -1,0 +1,130 @@
+@use "@/app/styles/utils/mixins" as mixins;
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.header {
+  position: relative;
+  isolation: isolate;
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 16px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+
+    background: var(--white);
+    box-shadow: 0 0 0 100vmax #fff;
+    clip-path: inset(0 -100vmax);
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    pointer-events: none;
+
+    background: #dfe5ee;
+    box-shadow: 0 0 0 100vmax #dfe5ee;
+    clip-path: inset(0 -100vmax);
+  }
+}
+
+.headerLeft {
+  display: flex;
+  align-items: normal;
+  gap: 16px;
+  
+  .input {
+    @include mixins.reset-input;
+    field-sizing: content;
+    
+    font-size: 22px;
+    font-weight: 700;
+
+    border-bottom: 1px solid #DFE5EE;
+    
+    &:focus {
+      border-bottom: 1px solid #536FE8;
+    }
+  }
+  
+  .campaignStatus {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+
+    font-weight: 500;
+    font-size: 12px;
+    
+    >span {
+      display: block;
+      flex-shrink: 0;
+      transform: translateY(1px);
+    }
+  }
+
+  .underReview {
+    background: #FFF6E5;
+    color: #A66500;
+  }
+  .distributing {
+    background: #DBEAFE;
+    color: #1E40AF;
+  }
+  .completed {
+    background: #DCFCE7;
+    color: #166534;
+  }
+  .proposal {
+    background: #EDE9FE;
+    color: #5B21B6;
+  }
+  .pause {
+    background: #F1F5F9;
+    color: #475569;
+  }
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  
+  .internalCost {
+    color: #6C778B;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .action {
+    @include mixins.reset-button;
+    @include mixins.flex-center;
+
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #DFE5EE;
+    background: var(--white);
+
+    font-weight: 500;
+
+    transition: var(--transition-fast);
+
+    @include mixins.hover {
+      opacity: 0.8;
+    }
+  }
+  
+  .save {
+    color: var(--white);
+    opacity: 0.5;
+    background: #536FE8;
+  }
+}
+

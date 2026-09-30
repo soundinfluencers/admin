@@ -7,7 +7,7 @@
   </g>
   <defs>
     <linearGradient id="a" x1=".65" x2="28.185" y1="0" y2="34.472" gradientUnits="userSpaceOnUse">
-      <stop/>
+      <stop offset=""/>
       <stop offset="1" stop-color="#323232"/>
     </linearGradient>
     <filter id="b" width="22" height="22.5" x="5" y="5" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">

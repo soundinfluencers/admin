@@ -1,7 +1,7 @@
 import { useClientsInvoicesPageState } from "../model/use-clients-invoices-page-state.ts";
 import { useClientsInvoicesQuery } from "@/entities/invoices/client-invoice";
 
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { SearchByQuery } from "@/features/search";
 import { ClientsInvoicesTable } from "@/widgets/clients-invoices/clients-invoices-table";

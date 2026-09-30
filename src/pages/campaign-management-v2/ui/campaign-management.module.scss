@@ -1,0 +1,19 @@
+@use "@/app/styles/utils/mixins" as mixins;
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.page {
+  padding-block: 32px;
+  display: flex;
+  flex-direction: column;
+
+  @include breakpoints.tablet {
+    padding-block: 16px;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 24px;
+}

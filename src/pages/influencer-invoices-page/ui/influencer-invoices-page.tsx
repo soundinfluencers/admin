@@ -3,7 +3,7 @@ import {
 } from "@/pages/influencer-invoices-page/model/use-influencer-invoices-page-state.ts";
 import { useInfluencersInvoicesQuery } from "@/entities/invoices/influencer-invoice/api/influencer-invoice.queries.ts";
 
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { SearchByQuery } from "@/features/search";
 import { InfluencerInvoicesTable } from "@/widgets/influencer-invoices/influencer-invoices-table";

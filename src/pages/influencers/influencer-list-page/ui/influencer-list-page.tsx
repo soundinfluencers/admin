@@ -1,6 +1,6 @@
 import { useInfluencersQuery } from "@/entities/influencers/api/use-influencers-query.ts";
 import { useInfluencersListPageState } from "@/pages/influencers/influencer-list-page/model/use-influencers-list-page-state.ts";
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { PlatformsFilterBar } from "@/widgets/influencers/platforms-filter-bar";
 import { InfluencersToolbar } from "@/widgets/influencers/influencers-toolbar";

@@ -1,6 +1,6 @@
 import { useCampaignsQuery } from "@/entities/campaign/api/use-campaigns-query.ts";
 import { useCampaignsPageState } from "@/pages/campaigns/model/use-campaigns-page-state.ts";
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { CampaignsToolbar } from "@/widgets/campaigns/campaigns-toolbar";
 import { CampaignsTable } from "@/widgets/campaigns/campaigns-table";

@@ -1,4 +1,4 @@
-// widgets/admin-create-campaign-strategy/model/use-create-admin-campaign.ts
+// widgets/admin-create-campaign-cmpaign-strategy/model/use-create-admin-campaign.ts
 import React from "react";
 import { toast } from "react-toastify";
 import {

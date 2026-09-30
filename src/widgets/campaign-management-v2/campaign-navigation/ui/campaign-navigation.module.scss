@@ -1,0 +1,44 @@
+@use "@/app/styles/utils/mixins" as mixins;
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action {
+  @include mixins.reset-button;
+  @include mixins.flex-center;
+  
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #DFE5EE;
+  background: var(--white);
+  
+  font-weight: 500;
+  
+  transition: var(--transition-fast);
+  
+  @include mixins.hover {
+    opacity: 0.8;
+  }
+}
+
+.spinning {
+  animation: spin 1.3s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

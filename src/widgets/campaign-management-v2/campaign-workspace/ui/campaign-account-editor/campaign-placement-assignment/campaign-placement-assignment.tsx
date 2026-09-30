@@ -1,0 +1,250 @@
+import { useId, useState } from "react";
+import clsx from "clsx";
+import * as Popover from "@radix-ui/react-popover";
+import { EditorField } from "../editor-field/editor-field.tsx";
+import { CampaignDateRequest } from "./campaign-date-request/campaign-date-request.tsx";
+
+import Plus from "@/shared/assets/icons/plus.svg?react";
+import Chevron from '@/shared/assets/icons/chevron-right.svg?react';
+import ExternalLink from '@/shared/assets/icons/external-link.svg?react';
+import Trash from '@/shared/assets/icons/trash.svg?react';
+
+import s from './campaign-placement-assignment.module.scss';
+
+type ContentOption = {
+  id: string;
+  label: string;
+  mainLink: string;
+}
+
+interface CampaignPlacementAssignmentProps {
+  options: ContentOption[];
+  dateRequest: string;
+  selectedId: string | null;
+  onContentSelect: (campaignContentItemId: string) => void;
+  onContentCreate: (mainLink: string) => void;
+  onDelete: (id: string) => void;
+  onDateRequestChange: (dateRequest: string) => void;
+}
+
+export const CampaignPlacementAssignment = ({
+  options,
+  dateRequest,
+  selectedId,
+  onContentSelect,
+  onContentCreate,
+  onDateRequestChange,
+  onDelete,
+}: CampaignPlacementAssignmentProps) => {
+  const inputId = useId();
+  const triggerId = useId();
+  
+  const [draftText, setDraftText] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const selectedOption = options.find((option) => option.id === selectedId) ?? null;
+
+  const text = draftText ?? selectedOption?.label ?? "";
+  const hasDraft = draftText !== null;
+  const otherOptionsCount = Math.max(
+    options.length - (selectedOption ? 1 : 0),
+    0,
+  );
+
+  const handleCancel = () => {
+    setDraftText(null);
+    setIsCreating(false);
+  };
+
+  const handleCreateNew = () => {
+    setDraftText("");
+    setIsCreating(true);
+  };
+
+  const handleApply = () => {
+    if (draftText === null) return;
+
+    const nextText = draftText.trim();
+
+    if (!nextText) {
+      handleCancel();
+      return;
+    }
+
+    if (isCreating) {
+      onContentCreate(nextText);
+    }
+
+    handleCancel();
+  };
+  
+  const handleDelete = (id: string) => {
+    onDelete(id);
+    
+    if (options.length === 1) {
+      setIsOpen(false);
+    }
+  };
+
+  return (
+    <div className={s.placementAssignment}>
+      <EditorField
+        label="Assigned video"
+        htmlFor={isCreating ? inputId : triggerId}
+        action={
+          <button
+            type="button"
+            className={s.addBtn}
+            onClick={handleCreateNew}
+            disabled={hasDraft}
+          >
+            <Plus className={s.plusIcon}/>
+            New
+          </button>
+        }
+      >
+
+        <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+          <Popover.Anchor asChild>
+            <div className={s.control}>
+              {isCreating ? (
+                <input
+                  id={inputId}
+                  className={s.input}
+                  value={text}
+                  disabled={!selectedOption && !isCreating}
+                  placeholder={
+                    isCreating ? `Enter content link…` : `Select or create content link…`
+                  }
+                  onChange={(e) => setDraftText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      e.preventDefault();
+                      handleCancel();
+                    }
+                  }}
+                />
+              ) : (
+                <div className={s.preview}>
+                  {selectedOption?.mainLink.trim() ? (
+                    <a
+                      href={selectedOption.mainLink}
+                      className={s.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open content in a new tab"
+                    >
+                      {text}
+                      <ExternalLink aria-hidden="true"/>
+                    </a>
+                  ) : (
+                    <span>{selectedOption?.label ?? "Select or create content"}</span>
+                  )}
+                  {selectedOption && otherOptionsCount > 0 && (
+                    <p className={s.subtitle}>
+                      {otherOptionsCount} other{' '}
+                      {otherOptionsCount === 1 ? 'option' : 'options'} available
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <Popover.Trigger asChild>
+                <button
+                  id={triggerId}
+                  type="button"
+                  className={s.selectTrigger}
+                  aria-label="Select assigned video"
+                  disabled={hasDraft || options.length === 0}
+                >
+                  <Chevron aria-hidden="true"/>
+                </button>
+              </Popover.Trigger>
+            </div>
+          </Popover.Anchor>
+
+          <Popover.Portal>
+            <Popover.Content
+              className={s.dropdown}
+              side="bottom"
+              align="start"
+              sideOffset={6}
+              collisionPadding={12}
+              aria-label="Choose assigned video"
+            >
+              <div className={s.dropdownScroll}>
+                {options.map((option) => (
+                  <div
+                    key={option.id}
+                    className={s.inner}
+                    data-selected={option.id === selectedId}
+                  >
+                    <Popover.Close asChild>
+                      <button
+                        type="button"
+                        className={s.option}
+                        title={option.mainLink}
+                        onClick={() => onContentSelect(option.id)}
+                      >
+                        {option.mainLink}
+                      </button>
+                    </Popover.Close>
+
+                    <div className={s.optionActions}>
+                      <a
+                        href={option.mainLink}
+                        className={s.optionAction}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Open ${option.label} in a new tab`}
+                        title="Open content in a new tab"
+                      >
+                        <ExternalLink aria-hidden="true"/>
+                      </a>
+
+                      <button
+                        type="button"
+                        className={clsx(s.optionAction, s.removeBtn)}
+                        onClick={() => handleDelete(option.id)}
+                        aria-label={`Delete ${option.label}`}
+                        title="Delete content"
+                      >
+                        <Trash aria-hidden="true"/>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+
+        {hasDraft && (
+          <div className={s.actions}>
+            <button
+              type="button"
+              className={clsx(s.action, s.apply)}
+              onClick={handleApply}
+            >
+              Apply
+            </button>
+
+            <button
+              type="button"
+              className={clsx(s.action, s.cancel)}
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </EditorField>
+      
+      <CampaignDateRequest
+        value={dateRequest}
+        onChange={onDateRequestChange}
+      />
+    </div>
+  );
+};

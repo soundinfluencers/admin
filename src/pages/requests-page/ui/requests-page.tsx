@@ -1,6 +1,6 @@
 import { useRequestsPageState } from "@/pages/requests-page/model/use-requests-page-state.ts";
 import { useRequestsQuery } from "@/entities/requests";
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { Pagination } from "@/shared/ui";
 import { RequestsToolbar } from "@/widgets/requests/requests-toolbar";

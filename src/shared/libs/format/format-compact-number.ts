@@ -1,11 +1,9 @@
 export const formatCompactNumber = (
   value: number,
-  suffix?: string
+  floor?: boolean,
 ) => {
-  const formatted = new Intl.NumberFormat("en", {
+  return new Intl.NumberFormat("en", {
     notation: "compact",
-    maximumFractionDigits: 2,
+    maximumFractionDigits: floor ? 2 : undefined,
   }).format(value);
-
-  return suffix ? `${formatted}${suffix}` : formatted;
 };

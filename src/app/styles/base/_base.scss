@@ -1,17 +1,13 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
 @font-face {
   font-family: 'Satoshi';
-  src: url("@/assets/fonts/Satoshi-Regular.woff2") format("woff2");
-  font-weight: 400;
+  src: url("@/assets/fonts/Satoshi-Variable.woff2") format("woff2");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
-@font-face {
-  font-family: 'Satoshi';
-  src: url("@/assets/fonts/Satoshi-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
+
 @font-face {
   font-family: 'Brygada1918';
   src: url("@/assets/fonts/Brygada1918-Regular.woff2") format("woff2");
@@ -48,4 +44,15 @@ body {
   scrollbar-gutter: stable;
   overflow-x: clip;
   isolation: isolate;
+}
+
+@supports (scrollbar-gutter: stable) {
+  // The root gutter already reserves the scrollbar space that Radix compensates for.
+  html body[data-scroll-locked] {
+    margin-right: 0 !important;
+  }
+}
+
+.visually-hidden {
+  @include mixins.visually-hidden;
 }

@@ -1,0 +1,214 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.panel {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  
+  border-right: 1px solid #DFE5EE;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  justify-content: space-between;
+  padding: 16px;
+
+  border-bottom: 1px solid #DFE5EE;
+
+  .titleGroup {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    
+    .title {
+      font-size: var(--text-md);
+      font-weight: 700;
+    }
+
+    .total {
+      color: #6C778B;
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+  }
+  
+  .add {
+    @include mixins.reset-button;
+    display: flex;
+    padding: 6px 8px;
+    align-items: center;
+    gap: 4px;
+
+    border-radius: 6px;
+    border: 1px solid #DFE5EE;
+    background: #F7F8FC;
+
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 16px;
+    
+    transition: opacity var(--transition-base);
+    
+    .icon {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+    }
+    
+    @include mixins.hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.searchContainer {
+  display: flex;
+  align-items: flex-start;
+  align-self: stretch;
+  padding: 10px 12px;
+  
+  border-bottom: 1px solid #DFE5EE;
+}
+
+.searchInner {
+  display: flex;
+  padding: 8px 10px;
+  align-items: center;
+  align-self: stretch;
+  gap: 8px;
+  flex: 1 0 0;
+  
+  border-radius: 8px;
+  border: 1px solid #DFE5EE;
+  background: #F8FAFF;
+  
+  color: #6C778B;
+  
+  .search {
+    @include mixins.reset-input;
+    width: 100%;
+    
+    color: var(--black-blue);
+    
+    &::placeholder {
+      color: #6C778B;
+    }
+  }
+  
+  .searchIcon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+}
+
+.scroll {
+  align-self: stretch;
+  overflow-y: auto;
+  max-height: 895px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+
+  > li:not(:last-child) > .account {
+    border-bottom: 1px solid #DFE5EE;
+  }
+}
+
+.account {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 12px;
+  justify-content: space-between;
+  align-items: center;
+  
+  text-align: left;
+  
+  &[aria-pressed="true"] {
+    background: #EDF1FF;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: #536FE8;
+      pointer-events: none;
+    }
+  }
+  
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    
+    .socialIcon {
+      display: flex;
+      width: 32px;
+      height: 32px;
+      justify-content: center;
+      align-items: center;
+
+      border-radius: 16px;
+      border: 1px solid #DFE5EE;
+      background: #F8FAFF;
+      
+      >svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0; 
+      }
+    }
+    
+    .text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      flex: 1 0 0;
+      
+      .username {
+        align-self: stretch;
+        
+        font-size: var(--text-sm);
+        font-weight: 600;
+      }
+      
+      .followers {
+        color: #6C778B;
+        font-size: 12px;
+      }
+    }
+  }
+  
+  .chip {
+    display: flex;
+    padding: 4px 8px;
+    align-items: flex-start;
+
+    border-radius: 6px;
+    border: 1px solid #DFE5EE;
+    background: #F7F8FC;
+
+    color: #6C778B;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 15px;
+  }
+}
+
+

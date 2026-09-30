@@ -5,7 +5,7 @@ import {
 import {
   useInfluencerSearchHistoryQuery
 } from "@/entities/influencer-history/api/use-influencer-search-history-query.ts";
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { InfluencerSearch } from "@/widgets/influencer-history/influencer-search";
 import { InfluencerHistoryTable } from "@/widgets/influencer-history/influencer-history-table";

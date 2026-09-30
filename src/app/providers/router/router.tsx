@@ -15,6 +15,7 @@ import { InfluencerDetailsPage } from "@/pages/influencers/influencer-details-pa
 import { SocialAccountCreatePage } from "@/pages/influencers/social-account-create-page";
 import { SocialAccountEditPage } from "@/pages/influencers/social-account-edit-page";
 import { CampaignManagment } from "@/pages/campaign-managment";
+import { CampaignManagementPage } from "@/pages/campaign-management-v2";
 import { InfluencerHistoryPage } from "@/pages/influencer-history/influencer-history-page";
 import { InfluencerHistoryDetailsPage } from "@/pages/influencer-history/influencer-history-details-page";
 import { InfluencerInvoicesPage } from "@/pages/influencer-invoices-page";
@@ -68,15 +69,20 @@ export const ROUTER = createBrowserRouter([
                 children: [
                   { index: true, element: <CampaignsPage/> },
                   {
-                    path: "campaign-management",
-                    children: [
-                      { index: true, element: <CampaignManagment/> },
-                      {
-                        path: "add-account",
-                        element: <AdminCreateCampaignPage/>,
-                      },
-                    ],
+                    path: "campaign-management/:status/:campaignId",
+                    element: <CampaignManagementPage/>,
                   },
+                  
+                  // {
+                  //   path: "campaign-management",
+                  //   children: [
+                  //     { index: true, element: <CampaignManagment/> },
+                  //     {
+                  //       path: "add-account",
+                  //       element: <AdminCreateCampaignPage/>,
+                  //     },
+                  //   ],
+                  // },
                 ],
               },
 
@@ -88,7 +94,7 @@ export const ROUTER = createBrowserRouter([
                     path: "content",
                     children: [
                       { index: true, element: <AdminCreateCampaignPostContentPage/> },
-                      { path: "strategy", element: <AdminCreateCampaignStrategyPage/> },
+                      { path: "cmpaign-strategy", element: <AdminCreateCampaignStrategyPage/> },
                     ],
                   },
                 ],

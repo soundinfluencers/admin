@@ -1,8 +1,14 @@
 import { $api } from '@/app/api/http.ts';
 import type {
-  ICampaignListResponse, IDeleteCampaignParams, IUpdateCampaignParams, IUpdateCampaignResponse,
+  ICampaignListResponse, IDeleteCampaignParams,
+  IUpdateCampaignParams, IUpdateCampaignResponse,
   TGetCampaignParams,
 } from "@/entities/campaign/model/campaign.types.ts";
+import type {
+  ICampaignDetails,
+  ICampaignDetailsRequestParams,
+  ICampaignDetailsResponse,
+} from "../model/campaign-details.types.ts";
 
 export const getAllCampaigns = async (params: TGetCampaignParams) => {
   console.log('Fetching campaigns with params:', params);
@@ -48,3 +54,21 @@ export const uploadCampaignsXlsx = async (file: File) => {
 
   console.log('Successfully uploaded XLSX file');
 };
+
+export const getCampaignById = async ({
+  campaignId,
+  status,
+  optionIndex,
+}: ICampaignDetailsRequestParams): Promise<ICampaignDetails> => {
+  console.log('Fetching campaign with params:', campaignId, status);
+
+  const { data } = await $api.get<ICampaignDetailsResponse>(`/admin/campaigns/${status}/${campaignId}`,
+    {
+      params: { optionIndex },
+    }
+  );
+
+  console.log('Successfully fetched campaign', data.data);
+
+  return data.data;
+}

@@ -2,7 +2,7 @@ import { useClientsQuery } from "@/entities/client/api/use-clients-query.ts";
 import { useClientsPageState } from "@/pages/clients-page/model/use-clients-page-state.ts";
 import { SearchByQuery } from "@/features/search";
 
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { ClientsTable } from "@/widgets/clients/clients-table";
 import { Pagination } from "@/shared/ui";

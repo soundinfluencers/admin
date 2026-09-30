@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import type { IOfferHeader } from "@/entities/influencers-offers/model/influencers-offers.types.ts";
 import { OffersMatrixActions } from "@/widgets/influencers-offers/offers-matrix-actions";

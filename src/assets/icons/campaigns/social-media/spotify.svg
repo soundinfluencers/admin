@@ -5,7 +5,7 @@
   </g>
   <defs>
     <linearGradient id="a" x1="18.212" x2="3.252" y1="32.954" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#00D95F"/>
+      <stop stop-color="#00D95F" offset=""/>
       <stop offset="1" stop-color="#10BC4C"/>
     </linearGradient>
     <clipPath id="b">

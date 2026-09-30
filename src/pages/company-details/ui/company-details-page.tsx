@@ -1,7 +1,7 @@
 import { useClientQuery } from "@/entities/client/api/use-client-query.ts";
 import { useParams } from "react-router-dom";
 
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { CompanyDetails } from "@/widgets/clients/company-details/ui/company-details.tsx";
 import { CompanyCampaigns } from "@/widgets/clients/campaigns-status";

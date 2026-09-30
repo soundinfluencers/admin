@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useInfluencerQuery } from "@/entities/influencers/api/use-influencer-query.ts";
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { InfluencerAccountDetails } from "@/widgets/influencers/influencer-account-details";
 import { InfluencerSocialAccounts } from "@/widgets/influencers/social-accounts-list";
+import { DeleteInfluencer } from "@/features/influencers/delete-influencer";
 import { mapInfluencerProfileToAccounts } from "../model/influencer-social-accounts.mapper.ts";
 
 import s from './influencer-details-page.module.scss';
-import { DeleteInfluencer } from "@/features/influencers/delete-influencer";
 
 export const InfluencerDetailsPage = () => {
   const { influencerId } = useParams();

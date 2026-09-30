@@ -11,6 +11,7 @@ import {
 } from "@/entities/campaign";
 
 import type { TGetCampaignParams } from "@/entities/campaign";
+import { useCampaignManagementStore } from "@/pages/campaign-management-v2/store/campaign-management.store.ts";
 
 export const CAMPAIGNS_ITEMS_LIMIT = [
   { label: "10 per page", value: 10 },
@@ -47,8 +48,16 @@ export const useCampaignsPageState = () => {
     parseAsString.withDefault(""),
   );
 
+  const resetCampaignDraft = useCampaignManagementStore(
+    (state) => state.resetDraft,
+  );
+
   const [searchValue, setSearchValue] = useState(query);
   const debouncedSearchValue = useDebounce(searchValue, 400);
+
+  useEffect(() => {
+    resetCampaignDraft();
+  }, [resetCampaignDraft]);
 
   useEffect(() => {
     const normalizedSearch = debouncedSearchValue.trim();

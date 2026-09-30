@@ -4,7 +4,7 @@
   <path fill="red" d="M13.702 19.43 19.677 16l-5.975-3.43v6.86Z"/>
   <defs>
     <linearGradient id="a" x1="18.212" x2="3.252" y1="32.954" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#DB0505"/>
+      <stop stop-color="#DB0505" offset=""/>
       <stop offset="1" stop-color="red"/>
     </linearGradient>
   </defs>

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useCampaignBuilderStore } from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.store";
 import styles from "./admin-create-campaign-post-content.module.scss";
 
-import {PageBreadcrumbs} from "@/widgets/page-breadcrumbs";
+import {PageBreadcrumbs} from "@/shared/ui/page-breadcrumbs";
 import {CampaignPostContentPage} from "@/widgets/admin-create-campaign-post-content/ui/campaign-post-content-page.tsx";
 import {CAMPAIGN_CURRENCY_OPTIONS} from "@/features/admin-create-campaign/build-campaign-filters/model/build-campaign-params.constants.ts";
 

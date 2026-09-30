@@ -1,0 +1,81 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.storySupport {
+  display: flex;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 16px;
+}
+
+.control {
+  min-height: 150px;
+  display: flex;
+  align-items: flex-end;
+  align-self: stretch;
+  gap: 8px;
+  padding: 10px 12px;
+
+  border-radius: 8px;
+  border: 1px solid #DFE5EE;
+  background: #F8FAFF;
+}
+
+.input {
+  min-height: auto;
+}
+
+.linkIcon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.textarea {
+  @include mixins.reset-input;
+
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  resize: none;
+  
+
+  font-size: var(--text-sm);
+
+  &::placeholder {
+    font-style: italic;
+    color: #6C778B;
+  }
+
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    min-height: 32px;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-color: #c3cde0;
+    background-clip: padding-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #9eacc6;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+

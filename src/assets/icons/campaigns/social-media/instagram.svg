@@ -6,7 +6,7 @@
   </g>
   <defs>
     <linearGradient id="a" x1="16" x2="16" y1="-.997" y2="33.677" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FCA759"/>
+      <stop stop-color="#FCA759" offset=""/>
       <stop offset=".19" stop-color="#E82D56"/>
       <stop offset=".74" stop-color="#A22DB4"/>
       <stop offset="1" stop-color="#643DCE"/>

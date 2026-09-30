@@ -1,0 +1,127 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.root {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input {
+  @include mixins.reset-input;
+  field-sizing: content;
+
+  display: flex;
+  align-items: center;
+  min-width: 1ch;
+}
+
+.trigger {
+  @include mixins.reset-button;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.input,
+.trigger {
+  padding: 2px 6px;
+
+  border-radius: 4px;
+  border: 1px solid #dfe5ee;
+  background: #f8faff;
+
+  font: inherit;
+  outline: none;
+  box-shadow: none;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.icon {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  transform: rotate(90deg);
+  transition: transform var(--transition-fast);
+}
+
+.trigger[data-state="open"] .icon {
+  transform: rotate(-90deg);
+}
+
+.content {
+  z-index: 1000;
+  width: var(--radix-select-trigger-width);
+  min-width: var(--radix-select-trigger-width);
+  max-width: var(--radix-select-trigger-width);
+  max-height: var(--radix-select-content-available-height);
+  overflow: hidden;
+
+  border-radius: 4px;
+  border: 1px solid #dfe5ee;
+  background-color: var(--white);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+.viewport {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-block: 4px;
+
+  outline: none;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 31px;
+  padding: 8px 12px;
+
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  user-select: none;
+  outline: none;
+  box-shadow: none;
+  cursor: pointer;
+
+  &[data-state="checked"],
+  &[data-highlighted] {
+    background: #edf1ff;
+    color: #536fe8;
+  }
+
+  &:focus,
+  &:focus-visible,
+  &[data-highlighted] {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

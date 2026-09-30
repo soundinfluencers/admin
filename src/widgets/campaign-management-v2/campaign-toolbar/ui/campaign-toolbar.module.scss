@@ -1,0 +1,67 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+  }
+  .subtitle {
+    font-size: var(--text-sm);
+    color: #585e70;
+  }
+}
+
+.tabs {
+  flex: 0 0 auto;
+}
+
+.tabsList {
+  display: inline-flex;
+  align-items: flex-start;
+  padding: 4px;
+
+  border: 1px solid #dfe5ee;
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.tabsTrigger {
+  @include mixins.reset-button;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+
+  border-radius: 6px;
+  background: var(--white);
+
+  color: #6c778b;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: normal;
+  white-space: nowrap;
+  outline: none;
+
+  &[data-state="active"] {
+    background: #536fe8;
+    color: var(--white);
+  }
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+}

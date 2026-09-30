@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import styles from "./admin-create-campaign-strategy-page.module.scss";
 
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { Modal } from "@/shared/ui/modal/modal";
 
 import { useCampaignBuilderStore } from "@/entities/admin-create-campaign/campaign-builder/model/campaign-builder.store";
@@ -146,7 +146,7 @@ export const AdminCreateCampaignStrategyPage = () => {
 
             <div className={styles.page}>
                 <div className={styles.header}>
-                    <h1>{campaignName || "Campaign strategy"}</h1>
+                    <h1>{campaignName || "Campaign cmpaign-strategy"}</h1>
 
                     <Bar
                         submittedLabel={barData.submittedLabel}

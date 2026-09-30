@@ -1,0 +1,304 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.placementAssignment {
+  display: flex;
+  align-self: stretch;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.control {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 10px 12px;
+
+  border-radius: 8px;
+  border: 1px solid #DFE5EE;
+  background: #F8FAFF;
+}
+
+.input {
+  @include mixins.reset-input;
+
+  flex: 1;
+  height: 100%;
+  width: 100%;
+
+  font-size: var(--text-sm);
+
+  &::placeholder {
+    font-style: italic;
+    color: #6C778B;
+  }
+}
+
+.preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1px;
+  
+  >svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #6C778B;
+}
+
+.addBtn {
+  @include mixins.reset-button;
+  display: flex;
+  padding: 4px 8px;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+
+  border-radius: 6px;
+  border: 1px solid #DFE5EE;
+  background: #F7F8FC;
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 12px;
+
+  transition: opacity var(--transition-base);
+
+  .icon {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  @include mixins.hover {
+    opacity: 0.8;
+  }
+}
+
+.selectTrigger {
+  @include mixins.reset-button;
+
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+
+  >svg {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    transform: rotate(90deg);
+    transition: transform var(--transition-fast);
+  }
+}
+
+.selectTrigger[data-state="open"] {
+  >svg {
+    transform: rotate(-90deg);
+  }
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  width: var(--radix-popover-trigger-width);
+  max-width: var(--radix-popover-content-available-width);
+  max-height: min(320px, var(--radix-popover-content-available-height));
+
+  padding: 4px 0 4px 4px;
+  overflow: hidden;
+
+  border: 1px solid #dfe5ee;
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+}
+
+.dropdownScroll {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+  scrollbar-gutter: stable;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    min-height: 32px;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-color: #c3cde0;
+    background-clip: padding-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #9eacc6;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .dropdownScroll {
+    scrollbar-width: thin;
+    scrollbar-color: #c3cde0 transparent;
+  }
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-width: 0;
+  padding-right: 6px;
+  border-radius: 4px;
+
+  &[data-selected="true"] {
+    background: #edf1ff;
+    color: #536fe8;
+  }
+
+  &[data-selected="true"] .option {
+    font-weight: 500;
+  }
+
+  @include mixins.hover {
+    background: #edf1ff;
+    color: #536fe8;
+  }
+}
+
+.option {
+  @include mixins.reset-button;
+
+  min-width: 0;
+  align-self: stretch;
+  padding: 10px 12px;
+  border-radius: 4px;
+  color: inherit;
+
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: normal;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:focus-visible {
+    outline: 2px solid #536fe8;
+    outline-offset: -2px;
+  }
+}
+
+.optionActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.optionAction {
+  @include mixins.reset-button;
+  @include mixins.reset-link;
+  @include mixins.flex-center;
+
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  color: #6C778B;
+
+  >svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  @include mixins.hover {
+    background: #dfe5ff;
+    color: #536fe8;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #536fe8;
+    outline-offset: -2px;
+  }
+}
+
+.removeBtn {
+  @include mixins.hover {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.action {
+  @include mixins.reset-button;
+  @include mixins.flex-center;
+
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #DFE5EE;
+  background: var(--white);
+
+  font-size: 14px;
+  font-weight: 500;
+
+  transition: var(--transition-fast);
+
+  @include mixins.hover {
+    opacity: 0.8;
+  }
+}
+
+.apply {
+  color: var(--white);
+  background: #536FE8;
+}
+
+.cancel {}

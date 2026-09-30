@@ -13,7 +13,7 @@ import { CampaignManagementBar } from "@/widgets/campaign-management/campaign-ma
 
 import { useCampaignManagementStore } from "@/entities/campaign-managment/store/campaign-management.store.ts";
 import { groupCampaignData } from "@/widgets/campaign-management/campaign-management-table/model/group-campaign-data.ts";
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { toast } from "react-toastify";
 
 import { getCampaignKindByStatus } from "@/entities/campaign-managment/model/campaign-management.helpers.ts";

@@ -1,5 +1,5 @@
 import { usePaymentHistoryInfiniteQuery, usePaymentHistoryPageState } from "@/pages/payment-history-page";
-import { PageBreadcrumbs } from "@/widgets/page-breadcrumbs";
+import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs";
 import { PageTitle } from "@/widgets/page-title";
 import { PaymentHistoryMatrix } from "@/widgets/payment-history/payment-history-matrix";
 import { EMPTY_PAYMENT_HISTORY_MATRIX } from "@/pages/payment-history-page/model/use-payment-history-page-state.ts";

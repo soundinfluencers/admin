@@ -1,0 +1,53 @@
+@use "@/app/styles/utils/mixins" as mixins;
+@use '@/app/styles/utils/breakpoints' as breakpoints;
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 6px;
+}
+
+.row {
+  min-height: 26px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 4px;
+
+  font-size: 14px;
+}
+
+.label {
+  color: #6C778B;
+  font-weight: 500;
+}
+
+.value {
+  flex: 1 0 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  
+  color: var(--black);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  cursor: default;
+}
+
+.hideBtn {
+  @include mixins.reset-button;
+  @include mixins.flex-center;
+
+  padding: 2px 8px;
+  border-radius: 8px;
+  border: 1px solid #DFE5EE;
+  background: var(--white);
+  
+  >svg {
+    width: 16px;
+    height: 16px;
+  }
+}
