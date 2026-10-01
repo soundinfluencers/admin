@@ -1,23 +1,87 @@
-.tableWrapper {}
+.tableWrapper {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  contain: inline-size;
+  overflow: hidden;
+  border: 1px solid #DFE5EE;
+  border-radius: 12px;
+  background: var(--white);
+}
 
-.scrollWrapper {}
+.scrollWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
 
-.tableInner {}
+.tableInner {
+  min-width: 100%;
+  width: max-content;
+}
 
-.table {}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--black-blue);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
 
-.thead {}
+.thead,
+.tfoot {
+  background: #F8FAFF;
+}
 
-.tbody {}
+.thead .tr,
+.tbody .tr:not(:last-child) {
+  border-bottom: 1px solid #DFE5EE;
+}
 
-.tfoot {}
+.tfoot {
+  border-top: 1px solid #DFE5EE;
+  font-weight: 600;
+}
 
-.th {}
+.th,
+.td {
+  padding-inline: 12px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
 
-.headCell {}
+  &:first-child {
+    padding-left: 16px;
+  }
 
-.tr {}
+  &:last-child {
+    padding-right: 16px;
+  }
 
-.td {}
+  &[data-align="center"] {
+    text-align: center;
+  }
 
-.stateCell {}
+  &[data-align="right"] {
+    text-align: right;
+  }
+}
+
+.th {
+  padding-block: 14px;
+  color: #6C778B;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+.td {
+  padding-block: 18px;
+}
+
+.stateCell {
+  padding: 32px 16px;
+  color: #6C778B;
+  text-align: center;
+}

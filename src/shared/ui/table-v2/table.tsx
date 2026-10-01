@@ -1,5 +1,6 @@
 import { 
   type ColumnDef, 
+  type RowData,
   type TableOptions, 
   flexRender, 
   getCoreRowModel, 
@@ -7,6 +8,13 @@ import {
 } from "@tanstack/react-table";
 
 import s from './table.module.scss';
+
+declare module "@tanstack/react-table" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface ColumnMeta<TData extends RowData, TValue> {
+    align?: "left" | "center" | "right";
+  }
+}
 
 interface TableProps<TData> {
   data: TData[];
@@ -46,15 +54,16 @@ export function Table<TData>({
                     key={header.id}
                     colSpan={header.colSpan}
                     className={s.th}
+                    scope={header.colSpan > 1 ? "colgroup" : "col"}
+                    data-align={header.column.columnDef.meta?.align}
+                    style={{ minWidth: header.column.columnDef.size }}
                   >
-                    <div className={s.headCell}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                    </div>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </th>
                 ))}
               </tr>
@@ -75,7 +84,11 @@ export function Table<TData>({
               rows.map((row) => (
                 <tr key={row.id} className={s.tr}>
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className={s.td}>
+                    <td
+                      key={cell.id}
+                      className={s.td}
+                      data-align={cell.column.columnDef.meta?.align}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -93,6 +106,7 @@ export function Table<TData>({
                         key={footer.id}
                         colSpan={footer.colSpan}
                         className={s.td}
+                        data-align={footer.column.columnDef.meta?.align}
                       >
                         {footer.isPlaceholder 
                           ? null

@@ -1,0 +1,66 @@
+.account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 220px;
+  font-weight: 500;
+}
+
+.avatar {
+  display: flex;
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #DFE5EE;
+  border-radius: 50%;
+  background: #F8FAFF;
+  color: #6C778B;
+  font-size: 10px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.username {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link {
+  color: #536FE8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  &:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+.status {
+  display: inline-block;
+  max-width: 180px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #F7F8FC;
+  color: #6C778B;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

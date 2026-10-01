@@ -56,7 +56,7 @@ interface IAccountCountry {
   percentage: number;
 }
 
-interface IAddedAccount {
+export interface IAddedAccount {
   addedAccountsId: string;
   socialAccountId: string;
   influencerId: string;
@@ -93,7 +93,7 @@ interface IAddedAccount {
   firstName: string;
   phoneNumber: string;
   statusLabel: string;
-  cpm: number;
+  cpm: number | undefined;
 }
 
 interface IAddedBundle {
@@ -152,6 +152,7 @@ export interface ICampaignDetails {
   creationDate: string;
   price: number;
   displayCurrency: TCurrency;
+  pricesByCurrency: Record<TCurrency, number>;
   status: TCampaignStatus;
   addedAccounts: IAddedAccount[];
   addedBundles: IAddedBundle[];

@@ -3,6 +3,7 @@ import { CampaignAccountsList } from "../campaign-accounts-list/campaign-account
 import { CampaignAccountHeader } from "../campaign-account-header/campaign-account-header.tsx";
 import { CampaignAccountEditor } from "../campaign-account-editor/campaign-account-editor.tsx";
 import { CampaignAccountAudience } from "../campaign-account-audience/campaign-account-audience.tsx";
+import { CampaignAccountsTable } from "../campaign-accounts-table/ui/campaign-accounts-table.tsx";
 
 import type { TCampaignView } from "@/shared/constants/campaign-view.ts";
 import type { ICampaignDetails } from "@/entities/campaign/model/campaign-details.types.ts";
@@ -59,7 +60,7 @@ export const CampaignWorkspace = ({
     null;
 
   if (view === "insights") {
-    return <div>Accounts table will be here</div>;
+    return <CampaignAccountsTable accounts={campaign.addedAccounts}/>;
   }
   
   return (
