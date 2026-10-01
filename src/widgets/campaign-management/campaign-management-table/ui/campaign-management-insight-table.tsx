@@ -194,7 +194,7 @@ export const CampaignManagementInsightTable = ({
           promoId,
         });
 
-        await loadCampaignByOption?.(0);
+        await loadCampaignByOption?.(optionIndex);
 
         toast.success("Promo marked as paid");
       } catch (error) {
@@ -202,7 +202,7 @@ export const CampaignManagementInsightTable = ({
         toast.error("Failed to mark promo as paid");
       }
     },
-    [campaignId, loadCampaignByOption],
+    [campaignId, optionIndex, loadCampaignByOption],
   );
 
   const handleOpenLinkModal = React.useCallback(
