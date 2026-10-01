@@ -4,8 +4,7 @@ import { ObjectId } from "bson";
 
 import styles from "./campaign-managment.module.scss";
 
-import { getCampaignByStatus } from "@/entities/campaign-managment/api/fetch-status-campaign.ts";
-import { updateCampaignByStatus } from "@/entities/campaign-managment/api/update-campaign.ts";
+import { useCampaignLoading } from "@/pages/campaign-managment/model/use-campaign-loading";
 import type { CampaignStatus } from "@/entities/campaign-managment/model/campaign.managment.ts";
 import type { ViewMode } from "@/entities/campaign-managment/model/campaign-management-table.types";
 
@@ -137,7 +136,6 @@ export const CampaignManagment = () => {
     const insightMode = pageMode === "insight";
 
 
-    const initCampaign = useCampaignManagementStore((s) => s.initCampaign);
     const view = useCampaignManagementStore((s) => s.view);
     const setView = useCampaignManagementStore((s) => s.setView);
     const changeView = useCampaignManagementStore((s) => s.changeView);
@@ -157,7 +155,8 @@ export const CampaignManagment = () => {
     const [optionModal, setOptionModal] = useState(false);
     const resolvedStatus = status || statusParam;
     const kind = getCampaignKindByStatus(resolvedStatus);
-    const [isCampaignLoading, setIsCampaignLoading] = useState(false);
+    const { isCampaignLoading, loadCampaignByOption, saveCampaign } =
+        useCampaignLoading(campaignId, statusParam, optionIndex);
     const [isSaving, setIsSaving] = useState(false);
     const [isEditingCampaignName, setIsEditingCampaignName] = useState(false);
     const [campaignNameDraft, setCampaignNameDraft] = useState("");
@@ -214,32 +213,6 @@ export const CampaignManagment = () => {
     const handleCloseAddOptionModal = () => {
         setOptionModal(false);
     };
-    const loadCampaignByOption = useCallback(
-        async (nextOptionIndex: number, nextStatus?: CampaignStatus) => {
-            const resolvedStatus = nextStatus || statusParam;
-
-            if (!campaignId || !resolvedStatus) return;
-
-            try {
-                setIsCampaignLoading(true);
-
-                const response = await getCampaignByStatus({
-                    status: resolvedStatus,
-                    campaignId,
-                    optionIndex: nextOptionIndex,
-                });
-
-                if (!response) return;
-
-                initCampaign(response, nextOptionIndex);
-            } catch (error) {
-                console.error("Failed to load campaign", error);
-            } finally {
-                setIsCampaignLoading(false);
-            }
-        },
-        [campaignId, statusParam, initCampaign],
-    );
     const reloadCampaignFromScratch = useCallback(
         async (nextStatus: CampaignStatus) => {
             if (!campaignId) return;
@@ -267,27 +240,6 @@ export const CampaignManagment = () => {
             mode: getDefaultModeByStatus(statusParam),
         });
     }, [modeKey, statusParam]);
-    useEffect(() => {
-        if (!campaignId || !statusParam) return;
-
-        const normalizedStatusParam = String(statusParam).toLowerCase();
-
-        const hasSameCampaign = editable?.campaignId === campaignId;
-        const hasSameOption = activeOptionIndex === optionIndex;
-        const hasSameStatus = String(status || "").toLowerCase() === normalizedStatusParam;
-
-        if (hasSameCampaign && hasSameOption && hasSameStatus) return;
-
-        loadCampaignByOption(optionIndex, statusParam);
-    }, [
-        campaignId,
-        statusParam,
-        optionIndex,
-        editable?.campaignId,
-        activeOptionIndex,
-        status,
-        loadCampaignByOption,
-    ]);
     useEffect(() => {
         if (normalizedViewParam === null) return;
         if (view === normalizedViewParam) return;
@@ -321,12 +273,9 @@ export const CampaignManagment = () => {
         try {
             setIsSaving(true);
 
-            const updated = await updateCampaignByStatus({
-                status: requestStatus,
-                campaignId,
-                optionIndex,
-                body,
-            });
+            const result = await saveCampaign(body, requestStatus);
+            if (result.kind === "skipped") return;
+            const updated = result.updated;
 
             console.log(
                 "BACKEND_AFTER_SAVE",
@@ -345,10 +294,6 @@ export const CampaignManagment = () => {
                     2,
                 ),
             );
-
-            if (updated) {
-                initCampaign(updated, optionIndex);
-            }
 
             toast.success("Campaign saved successfully");
         } catch (error) {
