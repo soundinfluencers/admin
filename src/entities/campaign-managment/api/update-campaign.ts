@@ -57,5 +57,5 @@ export const updateCampaignByStatus = async ({
         },
     );
 
-    return res.data.data;
+    return res.data?.data;
 };
