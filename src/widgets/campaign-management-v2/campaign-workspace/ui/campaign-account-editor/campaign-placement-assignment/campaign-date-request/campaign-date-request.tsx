@@ -13,11 +13,13 @@ import Chevron from '@/shared/assets/icons/chevron-right.svg?react';
 import s from "./campaign-date-request.module.scss";
 
 interface CampaignDateRequestProps {
+  readOnly: boolean;
   value: string;
   onChange: (dateRequest: string) => void;
 }
 
 export const CampaignDateRequest = ({
+  readOnly,
   value,
   onChange,
 }: CampaignDateRequestProps) => {
@@ -28,15 +30,19 @@ export const CampaignDateRequest = ({
 
   const [draftMode, setDraftMode] = useState<TDateRequestMode | null>(null);
 
-  const mode = draftMode ?? parsed.mode;
+  const mode = readOnly ? parsed.mode : draftMode ?? parsed.mode;
 
   const applyValue = (nextValue: string) => {
+    if (readOnly) return;
+    
     if (nextValue !== value) {
       onChange(nextValue);
     }
   };
 
   const handleModeChange = (nextMode: TDateRequestMode) => {
+    if (readOnly) return;
+    
     if (nextMode === "ASAP") {
       setDraftMode(null);
       applyValue("ASAP");
@@ -48,6 +54,8 @@ export const CampaignDateRequest = ({
   };
 
   const handleDateChange = (date: string) => {
+    if (readOnly) return;
+    
     setDraftMode(mode);
     applyValue(formatDateRequest(mode, date));
   };
@@ -70,6 +78,7 @@ export const CampaignDateRequest = ({
               handleModeChange(nextMode);
             }
           }}
+          disabled={readOnly}
         >
           <Select.Trigger id={modeId} className={s.dateMode}>
             <Select.Value />
@@ -105,6 +114,7 @@ export const CampaignDateRequest = ({
             id={dateId}
             className={s.input}
             type="date"
+            readOnly={readOnly}
             aria-label={`Publication date ${mode.toLowerCase()}`}
             min="2000-01-01"
             max="2099-12-31"

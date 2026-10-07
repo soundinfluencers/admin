@@ -104,6 +104,10 @@
     transform: rotate(90deg);
     transition: transform var(--transition-fast);
   }
+  
+  &:disabled {
+    cursor: not-allowed;
+  }
 }
 
 .selectTrigger[data-state="open"] {

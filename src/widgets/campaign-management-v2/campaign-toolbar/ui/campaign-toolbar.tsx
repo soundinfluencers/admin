@@ -1,6 +1,5 @@
 import * as Tabs from '@radix-ui/react-tabs';
-import { 
-  CAMPAIGN_VIEWS,
+import {
   CAMPAIGN_VIEWS_LABELS,
   isCampaignView,
   type TCampaignView 
@@ -10,17 +9,25 @@ import s from './campaign-toolbar.module.scss';
 
 interface CampaignToolbarProps {
   value: TCampaignView;
+  availableViews: readonly TCampaignView[];
   onValueChange: (value: TCampaignView) => void;
 }
 
 export const CampaignToolbar = ({
   value,
+  availableViews,
   onValueChange,
 }: CampaignToolbarProps) => {
+  
   const handleValueChange = (nextValue: string) => {
-    if (isCampaignView(nextValue)) {
-      onValueChange(nextValue);
+    if (
+      !isCampaignView(nextValue) ||
+      !availableViews.includes(nextValue)
+    ) {
+      return;
     }
+
+    onValueChange(nextValue);
   };
 
   return (
@@ -33,11 +40,10 @@ export const CampaignToolbar = ({
       <Tabs.Root
         className={s.tabs}
         value={value}
-        defaultValue={value}
         onValueChange={handleValueChange}
       >
         <Tabs.List className={s.tabsList} aria-label="Campaign view">
-          {CAMPAIGN_VIEWS.map((value) => (
+          {availableViews.map((value) => (
             <Tabs.Trigger
               key={value}
               className={s.tabsTrigger}

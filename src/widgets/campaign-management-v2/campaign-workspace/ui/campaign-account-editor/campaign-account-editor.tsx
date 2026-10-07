@@ -8,25 +8,27 @@ import type { ICampaignDetails } from "@/entities/campaign/model/campaign-detail
 import s from "./campaign-account-editor.module.scss";
 
 interface CampaignAccountEditorProps {
+  readOnly: boolean;
   account: ICampaignDetails["addedAccounts"][number];
   campaignContent: ICampaignDetails["campaignContent"];
-  onAccountContentChange: (socialAccountId: string, campaignContentItemId: string) => void;
-  onCreateContentForAccount: (socialAccountId: string, mainLink: string) => void;
-  onAccountDescriptionChange: (socialAccountId: string, descriptionId: string) => void;
-  onAccountBriefChange: (socialAccountId: string, additionalBriefId: string) => void;
-  onCreateDescriptionForAccount: (socialAccountId: string, text: string) => void;
-  onCreateBriefForAccount: (socialAccountId: string, text: string) => void;
+  onAccountContentChange: (addedAccountsId: string, campaignContentItemId: string) => void;
+  onCreateContentForAccount: (addedAccountsId: string, mainLink: string) => void;
+  onAccountDescriptionChange: (addedAccountsId: string, descriptionId: string) => void;
+  onAccountBriefChange: (addedAccountsId: string, additionalBriefId: string) => void;
+  onCreateDescriptionForAccount: (addedAccountsId: string, text: string) => void;
+  onCreateBriefForAccount: (addedAccountsId: string, text: string) => void;
   onUpdateDescriptionForAccount: (campaignContentItemId: string, descriptionId: string, text: string) => void;
   onUpdateBriefForAccount: (campaignContentItemId: string, additionalBriefId: string, text: string) => void;
   onDeleteContentDescription: (campaignContentItemId: string, descriptionId: string) => void;
   onDeleteContentBrief: (campaignContentItemId: string, additionalBriefId: string) => void;
   onUpdateContentTaggedLink: (campaignContentItemId: string, taggedUser: string) => void;
   onUpdateContentTaggedUser: (campaignContentItemId: string, taggedLink: string) => void;
-  onAccountDateRequestChange: (socialAccountId: string, dateRequest: string) => void;
+  onAccountDateRequestChange: (addedAccountsId: string, dateRequest: string) => void;
   onDeleteCampaignContent: (campaignContentItemId: string) => void;
 }
 
 export const CampaignAccountEditor = ({
+  readOnly,
   account,
   campaignContent,
   onAccountContentChange,
@@ -71,49 +73,61 @@ export const CampaignAccountEditor = ({
     : [];
   
   const handleContentSelect = (campaignContentItemId: string) => {
+    if (readOnly) return;
+    
     onAccountContentChange(
-      account.socialAccountId,
+      account.addedAccountsId,
       campaignContentItemId,
     )
   };
   
   const handleContentCreate = (mainLink: string) => {
+    if (readOnly) return;
+    
     onCreateContentForAccount(
-      account.socialAccountId,
+      account.addedAccountsId,
       mainLink,
     )
   };
   
   const handleDescriptionSelect = (descriptionId: string) => {
+    if (readOnly) return;
+    
     onAccountDescriptionChange(
-      account.socialAccountId,
+      account.addedAccountsId,
       descriptionId,
     );
   };
   
   const handleBriefSelect = (additionalBriefId: string) => {
+    if (readOnly) return;
+    
     onAccountBriefChange(
-      account.socialAccountId,
+      account.addedAccountsId,
       additionalBriefId,
     );
   };
   
   const handleDescriptionCreate = (text: string) => {
+    if (readOnly) return;
+    
     onCreateDescriptionForAccount(
-      account.socialAccountId,
+      account.addedAccountsId,
       text,
     )
   };
   
   const handleBriefCreate = (text: string) => {
+    if (readOnly) return;
+    
     onCreateBriefForAccount(
-      account.socialAccountId,
+      account.addedAccountsId,
       text,
     )
   };
   
   const handleDescriptionUpdate = (descriptionId: string, text: string) => {
-    if (!selectedContent) return;
+    if (readOnly || !selectedContent) return;
     
     onUpdateDescriptionForAccount(
       selectedContent._id,
@@ -123,7 +137,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleBriefUpdate = (additionalBriefId: string, text: string) => {
-    if (!selectedContent) return;
+    if (readOnly || !selectedContent) return;
     
     onUpdateBriefForAccount(
       selectedContent._id,
@@ -133,7 +147,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleDescriptionDelete = (descriptionId: string) => {
-    if (!selectedContent) return;
+    if (readOnly || !selectedContent) return;
     
     onDeleteContentDescription(
       selectedContent._id,
@@ -142,7 +156,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleBriefDelete = (additionalBriefId: string) => {
-    if (!selectedContent) return;
+    if (readOnly || !selectedContent) return;
     
     onDeleteContentBrief(
       selectedContent._id,
@@ -151,7 +165,7 @@ export const CampaignAccountEditor = ({
   };
 
   const handleTaggedUserChange = (taggedUser: string) => {
-    if (!selectedContent) return;
+    if (readOnly || !selectedContent) return;
 
     onUpdateContentTaggedUser(
       selectedContent._id, 
@@ -160,7 +174,7 @@ export const CampaignAccountEditor = ({
   };
 
   const handleTaggedLinkChange = (taggedLink: string) => {
-    if (!selectedContent) return;
+    if (readOnly || !selectedContent) return;
 
     onUpdateContentTaggedLink(
       selectedContent._id, 
@@ -169,7 +183,18 @@ export const CampaignAccountEditor = ({
   };
   
   const handleDateRequestChange = (dateRequest: string) => {
-    onAccountDateRequestChange(account.socialAccountId, dateRequest);
+    if (readOnly) return;
+    
+    onAccountDateRequestChange(
+      account.addedAccountsId, 
+      dateRequest
+    );
+  };
+
+  const handleContentDelete = (campaignContentItemId: string) => {
+    if (readOnly) return;
+
+    onDeleteCampaignContent(campaignContentItemId);
   };
 
   return (
@@ -179,12 +204,13 @@ export const CampaignAccountEditor = ({
         subtitle="The same video can be assigned to several placements with different copy and briefs."
       >
         <CampaignPlacementAssignment
+          readOnly={readOnly}
           options={contentOptions}
           dateRequest={account.dateRequest}
           selectedId={account.selectedContent?.campaignContentItemId ?? null}
           onContentSelect={handleContentSelect}
           onContentCreate={handleContentCreate}
-          onDelete={onDeleteCampaignContent}
+          onDelete={handleContentDelete}
           onDateRequestChange={handleDateRequestChange}
         />
       </EditSection>
@@ -194,6 +220,7 @@ export const CampaignAccountEditor = ({
         subtitle="Select a saved description, edit it for all accounts using it, or create a new one."
       >
         <CampaignTextEditor
+          readOnly={readOnly}
           key={`description:${selectedContent?._id ?? "no-content"}`}
           label="Description"
           placeholder="post description…"
@@ -211,6 +238,7 @@ export const CampaignAccountEditor = ({
         subtitle="Select a saved brief, edit it for all accounts using it, or create a new one."
       >
         <CampaignTextEditor
+          readOnly={readOnly}
           key={`brief:${selectedContent?._id ?? "no-content"}`}
           label="Brief"
           placeholder="additional brief…"
@@ -228,6 +256,7 @@ export const CampaignAccountEditor = ({
         subtitle="Story tags and link shared by all accounts using this content."
       >
         <CampaignStorySupport
+          readOnly={readOnly}
           key={`story-support:${selectedContent?._id ?? "no-content"}`}
           storyLink={selectedContent?.taggedLink ?? ""}
           storyTag={selectedContent?.taggedUser ?? ""}

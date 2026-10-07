@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { useCampaignManagementState } from "@/pages/campaign-management-v2/model/use-campaign-management-state.ts";
 import { CampaignNavigation } from "@/widgets/campaign-management-v2/campaign-navigation";
 import { CampaignHeader } from "@/widgets/campaign-management-v2/campaign-header";
 import { CampaignMetrics } from "@/widgets/campaign-management-v2/campaign-metrics";
 import { CampaignToolbar } from "@/widgets/campaign-management-v2/campaign-toolbar";
 import { CampaignWorkspace } from "@/widgets/campaign-management-v2/campaign-workspace";
+import { CampaignInfo } from "@/widgets/campaign-management-v2/campaign-info/campaign-info.tsx";
+import { ProposalOptionToolbar } from "@/widgets/campaign-management-v2/proposal-option-toolbar";
+import { CreateProposalOptionModal } from "@/features/campaign-management/create-proposal-option";
 
 import s from './campaign-management.module.scss';
 
@@ -15,7 +19,16 @@ export const CampaignManagementPage = () => {
     isError,
     error,
     view,
+    reach,
     canReset,
+    canEditMetrics,
+    canMarkAsPaid,
+    canEditPostDetails,
+    isReadOnly,
+    isProposal,
+    availableViews,
+    optionIndex,
+    editorRevision,
     updateCampaignName,
     setPriceHidden,
     setCpmAndResultHidden,
@@ -25,6 +38,8 @@ export const CampaignManagementPage = () => {
     setAccountSelectedDescription,
     setAccountSelectedBrief,
     setAccountDateRequest,
+    setAccountPostLink,
+    setAccountScreenshot,
     onCreateContentForAccount,
     onCreateBriefForAccount,
     onCreateDescriptionForAccount,
@@ -32,6 +47,8 @@ export const CampaignManagementPage = () => {
     onUpdateContentTaggedLink,
     onUpdateContentTaggedUser,
     onUpdateBriefForAccount,
+    onUpdateAccountMetricField,
+    onPromoPaid,
     deleteContentDescription,
     deleteContentBrief,
     deleteCampaignContent,
@@ -39,6 +56,8 @@ export const CampaignManagementPage = () => {
     setView,
     resetDraft,
   } = useCampaignManagementState();
+
+  const [isCreateOptionModalOpen, setCreateOptionModalOpen] = useState(false);
 
   if (isInvalidParams) {
     return <div>Campaign parameters is invalid.</div>;
@@ -69,6 +88,7 @@ export const CampaignManagementPage = () => {
       />
 
       <CampaignHeader
+        // isSaving={isSaving}
         campaignName={data.campaignName}
         onCampaignNameChange={updateCampaignName}
         campaignStatus={data.status}
@@ -76,25 +96,53 @@ export const CampaignManagementPage = () => {
         currency={data.displayCurrency}
         onReset={resetDraft}
         isResetDisabled={!canReset}
+        readOnly={isReadOnly}
       />
-      
+
       <div className={s.content}>
-        <CampaignMetrics 
-          campaign={data}
-          onPriceHiddenChange={setPriceHidden}
-          onCpmAndResultHiddenChange={setCpmAndResultHidden}
-          onPriceChange={setPrice}
-          onCurrencyChange={setDisplayCurrency}
-        />
-        
+        {isProposal ? (
+          <CampaignInfo
+            campaign={data}
+            readOnly={isReadOnly}
+            reach={reach}
+            onPriceChange={setPrice}
+            onCurrencyChange={setDisplayCurrency}
+          />
+        ) : (
+          <CampaignMetrics
+            campaign={data}
+            reach={reach}
+            onPriceHiddenChange={setPriceHidden}
+            onCpmAndResultHiddenChange={setCpmAndResultHidden}
+            onPriceChange={setPrice}
+            onCurrencyChange={setDisplayCurrency}
+            readOnly={isReadOnly}
+          />
+        )}
+
+        {isProposal && (
+          <ProposalOptionToolbar
+            options={data.existingOptions}
+            selectedOptionIndex={optionIndex}
+            onOptionChange={() => {}}
+            onCreateOption={() => setCreateOptionModalOpen(true)}
+          />
+        )}
+
         <CampaignToolbar
           value={view}
+          availableViews={availableViews}
           onValueChange={setView}
         />
-        
+
         <CampaignWorkspace
           campaign={data}
           view={view}
+          editorRevision={editorRevision}
+          canEditMetrics={canEditMetrics}
+          canMarkAsPaid={canMarkAsPaid}
+          canEditPostDetails={canEditPostDetails}
+          readOnly={isReadOnly}
           onAccountContentChange={setAccountSelectedContent}
           onCreateContentForAccount={onCreateContentForAccount}
           onAccountDescriptionChange={setAccountSelectedDescription}
@@ -105,6 +153,10 @@ export const CampaignManagementPage = () => {
           onUpdateBriefForAccount={onUpdateBriefForAccount}
           onUpdateContentTaggedLink={onUpdateContentTaggedLink}
           onUpdateContentTaggedUser={onUpdateContentTaggedUser}
+          onUpdatePostLink={setAccountPostLink}
+          onUpdateScreenshot={setAccountScreenshot}
+          onUpdateAccountMetricField={onUpdateAccountMetricField}
+          onPromoPaid={onPromoPaid}
           onAccountDateRequestChange={setAccountDateRequest}
           onDeleteContentDescription={deleteContentDescription}
           onDeleteContentBrief={deleteContentBrief}
@@ -112,6 +164,14 @@ export const CampaignManagementPage = () => {
           onAccountRemove={removeAccount}
         />
       </div>
+
+      {isProposal && (
+        <CreateProposalOptionModal
+          open={isCreateOptionModalOpen}
+          onOpenChange={setCreateOptionModalOpen}
+          selectedOptionIndex={optionIndex}
+        />
+      )}
     </div>
   );
 };

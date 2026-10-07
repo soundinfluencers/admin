@@ -5,6 +5,7 @@ import Trash from "@/shared/assets/icons/trash.svg?react";
 import s from './campaign-account-header.module.scss';
 
 interface CampaignAccountHeaderProps {
+  readOnly: boolean;
   username: string;
   socialMedia: TSocialMedia;
   followers: number;
@@ -12,6 +13,7 @@ interface CampaignAccountHeaderProps {
 }
 
 export const CampaignAccountHeader = ({
+  readOnly,
   username,
   socialMedia,
   followers,
@@ -26,15 +28,17 @@ export const CampaignAccountHeader = ({
         </p>
       </div>
 
-      <button
-        type="button"
-        className={s.removeBtn}
-        onClick={onRemove}
-        aria-label="Remove account"
-      >
-        <Trash className={s.icon}/>
-        Remove influencer
-      </button>
+      {!readOnly && (
+        <button
+          type="button"
+          className={s.removeBtn}
+          onClick={onRemove}
+          aria-label="Remove account"
+        >
+          <Trash className={s.icon}/>
+          Remove influencer
+        </button>
+      )}
     </div>
   );
 };

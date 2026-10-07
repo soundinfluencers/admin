@@ -1,4 +1,4 @@
-import { PageBreadcrumbs } from "@/shared/ui/page-breadcrumbs-v2/page-breadcrumbs.tsx";
+import { PageBreadcrumbs } from "@/shared/ui/v2/page-breadcrumbs-v2/page-breadcrumbs.tsx";
 import RefreshIcon from '@/shared/assets/icons/refresh.svg?react';
 
 import s from './campaign-navigation.module.scss';

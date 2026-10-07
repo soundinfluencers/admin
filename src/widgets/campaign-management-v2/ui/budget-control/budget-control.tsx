@@ -13,8 +13,10 @@ import Chevron from '@/shared/assets/icons/chevron-right.svg?react';
 import s from './budget-control.module.scss';
 
 interface BudgetControlProps {
+  readOnly: boolean;
   price: number;
   currency: TCurrency;
+  canChangeCurrency: boolean;
   onPriceChange: (price: number) => void;
   onCurrencyChange: (currency: TCurrency) => void;
 }
@@ -22,8 +24,10 @@ interface BudgetControlProps {
 const INTEGER_INPUT_PATTERN = /^\d*$/;
 
 export const BudgetControl = ({
+  readOnly,
   price,
   onPriceChange,
+  canChangeCurrency,
   currency,
   onCurrencyChange,
 }: BudgetControlProps) => {
@@ -35,12 +39,20 @@ export const BudgetControl = ({
   }, [price]);
 
   const handleChange = (rawValue: string) => {
+    if (readOnly) return;
+    
     if (INTEGER_INPUT_PATTERN.test(rawValue)) {
       setDraft(rawValue);
     }
   };
 
   const handleBlur = () => {
+    if (readOnly) {
+      skipNextBlurSaveRef.current = false;
+      setDraft(String(price));
+      return;
+    }
+    
     if (skipNextBlurSaveRef.current) {
       skipNextBlurSaveRef.current = false;
       return;
@@ -66,6 +78,8 @@ export const BudgetControl = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (readOnly) return;
+    
     if (e.key === "Enter") {
       e.preventDefault();
       e.currentTarget.blur();
@@ -80,6 +94,8 @@ export const BudgetControl = ({
   };
 
   const handleCurrencyChange = (value: string) => {
+    if (readOnly || !canChangeCurrency) return;
+    
     if (isCurrency(value)) {
       onCurrencyChange(value);
     }
@@ -92,7 +108,8 @@ export const BudgetControl = ({
         className={s.input}
         type="text"
         inputMode="numeric"
-        value={draft}
+        readOnly={readOnly}
+        value={readOnly ? String(price) : draft}
         onChange={(e) => handleChange(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
@@ -102,6 +119,7 @@ export const BudgetControl = ({
       <Select.Root
         value={currency}
         onValueChange={handleCurrencyChange}
+        disabled={readOnly || !canChangeCurrency}
       >
         <Select.Trigger className={s.trigger} aria-label="Currency">
           <Select.Value />

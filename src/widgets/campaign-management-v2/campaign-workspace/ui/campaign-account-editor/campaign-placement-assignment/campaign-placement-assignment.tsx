@@ -18,6 +18,7 @@ type ContentOption = {
 }
 
 interface CampaignPlacementAssignmentProps {
+  readOnly: boolean;
   options: ContentOption[];
   dateRequest: string;
   selectedId: string | null;
@@ -28,6 +29,7 @@ interface CampaignPlacementAssignmentProps {
 }
 
 export const CampaignPlacementAssignment = ({
+  readOnly,
   options,
   dateRequest,
   selectedId,
@@ -38,14 +40,17 @@ export const CampaignPlacementAssignment = ({
 }: CampaignPlacementAssignmentProps) => {
   const inputId = useId();
   const triggerId = useId();
-  
+
   const [draftText, setDraftText] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const selectedOption = options.find((option) => option.id === selectedId) ?? null;
 
-  const text = draftText ?? selectedOption?.label ?? "";
+  const text = readOnly
+    ? selectedOption?.label ?? ""
+    : draftText ?? selectedOption?.label ?? "";
+  
   const hasDraft = draftText !== null;
   const otherOptionsCount = Math.max(
     options.length - (selectedOption ? 1 : 0),
@@ -58,11 +63,15 @@ export const CampaignPlacementAssignment = ({
   };
 
   const handleCreateNew = () => {
+    if (readOnly) return;
+    
     setDraftText("");
     setIsCreating(true);
   };
 
   const handleApply = () => {
+    if (readOnly) return;
+    
     if (draftText === null) return;
 
     const nextText = draftText.trim();
@@ -78,10 +87,12 @@ export const CampaignPlacementAssignment = ({
 
     handleCancel();
   };
-  
+
   const handleDelete = (id: string) => {
-    onDelete(id);
+    if (readOnly) return;
     
+    onDelete(id);
+
     if (options.length === 1) {
       setIsOpen(false);
     }
@@ -93,22 +104,24 @@ export const CampaignPlacementAssignment = ({
         label="Assigned video"
         htmlFor={isCreating ? inputId : triggerId}
         action={
-          <button
-            type="button"
-            className={s.addBtn}
-            onClick={handleCreateNew}
-            disabled={hasDraft}
-          >
-            <Plus className={s.plusIcon}/>
-            New
-          </button>
+          !readOnly ? (
+            <button
+              type="button"
+              className={s.addBtn}
+              onClick={handleCreateNew}
+              disabled={hasDraft}
+            >
+              <Plus className={s.plusIcon}/>
+              New
+            </button>
+          ) : null
         }
       >
 
-        <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+        <Popover.Root open={!readOnly && isOpen} onOpenChange={setIsOpen}>
           <Popover.Anchor asChild>
             <div className={s.control}>
-              {isCreating ? (
+              {isCreating && !readOnly ? (
                 <input
                   id={inputId}
                   className={s.input}
@@ -156,7 +169,7 @@ export const CampaignPlacementAssignment = ({
                   type="button"
                   className={s.selectTrigger}
                   aria-label="Select assigned video"
-                  disabled={hasDraft || options.length === 0}
+                  disabled={readOnly || hasDraft || options.length === 0}
                 >
                   <Chevron aria-hidden="true"/>
                 </button>
@@ -203,15 +216,17 @@ export const CampaignPlacementAssignment = ({
                         <ExternalLink aria-hidden="true"/>
                       </a>
 
-                      <button
-                        type="button"
-                        className={clsx(s.optionAction, s.removeBtn)}
-                        onClick={() => handleDelete(option.id)}
-                        aria-label={`Delete ${option.label}`}
-                        title="Delete content"
-                      >
-                        <Trash aria-hidden="true"/>
-                      </button>
+                      {!readOnly && (
+                        <button
+                          type="button"
+                          className={clsx(s.optionAction, s.removeBtn)}
+                          onClick={() => handleDelete(option.id)}
+                          aria-label={`Delete ${option.label}`}
+                          title="Delete content"
+                        >
+                          <Trash aria-hidden="true"/>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -220,7 +235,7 @@ export const CampaignPlacementAssignment = ({
           </Popover.Portal>
         </Popover.Root>
 
-        {hasDraft && (
+        {!readOnly && hasDraft && (
           <div className={s.actions}>
             <button
               type="button"
@@ -240,8 +255,9 @@ export const CampaignPlacementAssignment = ({
           </div>
         )}
       </EditorField>
-      
+
       <CampaignDateRequest
+        readOnly={readOnly}
         value={dateRequest}
         onChange={onDateRequestChange}
       />

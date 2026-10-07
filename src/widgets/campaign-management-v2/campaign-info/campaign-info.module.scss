@@ -1,0 +1,50 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.summary {
+  display: flex;
+  align-items: center;
+  //justify-content: space-between;
+  //height: 100px;
+  align-self: stretch;
+  gap: 20px;
+  padding: 12px 20px;
+
+  border-radius: 10px;
+  border: 1px solid #DFE5EE;
+  background: var(--white);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.label {
+  color: #6C778B;
+  font-size: 14px;
+}
+
+.value {
+  color: var(--black);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.separatorContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.line {
+  width: 1px;
+  height: 20px;
+  background: #C8CFDA;
+}
+
+.separator {
+  width: 1px;
+  height: 28px;
+  background: #DFE5EE;
+}

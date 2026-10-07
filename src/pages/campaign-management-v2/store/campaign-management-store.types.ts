@@ -1,6 +1,8 @@
 import type {
   ICampaignDetails,
   ICampaignDetailsRequestParams,
+  IMarkPromoPaidResponse,
+  TEditableField,
 } from "@/entities/campaign/model/campaign-details.types.ts";
 import type { TCurrency } from "@/shared/constants/currency-taxonomy.ts";
 
@@ -15,6 +17,7 @@ export type TCampaignManagementMeta = {
 };
 
 export type TCampaignManagementState = {
+  baseline: TCampaignManagementDraft | null;
   draft: TCampaignManagementDraft | null;
   meta: TCampaignManagementMeta;
 };
@@ -22,27 +25,33 @@ export type TCampaignManagementState = {
 export type TCampaignManagementActions = {
   initializeDraft: (draft: TCampaignManagementDraft) => void;
   resetDraft: () => void;
-  
+  restoreBaseline: () => void;
+  applySavedCampaign: (submittedDraft: TCampaignManagementDraft, campaign: ICampaignDetails) => void;
+
   updateCampaignName: (name: string) => void;
   setPriceHidden: (hidden: boolean) => void;
   setCpmAndResultHidden: (hidden: boolean) => void;
   setCampaignPrice: (price: number) => void;
   setDisplayCurrency: (currency: TCurrency) => void;
-  setAccountSelectedContent: (socialAccountId: string, campaignContentItemId: string) => void;
-  createContentForAccount: (socialAccountId: string, mainLink: string) => void;
-  setAccountSelectedDescription: (socialAccountId: string, descriptionId: string) => void;
-  setAccountSelectedBrief: (socialAccountId: string, additionalBriefId: string) => void;
-  createDescriptionForAccount: (socialAccountId: string, text: string) => void;
-  createBriefForAccount: (socialAccountId: string, text: string) => void;
+  setAccountSelectedContent: (addedAccountsId: string, campaignContentItemId: string) => void;
+  createContentForAccount: (addedAccountsId: string, mainLink: string) => void;
+  setAccountSelectedDescription: (addedAccountsId: string, descriptionId: string) => void;
+  setAccountSelectedBrief: (addedAccountsId: string, additionalBriefId: string) => void;
+  createDescriptionForAccount: (addedAccountsId: string, text: string) => void;
+  createBriefForAccount: (addedAccountsId: string, text: string) => void;
   updateContentDescription: (campaignContentItemId: string, descriptionId: string, text: string) => void;
   updateContentBrief: (campaignContentItemId: string, additionalBriefId: string, text: string) => void;
   deleteContentDescription: (campaignContentItemId: string, descriptionId: string) => void;
   deleteContentBrief: (campaignContentItemId: string, additionalBriefId: string) => void;
   updateContentTaggedUser: (campaignContentItemId: string, taggedUser: string) => void;
   updateContentTaggedLink: (campaignContentItemId: string, taggedLink: string) => void;
-  setAccountDateRequest: (socialAccountId: string, dateRequest: string) => void;
+  setAccountDateRequest: (addedAccountsId: string, dateRequest: string) => void;
+  setAccountPostLink: (addedAccountsId: string, postLink: string) => void;
+  setAccountScreenshot: (addedAccountsId: string, screenshot: string) => void;
+  setAccountMetricField: (addedAccountsId: string, field: TEditableField, value: number) => void;
+  applyPromoPaid: (result: IMarkPromoPaidResponse["data"]) => void;
   deleteCampaignContent: (campaignContentItemId: string) => void;
-  removeAccount: (socialAccountId: string) => void;
+  removeAccount: (addedAccountsId: string) => void;
 };
 
 export type TCampaignManagementStore = TCampaignManagementState & TCampaignManagementActions;

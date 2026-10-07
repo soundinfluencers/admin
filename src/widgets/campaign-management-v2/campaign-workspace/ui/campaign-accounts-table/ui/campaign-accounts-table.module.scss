@@ -1,38 +1,39 @@
+@use '@/app/styles/utils/mixins' as mixins;
+
 .account {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 220px;
+  //width: 160px;
   font-weight: 500;
 }
 
 .avatar {
   display: flex;
-  flex: 0 0 24px;
-  width: 24px;
-  height: 24px;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border-radius: 16px;
   border: 1px solid #DFE5EE;
-  border-radius: 50%;
   background: #F8FAFF;
   color: #6C778B;
   font-size: 10px;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 }
 
 .username {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .link {
@@ -53,14 +54,71 @@
 
 .status {
   display: inline-block;
-  max-width: 180px;
-  padding: 4px 8px;
-  border-radius: 6px;
+  width: 100%;
+  padding: 2px 6px;
+  border-radius: 4px;
   background: #F7F8FC;
   color: #6C778B;
   font-size: 12px;
-  font-weight: 500;
-  line-height: 16px;
+  font-weight: 600;
   white-space: normal;
   overflow-wrap: anywhere;
+
+  &Requested {
+    background: #FFF6E5;
+    color: #A66500;
+  }
+  &Accepted {
+    background: #DBEAFE;
+    color: #1E40AF;
+  }
+  &Declined {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+  &Posted {
+    background: #EDE9FE;
+    color: #5B21B6;
+  }
+  &Submitted {
+    background: #DCFCE7;
+    color: #166534;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  
+  border-radius: 6px;
+  border: 1px solid #DFE5EE;
+  background: var(--white);
+  
+  color: #536FE8;
+  
+  &[data-action="removeAccount"] {
+    color: #D92D20;
+  }
+  
+  &:disabled {
+    color: #6C778B;
+    cursor: not-allowed;
+  }
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }

@@ -1,0 +1,80 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+  padding: 16px;
+
+  background: rgb(0 0 0 / 40%);
+}
+
+.content {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: var(--modal-max-width, 480px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+
+  border-radius: 12px;
+  border: 1px solid #DFE5EE;
+  background: var(--white);
+  box-shadow: 0 18px 48px -8px rgba(27, 36, 54, 0.18);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  
+  padding: 20px 16px 16px 20px;
+}
+
+.titleGroup {
+  flex: 1 0 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.description {
+  color: #6C778B;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.close {
+  @include mixins.reset-button;
+  
+  display: flex;
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  
+  color: #6C778B;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+
+

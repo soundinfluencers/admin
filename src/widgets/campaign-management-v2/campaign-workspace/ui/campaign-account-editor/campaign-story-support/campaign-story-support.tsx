@@ -7,6 +7,7 @@ import LinkIcon from "@/shared/assets/icons/link.svg?react";
 import s from './campaign-story-support.module.scss';
 
 interface CampaignStorySupportProps {
+  readOnly: boolean;
   storyLink: string;
   storyTag: string;
   selectedId: string | null;
@@ -15,6 +16,7 @@ interface CampaignStorySupportProps {
 }
 
 export const CampaignStorySupport = ({
+  readOnly,
   storyLink,
   storyTag,
   selectedId,
@@ -29,11 +31,11 @@ export const CampaignStorySupport = ({
 
   const isDisabled = !selectedId;
 
-  const tagValue = draftTag ?? storyTag;
-  const linkValue = draftLink ?? storyLink;
+  const tagValue = readOnly ? storyTag : draftTag ?? storyTag;
+  const linkValue = readOnly ? storyLink : draftLink ?? storyLink;
 
   const handleTagApply = () => {
-    if (!selectedId || draftTag === null) return;
+    if (readOnly || !selectedId || draftTag === null) return;
 
     if (draftTag !== storyTag) {
       onStoryTagChange(draftTag);
@@ -43,7 +45,7 @@ export const CampaignStorySupport = ({
   };
 
   const handleLinkApply = () => {
-    if (!selectedId || draftLink === null) return;
+    if (readOnly || !selectedId || draftLink === null) return;
 
     const nextLink = draftLink.trim();
 
@@ -63,6 +65,7 @@ export const CampaignStorySupport = ({
             className={s.textarea}
             value={tagValue}
             disabled={isDisabled}
+            readOnly={readOnly}
             placeholder="Enter story tags"
             onChange={(e) => setDraftTag(e.target.value)}
             onBlur={handleTagApply}
@@ -74,11 +77,6 @@ export const CampaignStorySupport = ({
                 setDraftTag(null);
                 return;
               }
-
-              // if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-              //   e.preventDefault();
-              //   e.currentTarget.blur();
-              // }
             }}
             spellCheck="false"
           />
@@ -93,6 +91,7 @@ export const CampaignStorySupport = ({
             className={s.textarea}
             value={linkValue}
             disabled={isDisabled}
+            readOnly={readOnly}
             placeholder="Enter story Link URL"
             onChange={(e) => setDraftLink(e.target.value)}
             onBlur={handleLinkApply}

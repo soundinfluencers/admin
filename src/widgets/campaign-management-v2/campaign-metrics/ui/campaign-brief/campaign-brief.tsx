@@ -1,5 +1,5 @@
-import { BudgetControl } from "./budget-control/budget-control.tsx";
-import { formatCampaignDate } from "../../libs/format-campaign-date.ts";
+import { BudgetControl } from "../../../ui/budget-control/budget-control.tsx";
+import { formatCampaignDate } from "../../../libs/format-campaign-date.ts";
 import { formatCompactNumber } from "@/shared/libs/format/format-compact-number.ts";
 
 import type { TCurrency } from "@/shared/constants/currency-taxonomy.ts";
@@ -10,6 +10,7 @@ import EyeClose from '@/shared/assets/icons/eye-off.svg?react';
 import s from '../metric-content.module.scss';
 
 interface CampaignBriefProps {
+  readOnly: boolean;
   submitted: string;
   followers: number;
   price: number;
@@ -19,10 +20,12 @@ interface CampaignBriefProps {
   currency: TCurrency;
   onCurrencyChange: (currency: TCurrency) => void;
   isHidePrice: boolean;
+  canChangeCurrency: boolean;
   onPriceHiddenChange: (hidden: boolean) => void;
 }
 
 export const CampaignBrief = ({
+  readOnly,
   submitted,
   followers,
   price,
@@ -32,6 +35,7 @@ export const CampaignBrief = ({
   currency,
   onCurrencyChange,
   isHidePrice,
+  canChangeCurrency,
   onPriceHiddenChange,
 }: CampaignBriefProps) => {
   return (
@@ -55,9 +59,11 @@ export const CampaignBrief = ({
         <dt className={s.label}>Budget:</dt>
         <dd className={s.value}>
           {isHidePrice ?  "••••" : (
-            <BudgetControl 
+            <BudgetControl
+              readOnly={readOnly}
               price={price} 
-              currency={currency} 
+              currency={currency}
+              canChangeCurrency={canChangeCurrency}
               onPriceChange={onPriceChange} 
               onCurrencyChange={onCurrencyChange} 
             />

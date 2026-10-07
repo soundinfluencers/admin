@@ -6,33 +6,51 @@ import { CampaignAccountAudience } from "../campaign-account-audience/campaign-a
 import { CampaignAccountsTable } from "../campaign-accounts-table/ui/campaign-accounts-table.tsx";
 
 import type { TCampaignView } from "@/shared/constants/campaign-view.ts";
-import type { ICampaignDetails } from "@/entities/campaign/model/campaign-details.types.ts";
+import type {
+  ICampaignDetails,
+  IMarkPromoPaidResponse,
+  TEditableField,
+} from "@/entities/campaign/model/campaign-details.types.ts";
 
 import s from './campaign-workspace.module.scss';
 
 interface CampaignWorkspaceProps {
   campaign: ICampaignDetails;
   view: TCampaignView;
-  onAccountContentChange: (socialAccountId: string, campaignContentItemId: string) => void;
-  onCreateContentForAccount: (socialAccountId: string, mainLink: string) => void;
-  onAccountDescriptionChange: (socialAccountId: string, descriptionId: string) => void;
-  onAccountBriefChange: (socialAccountId: string, additionalBriefId: string) => void;
-  onCreateBriefForAccount: (socialAccountId: string, text: string) => void;
-  onCreateDescriptionForAccount: (socialAccountId: string, text: string) => void;
+  editorRevision: number;
+  canEditMetrics: boolean;
+  canMarkAsPaid: boolean;
+  canEditPostDetails: boolean;
+  readOnly: boolean;
+  onAccountContentChange: (addedAccountsId: string, campaignContentItemId: string) => void;
+  onCreateContentForAccount: (addedAccountsId: string, mainLink: string) => void;
+  onAccountDescriptionChange: (addedAccountsId: string, descriptionId: string) => void;
+  onAccountBriefChange: (addedAccountsId: string, additionalBriefId: string) => void;
+  onCreateBriefForAccount: (addedAccountsId: string, text: string) => void;
+  onCreateDescriptionForAccount: (addedAccountsId: string, text: string) => void;
   onUpdateDescriptionForAccount: (campaignContentItemId: string, descriptionId: string, text: string) => void;
   onUpdateBriefForAccount: (campaignContentItemId: string, additionalBriefId: string, text: string) => void;
   onDeleteContentDescription: (campaignContentItemId: string, descriptionId: string) => void;
   onDeleteContentBrief: (campaignContentItemId: string, additionalBriefId: string) => void;
   onUpdateContentTaggedLink: (campaignContentItemId: string, taggedUser: string) => void;
   onUpdateContentTaggedUser: (campaignContentItemId: string, taggedLink: string) => void;
-  onAccountDateRequestChange: (socialAccountId: string, dateRequest: string) => void;
+  onUpdatePostLink: (addedAccountsId: string, postLink: string) => void;
+  onUpdateScreenshot: (addedAccountsId: string, screenshot: string) => void;
+  onUpdateAccountMetricField: (addedAccountsId: string, field: TEditableField, value: number) => void;
+  onPromoPaid: (result: IMarkPromoPaidResponse["data"]) => void | Promise<void>;
+  onAccountDateRequestChange: (addedAccountsId: string, dateRequest: string) => void;
   onDeleteCampaignContent: (campaignContentItemId: string) => void;
-  onAccountRemove: (socialAccountId: string) => void;
+  onAccountRemove: (addedAccountsId: string) => void;
 }
 
 export const CampaignWorkspace = ({
   campaign,
   view,
+  editorRevision,
+  canEditMetrics,
+  canMarkAsPaid,
+  canEditPostDetails,
+  readOnly,
   onAccountContentChange,
   onCreateContentForAccount,
   onAccountDescriptionChange,
@@ -43,48 +61,69 @@ export const CampaignWorkspace = ({
   onUpdateBriefForAccount,
   onUpdateContentTaggedLink,
   onUpdateContentTaggedUser,
+  onUpdatePostLink,
+  onUpdateScreenshot,
+  onUpdateAccountMetricField,
+  onPromoPaid,
   onAccountDateRequestChange,
   onDeleteContentDescription,
   onDeleteContentBrief,
   onDeleteCampaignContent,
   onAccountRemove,
 }: CampaignWorkspaceProps) => {
-  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+  const [selectedAddedAccountsId, setSelectedAddedAccountsId] = useState<string | null>(null);
   
   const accounts = campaign.addedAccounts;
   
   const selectedAccount = accounts.find(
-    (account) => account.socialAccountId === selectedAccountId,
+    (account) => account.addedAccountsId === selectedAddedAccountsId,
   ) ?? 
     accounts[0] ?? 
     null;
 
   if (view === "insights") {
-    return <CampaignAccountsTable accounts={campaign.addedAccounts}/>;
+    return (
+      <CampaignAccountsTable
+        canRemoveAccount={!readOnly}
+        campaignId={campaign.campaignId}
+        accounts={campaign.addedAccounts}
+        canEditMetrics={canEditMetrics}
+        canMarkAsPaid={canMarkAsPaid}
+        canEditPostDetails={canEditPostDetails}
+        onUpdatePostLink={onUpdatePostLink}
+        onUpdateScreenshot={onUpdateScreenshot}
+        onUpdateAccountMetricField={onUpdateAccountMetricField}
+        onPromoPaid={onPromoPaid}
+        onAccountRemove={onAccountRemove}
+      />
+    );
   }
   
   return (
     <div className={s.workspace}>
-      <CampaignAccountsList 
+      <CampaignAccountsList
+        readOnly={readOnly}
         accounts={accounts}
         campaignContent={campaign.campaignContent}
-        selectedAccountId={selectedAccount?.socialAccountId ?? null} 
-        onAccountSelect={setSelectedAccountId} 
+        selectedAddedAccountsId={selectedAccount?.addedAccountsId ?? null} 
+        onAccountSelect={setSelectedAddedAccountsId} 
       />
       
       <div className={s.content}>
         {selectedAccount ? (
           <>
             <CampaignAccountHeader
+              readOnly={readOnly}
               username={selectedAccount.username}
               socialMedia={selectedAccount.socialMedia}
               followers={selectedAccount.followers}
-              onRemove={() => onAccountRemove(selectedAccount.socialAccountId)}
+              onRemove={() => onAccountRemove(selectedAccount.addedAccountsId)}
             />
 
             {view === "strategy" ? (
               <CampaignAccountEditor
-                key={selectedAccount.socialAccountId}
+                readOnly={readOnly}
+                key={`${selectedAccount.addedAccountsId}:${editorRevision}`}
                 account={selectedAccount}
                 campaignContent={campaign.campaignContent}
                 onAccountContentChange={onAccountContentChange}
@@ -104,7 +143,7 @@ export const CampaignWorkspace = ({
               />
             ) : (
               <CampaignAccountAudience
-                key={selectedAccount.socialAccountId}
+                key={selectedAccount.addedAccountsId}
                 countries={selectedAccount.countries}
                 genres={selectedAccount.genres}
               />

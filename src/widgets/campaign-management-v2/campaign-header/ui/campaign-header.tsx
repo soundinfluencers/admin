@@ -11,9 +11,13 @@ import {
   type TCurrency,
 } from "@/shared/constants/currency-taxonomy.ts";
 
+import CircleLoaderIcon from "@/shared/assets/icons/loader-circle.svg?react";
+
 import s from './campaign-header.module.scss';
 
 interface CampaignHeaderProps {
+  // onSave: () => void;
+  // isSaving: boolean;
   campaignName: string;
   onCampaignNameChange: (campaignName: string) => void;
   campaignStatus: TCampaignStatus;
@@ -21,9 +25,12 @@ interface CampaignHeaderProps {
   currency: TCurrency;
   onReset: () => void;
   isResetDisabled: boolean;
+  readOnly: boolean;
 }
 
 export const CampaignHeader = ({
+  // onSave,
+  // isSaving,
   campaignName,
   onCampaignNameChange,
   campaignStatus,
@@ -31,6 +38,7 @@ export const CampaignHeader = ({
   currency,
   onReset,
   isResetDisabled,
+  readOnly,
 }: CampaignHeaderProps) => {
   const [draft, setDraft] = useState(campaignName);
   const skipNextBlurSaveRef = useRef(false);
@@ -38,8 +46,14 @@ export const CampaignHeader = ({
   useEffect(() => {
     setDraft(campaignName);
   }, [campaignName]);
-  
+
   const handleBlur = () => {
+    if (readOnly) {
+      skipNextBlurSaveRef.current = false;
+      setDraft(campaignName);
+      return;
+    }
+
     if (skipNextBlurSaveRef.current) {
       skipNextBlurSaveRef.current = false;
       return;
@@ -60,6 +74,8 @@ export const CampaignHeader = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (readOnly) return;
+
     if (e.key === "Enter") {
       e.preventDefault();
       e.currentTarget.blur();
@@ -71,8 +87,8 @@ export const CampaignHeader = ({
       setDraft(campaignName);
       e.currentTarget.blur();
     }
-  }; 
-  
+  };
+
   return (
     <div className={s.header}>
       <h1 className="visually-hidden">{campaignName}</h1>
@@ -82,14 +98,15 @@ export const CampaignHeader = ({
           id="campaign-name"
           className={s.input}
           type="text"
-          value={draft}
+          readOnly={readOnly}
+          value={readOnly ? campaignName : draft}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           autoComplete="off"
           spellCheck="false"
         />
-        
+
         <div className={clsx(s.campaignStatus, {
           [s.underReview]: campaignStatus === "under_review",
           [s.distributing]: campaignStatus === "distributing",
@@ -104,29 +121,47 @@ export const CampaignHeader = ({
       <div className={s.headerRight}>
         <span className={s.internalCost}>Internal cost: {internalCost}{CURRENCY_LABELS[currency]}</span>
 
-        <button
-          className={s.action}
-          type="button"
-          onClick={onReset}
-          disabled={isResetDisabled}
-          aria-label="Reset cahnages"
-          aria-busy={isResetDisabled}
-        >
-          Reset
-        </button>
+        {!readOnly && (
+          <>
+            <button
+              className={s.action}
+              type="button"
+              onClick={onReset}
+              disabled={isResetDisabled}
+              aria-label="Reset cahnages"
+              aria-busy={isResetDisabled}
+            >
+              Reset
+            </button>
 
-        <button
-          className={clsx(s.action, s.save)}
-          type="button"
-          onClick={() => alert("Function don`t implemented yet!")}
-          disabled={false}
-          aria-label="Save campaign cahnages"
-          aria-busy={false}
-        >
-          Save
-        </button>
+            <button
+              className={clsx(s.action, s.save)}
+              type="button"
+              onClick={() => alert("Function don`t implemented yet!")}
+              disabled={false}
+              aria-label="Save campaign changes"
+              aria-busy={false}
+            >
+              {false ? (
+                <>
+                 <span
+                  className={s.indicator}
+                  role="status"
+                  aria-label="Save campaign"
+                 >
+                    <CircleLoaderIcon
+                      className={s.loader}
+                      aria-hidden="true"
+                      focusable="false"
+                    />
+                  </span>
+                  {"Saving…"}
+                </>
+              ) : "Save"}
+            </button>
+          </>
+        )}
       </div>
-
     </div>
   );
 };

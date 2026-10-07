@@ -6,8 +6,6 @@ export const uploadImageApi = async (file: File) => {
   formData.append('file', file);
 
   const { data } = await $api.post<IFileResponse>('/file', formData);
-
-  console.log("Successfully uploaded image file", data);
-
+  
   return data;
 };

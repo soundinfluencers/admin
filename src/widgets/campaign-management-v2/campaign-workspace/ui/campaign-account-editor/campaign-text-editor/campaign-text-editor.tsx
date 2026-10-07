@@ -15,6 +15,7 @@ type TextOption = {
 };
 
 interface CampaignTextEditorProps {
+  readOnly: boolean;
   label: string;
   placeholder: string;
   options: TextOption[];
@@ -27,6 +28,7 @@ interface CampaignTextEditorProps {
 }
 
 export const CampaignTextEditor = ({
+  readOnly,
   label,
   placeholder,
   options,
@@ -44,7 +46,9 @@ export const CampaignTextEditor = ({
 
   const selectedOption = options.find((option) => option.id === selectedId) ?? null;
 
-  const text = draftText ?? selectedOption?.text ?? "";
+  const text = readOnly
+    ? selectedOption?.text ?? ""
+    : draftText ?? selectedOption?.text ?? "";
   const hasDraft = draftText !== null;
 
   const handleCancel = () => {
@@ -53,11 +57,15 @@ export const CampaignTextEditor = ({
   };
 
   const handleCreateNew = () => {
+    if (readOnly) return;
+    
     setDraftText("");
     setIsCreating(true);
   };
 
   const handleDelete = (id: string) => {
+    if (readOnly) return;
+    
     onDelete(id);
 
     if (options.length === 1) {
@@ -66,6 +74,8 @@ export const CampaignTextEditor = ({
   };
 
   const handleApply = () => {
+    if (readOnly) return;
+    
     if (draftText === null) return;
 
     const nextText = draftText.trim();
@@ -92,24 +102,27 @@ export const CampaignTextEditor = ({
       label={label}
       htmlFor={inputId}
       action={
-        <button
-          type="button"
-          className={s.addBtn}
-          onClick={handleCreateNew}
-          disabled={hasDraft}
-        >
-          <Plus className={s.plusIcon} aria-hidden="true"/>
-          New
-        </button>
+        !readOnly ? (
+          <button
+            type="button"
+            className={s.addBtn}
+            onClick={handleCreateNew}
+            disabled={hasDraft}
+          >
+            <Plus className={s.plusIcon} aria-hidden="true"/>
+            New
+          </button>
+        ) : null
       }
     >
-      <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+      <Popover.Root open={!readOnly && isOpen} onOpenChange={setIsOpen}>
         <Popover.Anchor asChild>
           <div className={s.control}>
             <textarea
               id={inputId}
               className={s.textarea}
               value={text}
+              readOnly={readOnly}
               disabled={!selectedOption && !isCreating}
               placeholder={
                 isCreating ? `Enter ${placeholder}` : `Select or create ${placeholder}`
@@ -129,7 +142,7 @@ export const CampaignTextEditor = ({
                 type="button"
                 className={s.selectTrigger}
                 aria-label={`Select ${label.toLowerCase()}`}
-                disabled={hasDraft || options.length === 0}
+                disabled={readOnly || hasDraft || options.length === 0}
               >
                 <Chevron aria-hidden="true"/>
               </button>
@@ -163,14 +176,16 @@ export const CampaignTextEditor = ({
                     </button>
                   </Popover.Close>
 
-                  <button
-                    type="button"
-                    className={s.removeBtn}
-                    onClick={() => handleDelete(option.id)}
-                    aria-label={`Delete ${label.toLowerCase()}`}
-                  >
-                    <Trash aria-hidden="true"/>
-                  </button>
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      className={s.removeBtn}
+                      onClick={() => handleDelete(option.id)}
+                      aria-label={`Delete ${label.toLowerCase()}`}
+                    >
+                      <Trash aria-hidden="true"/>
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -178,7 +193,7 @@ export const CampaignTextEditor = ({
         </Popover.Portal>
       </Popover.Root>
 
-      {hasDraft && (
+      {!readOnly && hasDraft && (
         <div className={s.actions}>
           <button 
             type="button"

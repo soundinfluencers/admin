@@ -15,31 +15,42 @@ import s from './campaign-metrics.module.scss';
 
 interface CampaignMetricsProps {
   campaign: ICampaignDetails;
+  reach: number;
   onPriceHiddenChange: (hidden: boolean) => void;
   onCpmAndResultHiddenChange: (hidden: boolean) => void;
   onPriceChange: (price: number) => void;
   onCurrencyChange: (currency: TCurrency) => void;
+  readOnly: boolean;
 }
 
 export const CampaignMetrics = ({
   campaign,
+  reach,
   onPriceHiddenChange,
   onCpmAndResultHiddenChange,
   onPriceChange,
   onCurrencyChange,
+  readOnly,
 }: CampaignMetricsProps) => {
+  const budgetPrice =
+    campaign.pricesByCurrency?.[campaign.displayCurrency] ??
+    campaign.price;
+
+  const canChangeCurrency = !readOnly && campaign.pricesByCurrency != null;
   
   return (
     <div className={s.cards}>
       <MetricCard title="Brief" icon={<File />}>
-        <CampaignBrief 
+        <CampaignBrief
+          readOnly={readOnly}
           submitted={campaign.creationDate}
-          followers={campaign.totalFollowers}
-          price={campaign.price}
+          followers={reach}
+          price={budgetPrice}
+          currency={campaign.displayCurrency}
+          canChangeCurrency={canChangeCurrency}
           onPriceChange={onPriceChange}
           numberOfVideos={campaign.campaignContent.length}
           numberOfPosts={campaign.addedAccounts.length}
-          currency={campaign.displayCurrency}
           onCurrencyChange={onCurrencyChange}
           isHidePrice={campaign.isPriceHidden}
           onPriceHiddenChange={onPriceHiddenChange}

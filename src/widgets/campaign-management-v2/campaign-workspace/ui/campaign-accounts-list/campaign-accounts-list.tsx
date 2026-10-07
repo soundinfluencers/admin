@@ -10,16 +10,18 @@ import Search from '@/shared/assets/icons/search.svg?react';
 import s from './campaign-accounts-list.module.scss';
 
 interface CampaignAccountsListProps {
+  readOnly: boolean;
   accounts: ICampaignDetails["addedAccounts"];
   campaignContent: ICampaignDetails["campaignContent"];
-  selectedAccountId: string | null;
-  onAccountSelect: (accountId: string) => void;
+  selectedAddedAccountsId: string | null;
+  onAccountSelect: (addedAccountsId: string) => void;
 }
 
 export const CampaignAccountsList = ({
+  readOnly,
   accounts,
   campaignContent,
-  selectedAccountId,
+  selectedAddedAccountsId,
   onAccountSelect,
 }: CampaignAccountsListProps) => {
   const [search, setSearch] = useState("");
@@ -45,15 +47,17 @@ export const CampaignAccountsList = ({
           <span className={s.total}>{accounts.length} total</span>
         </div>
 
-        <Link
-          className={s.add}
-          to={""}
-          aria-label="Add account"
-          onClick={() => alert("Function don`t implemented yet!")}
-        >
-          <Plus className={s.icon}/>
-          Add
-        </Link>
+        {!readOnly && (
+          <Link
+            className={s.add}
+            to={""}
+            aria-label="Add account"
+            onClick={() => alert("Function don`t implemented yet!")}
+          >
+            <Plus className={s.icon}/>
+            Add
+          </Link>
+        )}
       </div>
 
       <div className={s.searchContainer}>
@@ -78,7 +82,7 @@ export const CampaignAccountsList = ({
         {filteredAccounts.length > 0 ? (
           <ul className={s.list}>
             {filteredAccounts.map((account) => {
-              const isSelected = account.socialAccountId === selectedAccountId;
+              const isSelected = account.addedAccountsId === selectedAddedAccountsId;
               const contentId = account.selectedContent?.campaignContentItemId;
               const Icon = SOCIAL_MEDIA_ICONS[account.socialMedia];
               
@@ -87,12 +91,12 @@ export const CampaignAccountsList = ({
                 : "No Content";
               
               return (
-                <li key={account.socialAccountId}>
+                <li key={account.addedAccountsId}>
                   <button
                     type="button"
                     className={s.account}
                     aria-pressed={isSelected}
-                    onClick={() => onAccountSelect(account.socialAccountId)}
+                    onClick={() => onAccountSelect(account.addedAccountsId)}
                   >
                     <div className={s.meta}>
                       <span className={s.socialIcon}>

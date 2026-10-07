@@ -56,7 +56,7 @@ interface IAccountCountry {
   percentage: number;
 }
 
-export interface IAddedAccount {
+interface IAddedAccount {
   addedAccountsId: string;
   socialAccountId: string;
   influencerId: string;
@@ -95,6 +95,11 @@ export interface IAddedAccount {
   statusLabel: string;
   cpm: number | undefined;
 }
+
+export type TEditableField = keyof Pick<
+  IAddedAccount, 
+  "impressions" | "like" | "comments" | "shares" | "saves"
+>;
 
 interface IAddedBundle {
   campaignBundleId: string;
@@ -152,7 +157,7 @@ export interface ICampaignDetails {
   creationDate: string;
   price: number;
   displayCurrency: TCurrency;
-  pricesByCurrency: Record<TCurrency, number>;
+  pricesByCurrency?: Record<TCurrency, number> | null;
   status: TCampaignStatus;
   addedAccounts: IAddedAccount[];
   addedBundles: IAddedBundle[];
@@ -184,4 +189,150 @@ export interface ICampaignDetailsResponse {
   statusCode: number;
   message: string;
   data: ICampaignDetails;
+}
+
+export interface IUpdateCampaignDetailsRequestParams {
+  campaignId: string;
+  
+  status: "pending" | "distributing" | "proposal";
+  
+  optionIndex?: number;
+
+  body: {
+    campaignName?: string;
+    isCpmAndResultHidden?: boolean;
+    isPriceHidden?: boolean;
+    
+    campaignPrice?: number;
+    displayCurrency?: TCurrency;
+
+    addedAccounts?: {
+      addedAccountsId?: string;
+      bundleId?: string;
+      campaignBundleId?: string;
+
+      socialAccountId: string;
+      influencerId: string;
+      socialMedia: TSocialMedia;
+      username: string;
+
+      selectedCampaignContentItem: {
+        campaignContentItemId?: string;
+        descriptionId?: string;
+        additionalBriefId?: string;
+      };
+
+      dateRequest: string;
+      
+      postLink?: string;
+      screenshot?: string;
+
+      impressions?: number;
+      like?: number;
+      comments?: number;
+      shares?: number;
+      saves?: number;
+      rating?: number;
+    }[];
+
+    campaignContent?: {
+      _id: string;
+      socialMedia: TSocialMedia;
+      profileType?: "community" | "creator";
+      socialMediaGroup: string;
+      mainLink: string;
+
+      descriptions?: {
+        _id: string;
+        description: string;
+      }[];
+
+      taggedUser?: string;
+      taggedLink?: string;
+
+      additionalBrief?: {
+        _id: string;
+        additionalBrief: string;
+      }[];
+    }[];
+  };
+}
+
+export interface IUpdateCampaignDetailsResponse {
+  statusCode: number;
+  message: string;
+  data: ICampaignDetails;
+}
+
+export interface IMarkPromoPaidParams {
+  campaignId: string;
+  promoId: string;
+}
+
+export interface IMarkPromoPaidResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    campaignId: string;
+    promoId: string;
+    closePromo: "close";
+    statusLabel: string;
+  };
+}
+
+export interface ICreateProposalOptionRequestParams {
+  campaignId: string;
+  body: {
+    campaignName: string;
+    socialMedia: TSocialMedia;
+    campaignPrice: number;
+    displayCurrency?: TCurrency;
+
+    addedAccounts: {
+      addedAccountsId?: string;
+      bundleId?: string;
+      socialAccountId: string;
+      influencerId: string;
+      socialMedia: TSocialMedia;
+      username: string;
+
+      selectedCampaignContentItem: {
+        campaignContentItemId?: string;
+        descriptionId?: string;
+        additionalBriefId?: string;
+      };
+
+      dateRequest: string;
+    }[];
+
+    campaignContent: {
+      _id: string;
+      socialMedia: TSocialMedia;
+      profileType?: "community" | "creator";
+      socialMediaGroup: string;
+      mainLink: string;
+
+      descriptions: {
+        _id: string;
+        description: string;
+      }[];
+
+      taggedUser?: string;
+      taggedLink?: string;
+
+      additionalBrief?: {
+        _id: string;
+        additionalBrief: string;
+      }[];
+    }[];
+  };
+}
+
+export interface ICreateProposalResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    campaignId: string;
+    optionIndex: number;
+  };
 }
