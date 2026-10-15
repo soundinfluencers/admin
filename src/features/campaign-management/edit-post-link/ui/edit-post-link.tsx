@@ -21,7 +21,6 @@ export const EditPostLink = ({
   const [open, setOpen] = useState(false);
 
   const handleApply = (nextValue: string) => {
-    console.log("Apply", nextValue);
     
     onApply(nextValue);
     setOpen(false);

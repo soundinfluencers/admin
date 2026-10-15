@@ -1,0 +1,87 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.description {
+  padding: 8px 20px 24px 20px;
+  color: #6C778B;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  padding: 12px 16px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+
+  border-top: 1px solid #DFE5EE;
+}
+
+.button {
+  @include mixins.reset-button;
+  display: flex;
+  height: 34px;
+  padding: 0 14px;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+
+  border-radius: 8px;
+  border: 1px solid #DFE5EE;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #6574e8;
+    outline-offset: 2px;
+  }
+}
+
+.cancel {
+  margin-right: auto;
+}
+
+.discard {
+  color: #C6404E;
+}
+
+.save {
+  border-color: #6574e8;
+  background: #6574e8;
+  color: #fff;
+}
+
+.indicator {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  transform-origin: center;
+  animation: loader-spin 1s linear infinite;
+}
+
+@keyframes loader-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    animation: none;
+  }
+}

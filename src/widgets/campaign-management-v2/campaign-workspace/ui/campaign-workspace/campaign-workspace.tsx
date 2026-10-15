@@ -41,6 +41,9 @@ interface CampaignWorkspaceProps {
   onAccountDateRequestChange: (addedAccountsId: string, dateRequest: string) => void;
   onDeleteCampaignContent: (campaignContentItemId: string) => void;
   onAccountRemove: (addedAccountsId: string) => void;
+  canSendMessage: boolean;
+  isMessageActionDisabled: boolean;
+  onOpenMessagePreview: (influencerId: string, trigger: HTMLButtonElement) => void;
 }
 
 export const CampaignWorkspace = ({
@@ -70,6 +73,9 @@ export const CampaignWorkspace = ({
   onDeleteContentBrief,
   onDeleteCampaignContent,
   onAccountRemove,
+  canSendMessage,
+  isMessageActionDisabled,
+  onOpenMessagePreview,
 }: CampaignWorkspaceProps) => {
   const [selectedAddedAccountsId, setSelectedAddedAccountsId] = useState<string | null>(null);
   
@@ -95,6 +101,9 @@ export const CampaignWorkspace = ({
         onUpdateAccountMetricField={onUpdateAccountMetricField}
         onPromoPaid={onPromoPaid}
         onAccountRemove={onAccountRemove}
+        canSendMessage={canSendMessage}
+        isMessageActionDisabled={isMessageActionDisabled}
+        onOpenMessagePreview={onOpenMessagePreview}
       />
     );
   }

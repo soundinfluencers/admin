@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
 import { markPromoAsPaid } from "@/entities/campaign";
 import { toast } from "react-toastify";
 
@@ -27,8 +27,13 @@ export const MarkPromoAsPaid = ({
   canMarkAsPaid,
   onPaid,
 }: MarkPromoAsPaidProps) => {
+  const queryClient = useQueryClient();
+  const mutationKey = ["campaigns", "mark-promo-as-paid", { campaignId, promoId }] as const;
+  const mutationFilters = { mutationKey, exact: true };
+  const isPending = useIsMutating(mutationFilters) > 0;
 
-  const { mutate, isPending } = useMutation({
+  const { mutate } = useMutation({
+    mutationKey,
     mutationFn: markPromoAsPaid,
     onSuccess: async (result) => {
       await onPaid(result);
@@ -49,7 +54,7 @@ export const MarkPromoAsPaid = ({
     isPending;
 
   const handleClick = () => {
-    if (isDisabled) return;
+    if (isDisabled || queryClient.isMutating(mutationFilters) > 0) return;
 
     mutate({ campaignId, promoId });
   };

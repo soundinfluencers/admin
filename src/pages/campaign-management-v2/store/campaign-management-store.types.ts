@@ -5,6 +5,7 @@ import type {
   TEditableField,
 } from "@/entities/campaign/model/campaign-details.types.ts";
 import type { TCurrency } from "@/shared/constants/currency-taxonomy.ts";
+import type { TCampaignWhatsAppAccountUpdate } from "@/entities/campaign/model/campaign-whatsapp.types.ts";
 
 export type TCampaignManagementDraft = {
   params: ICampaignDetailsRequestParams;
@@ -26,7 +27,7 @@ export type TCampaignManagementActions = {
   initializeDraft: (draft: TCampaignManagementDraft) => void;
   resetDraft: () => void;
   restoreBaseline: () => void;
-  applySavedCampaign: (submittedDraft: TCampaignManagementDraft, campaign: ICampaignDetails) => void;
+  applySavedCampaign: (params: ICampaignDetailsRequestParams, campaign: ICampaignDetails) => void;
 
   updateCampaignName: (name: string) => void;
   setPriceHidden: (hidden: boolean) => void;
@@ -50,6 +51,7 @@ export type TCampaignManagementActions = {
   setAccountScreenshot: (addedAccountsId: string, screenshot: string) => void;
   setAccountMetricField: (addedAccountsId: string, field: TEditableField, value: number) => void;
   applyPromoPaid: (result: IMarkPromoPaidResponse["data"]) => void;
+  applyWhatsAppUpdates: (params: ICampaignDetailsRequestParams, updates: readonly TCampaignWhatsAppAccountUpdate[]) => void;
   deleteCampaignContent: (campaignContentItemId: string) => void;
   removeAccount: (addedAccountsId: string) => void;
 };

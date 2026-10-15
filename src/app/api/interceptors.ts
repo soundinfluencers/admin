@@ -36,22 +36,23 @@ export function setupInterceptors(
     (res) => res,
     async (error: AxiosError) => {
       const config = error.config as RetriableRequestConfig | undefined;
+      const shouldNotify = options.notify === true && config?.silentError !== true;
 
       // network
       if (!error.response) {
-        if (options.notify) notifyApiError(error);
+        if (shouldNotify) notifyApiError(error);
         return Promise.reject(error);
       }
 
       // no config
       if (!config) {
-        if (options.notify) notifyApiError(error);
+        if (shouldNotify) notifyApiError(error);
         return Promise.reject(error);
       }
 
       // do not refresh on auth routes
       if (isAuthRoute(config.url)) {
-        if (options.notify) {
+        if (shouldNotify) {
           notifyApiError(error, {
             ignore: (n) => n.kind === "unauthorized",
           });
@@ -61,7 +62,7 @@ export function setupInterceptors(
 
       const isUnauthorized = error.response.status === 401;
       if (!isUnauthorized || config._retry) {
-        if (options.notify) {
+        if (shouldNotify) {
           notifyApiError(error, { ignore: (n) => n.kind === "unauthorized" });
         }
         return Promise.reject(error);
@@ -77,7 +78,7 @@ export function setupInterceptors(
       } catch (refreshErr) {
         // refresh failed
         logout();
-        if (options.notify) {
+        if (shouldNotify) {
           notifyApiError(refreshErr, { ignore: () => true });
           //or show toast.info("Session expired. Please login again.")
         }

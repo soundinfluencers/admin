@@ -20,6 +20,9 @@ interface CampaignAccountsTableProps {
   onUpdateAccountMetricField: (addedAccountsId: string, field: TEditableField, value: number) => void;
   onPromoPaid: (result: IMarkPromoPaidResponse["data"]) => void | Promise<void>;
   onAccountRemove: (addedAccountsId: string) => void;
+  canSendMessage: boolean;
+  isMessageActionDisabled: boolean;
+  onOpenMessagePreview: (influencerId: string, trigger: HTMLButtonElement) => void;
 }
 
 const getAccountRowId = (account: ICampaignDetails["addedAccounts"][number]): string => {
@@ -38,6 +41,9 @@ export const CampaignAccountsTable = ({
   onUpdateAccountMetricField,
   onPromoPaid,
   onAccountRemove,
+  canSendMessage,
+  isMessageActionDisabled,
+  onOpenMessagePreview,
 }: CampaignAccountsTableProps) => {
 
   const columns = useMemo(
@@ -52,6 +58,9 @@ export const CampaignAccountsTable = ({
       onUpdateAccountMetricField,
       onPromoPaid,
       onAccountRemove,
+      canSendMessage,
+      isMessageActionDisabled,
+      onOpenMessagePreview,
     }),
     [
       canRemoveAccount,
@@ -63,15 +72,20 @@ export const CampaignAccountsTable = ({
       onUpdateScreenshot, 
       onUpdateAccountMetricField, 
       onPromoPaid, 
-      onAccountRemove
+      onAccountRemove,
+      canSendMessage,
+      isMessageActionDisabled,
+      onOpenMessagePreview,
     ],
   );
 
   return (
     <Table
+      key={campaignId}
       data={accounts}
       columns={columns}
       getRowId={getAccountRowId}
+      enableSorting
       showFooter
     />
   );

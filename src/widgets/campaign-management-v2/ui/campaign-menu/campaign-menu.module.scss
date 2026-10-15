@@ -1,0 +1,173 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.panel .body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.actionsSection {
+  display: flex;
+  flex-shrink: 0;
+  padding: 20px 20px 24px 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  align-self: stretch;
+}
+
+.sectionLabel {
+  color: #6c778b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: stretch;
+  gap: 8px;
+
+  > button {
+    flex: 1 0 0;
+  }
+}
+
+.button {
+  @include mixins.reset-button;
+  
+  display: flex;
+  height: 34px;
+  padding: 0 14px;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+
+  border-radius: 8px;
+  border: 1px solid #DFE5EE;
+  background: var(--white);
+  
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid #5267f5;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.primaryButton {
+  border-color: #536FE8;
+  background: #536FE8;
+  color: #fff;
+}
+
+.dangerButton {
+  color: #e5484d;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.messagesSection {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 20px;
+}
+
+.messagesHeader {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 12px;
+  align-self: stretch;
+  
+  border-bottom: 1px solid #DFE5EE;
+}
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+
+.messagesTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summary {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+
+  color: #6c778b;
+  font-size: 13px;
+}
+
+.sentCount {
+  color: #167A56;
+}
+
+.failedCount {
+  color: #b42318;
+}
+
+.footerContent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.footerLabel {
+  color: #6c778b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.pdfLoader {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+
+  animation: pdf-spin 700ms linear infinite;
+}
+
+@keyframes pdf-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdfLoader {
+    animation: none;
+  }
+}

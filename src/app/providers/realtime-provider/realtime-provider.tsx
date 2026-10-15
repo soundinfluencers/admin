@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode, useCallback } from "react";
+import { useEffect, useMemo, useState, type ReactNode, useCallback } from "react";
 import { io, type Socket } from "socket.io-client";
 import { toast } from "react-toastify";
 
@@ -16,7 +16,6 @@ import { influencersQueryKeys } from "@/entities/influencers/api/influencers.que
 import { API_URL } from "@/shared/config/runtime-config.ts";
 
 const SOCKET_CLIENT_ID_KEY = "soundinfluencers-admin:socket-client-id";
-const WHATSAPP_SUCCESS_TOAST_ID = "whatsapp-success-once";
 // const SCRAPPER_ACCOUNTS_FINISHED_TOAST_ID = "scrapper-accounts-finished-toast";
 
 function getSocketClientId(): string {
@@ -45,7 +44,6 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const [clientId, setClientId] = useState<string | null>(null);
   const [lastWhatsappStatus, setLastWhatsappStatus] =
     useState<WhatsappMessageStatusUpdate | null>(null);
-  const hasShownWhatsappSuccessRef = useRef(false);
 
   const [
     activeAccountAccountsUpdates,
@@ -68,7 +66,6 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       setSocket(null);
       setClientId(null);
       setLastWhatsappStatus(null);
-      hasShownWhatsappSuccessRef.current = false;
 
       setActiveAccountAccountsUpdates([]);
       setLastRefreshAccountStatus(null);
@@ -99,17 +96,10 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       setIsConnected(false);
     });
 
-    const handleWhatsappStatusUpdate = (payload: WhatsappMessageStatusUpdate) => {
+    const handleWhatsappStatusUpdate = (
+      payload: WhatsappMessageStatusUpdate,
+    ) => {
       setLastWhatsappStatus(payload);
-
-      if (payload.status !== "sent") return;
-      if (hasShownWhatsappSuccessRef.current) return;
-
-      hasShownWhatsappSuccessRef.current = true;
-
-      toast.success("WhatsApp messages sent successfully", {
-        toastId: WHATSAPP_SUCCESS_TOAST_ID,
-      });
     };
 
     nextSocket.on("whatsappMessageStatusUpdate", handleWhatsappStatusUpdate);

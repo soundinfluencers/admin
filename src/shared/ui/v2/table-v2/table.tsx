@@ -4,6 +4,7 @@ import {
   flexRender, 
   getCoreRowModel, 
   useReactTable,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 
 import s from './table.module.scss';
@@ -13,6 +14,7 @@ interface TableProps<TData> {
   columns: ColumnDef<TData>[];
   getRowId?: TableOptions<TData>["getRowId"];
   showFooter?: boolean;
+  enableSorting?: boolean;
 }
 
 export function Table<TData>({ 
@@ -20,6 +22,7 @@ export function Table<TData>({
   columns,
   getRowId,
   showFooter,
+  enableSorting = false,
 }: TableProps<TData>) {
   "use no memo";
 
@@ -28,7 +31,18 @@ export function Table<TData>({
     data,
     columns,
     getRowId,
+
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+
+    enableSorting,
+    enableMultiSort: false,
+    enableSortingRemoval: true,
+    sortDescFirst: false,
+
+    defaultColumn: {
+      enableSorting: false,
+    },
   });
 
   const rows = table.getRowModel().rows;
@@ -39,27 +53,91 @@ export function Table<TData>({
         <div className={s.tableInner}>
           <table className={s.table}>
             <thead className={s.thead}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className={s.tr}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    colSpan={header.colSpan}
-                    className={s.th}
-                    scope={header.colSpan > 1 ? "colgroup" : "col"}
-                    data-align={header.column.columnDef.meta?.align}
-                    style={{ minWidth: header.column.columnDef.size }}
-                  >
-                    {header.isPlaceholder
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id} className={s.tr}>
+                  {headerGroup.headers.map((header) => {
+                    const canSort =
+                      !header.isPlaceholder &&
+                      header.column.getCanSort();
+
+                    const sorted = header.column.getIsSorted();
+                    const nextOrder = header.column.getNextSortingOrder();
+
+                    const sortTitle =
+                      nextOrder === "asc"
+                        ? "Sort ascending"
+                        : nextOrder === "desc"
+                          ? "Sort descending"
+                          : "Clear sorting";
+
+                    const content = header.isPlaceholder
                       ? null
                       : flexRender(
                         header.column.columnDef.header,
                         header.getContext(),
-                      )}
-                  </th>
-                ))}
-              </tr>
-            ))}
+                      );
+
+                    return (
+                      <th
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        className={s.th}
+                        scope={header.colSpan > 1 ? "colgroup" : "col"}
+                        data-align={header.column.columnDef.meta?.align}
+                        style={{ minWidth: header.column.columnDef.size }}
+                        aria-sort={
+                          canSort && sorted
+                            ? sorted === "asc"
+                              ? "ascending"
+                              : "descending"
+                            : undefined
+                        }
+                      >
+                        {canSort ? (
+                          <button
+                            type="button"
+                            className={s.sortButton}
+                            onClick={header.column.getToggleSortingHandler()}
+                            title={sortTitle}
+                          >
+                            {content}
+
+                            <svg
+                              className={s.sortIcon}
+                              data-sort={sorted || "none"}
+                              width="12"
+                              height="16"
+                              viewBox="0 0 12 16"
+                              fill="none"
+                              aria-hidden="true"
+                              focusable="false"
+                            >
+                              <path
+                                className={s.sortUp}
+                                d="M3 6L6 3L9 6"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                className={s.sortDown}
+                                d="M3 10L6 13L9 10"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        ) : (
+                          content
+                        )}
+                      </th>
+                    );
+                  })}
+                </tr>
+              ))}
             </thead>
 
             <tbody className={s.tbody}>

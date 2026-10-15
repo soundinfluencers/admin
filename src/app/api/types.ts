@@ -1,5 +1,17 @@
-import type { InternalAxiosRequestConfig } from "axios";
+import type {
+  AxiosRequestConfig,
+  InternalAxiosRequestConfig,
+} from "axios";
 
-export type RetriableRequestConfig = InternalAxiosRequestConfig & {
+export type ApiRequestOptions = {
+  silentError?: boolean;
+};
+
+export type ApiRequestConfig =
+  AxiosRequestConfig & ApiRequestOptions;
+
+export type RetriableRequestConfig =
+  InternalAxiosRequestConfig &
+  ApiRequestOptions & {
   _retry?: boolean;
 };

@@ -16,8 +16,9 @@ import CircleLoaderIcon from "@/shared/assets/icons/loader-circle.svg?react";
 import s from './campaign-header.module.scss';
 
 interface CampaignHeaderProps {
-  // onSave: () => void;
-  // isSaving: boolean;
+  onSave: () => void;
+  isSaveDisabled: boolean;
+  isSaving: boolean;
   campaignName: string;
   onCampaignNameChange: (campaignName: string) => void;
   campaignStatus: TCampaignStatus;
@@ -29,8 +30,9 @@ interface CampaignHeaderProps {
 }
 
 export const CampaignHeader = ({
-  // onSave,
-  // isSaving,
+  onSave,
+  isSaving,
+  isSaveDisabled,
   campaignName,
   onCampaignNameChange,
   campaignStatus,
@@ -128,8 +130,7 @@ export const CampaignHeader = ({
               type="button"
               onClick={onReset}
               disabled={isResetDisabled}
-              aria-label="Reset cahnages"
-              aria-busy={isResetDisabled}
+              aria-label="Reset changes"
             >
               Reset
             </button>
@@ -137,12 +138,12 @@ export const CampaignHeader = ({
             <button
               className={clsx(s.action, s.save)}
               type="button"
-              onClick={() => alert("Function don`t implemented yet!")}
-              disabled={false}
+              onClick={onSave}
+              disabled={isSaveDisabled || isSaving}
               aria-label="Save campaign changes"
-              aria-busy={false}
+              aria-busy={isSaving}
             >
-              {false ? (
+              {isSaving ? (
                 <>
                  <span
                   className={s.indicator}
@@ -154,7 +155,7 @@ export const CampaignHeader = ({
                       aria-hidden="true"
                       focusable="false"
                     />
-                  </span>
+                 </span>
                   {"Saving…"}
                 </>
               ) : "Save"}

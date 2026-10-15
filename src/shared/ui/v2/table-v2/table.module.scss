@@ -89,3 +89,50 @@
   color: #6C778B;
   text-align: center;
 }
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--black-blue);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+}
+
+.th[data-align="center"] .sortButton {
+  justify-content: center;
+}
+
+.th[data-align="right"] .sortButton {
+  justify-content: flex-end;
+}
+
+.sortIcon {
+  flex-shrink: 0;
+}
+
+.sortUp,
+.sortDown {
+  opacity: 0.35;
+}
+
+.sortIcon[data-sort="asc"] .sortUp,
+.sortIcon[data-sort="desc"] .sortDown {
+  opacity: 1;
+}

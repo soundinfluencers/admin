@@ -18,6 +18,8 @@ import type {
 } from "./campaign-management-store.types.ts";
 
 import { isValidCampaignPrice } from "@/entities/campaign/model/campaign-price.ts";
+import { applyPromoPaidToCampaign } from "@/entities/campaign/model/apply-promo-paid-to-campaign.ts";
+import { applyWhatsAppUpdatesToCampaign } from "@/entities/campaign/model/apply-whatsapp-updates-to-campaign.ts";
 import type { ICampaignDetails } from "@/entities/campaign/model/campaign-details.types.ts";
 
 const initialCampaignManagementState: TCampaignManagementState = {
@@ -750,7 +752,8 @@ export const useCampaignManagementStore =
           })
         },
 
-        applyPromoPaid: ({ campaignId, promoId, closePromo, statusLabel }) => {
+        applyPromoPaid: (result) => {
+          const { campaignId } = result;
           set((state) => {
             const applyToSnapshot = (
               snapshot: TCampaignManagementDraft | null,
@@ -759,32 +762,53 @@ export const useCampaignManagementStore =
                 return snapshot;
               }
 
-              const account = snapshot.campaign.addedAccounts.find(
-                (item) => item.addedAccountsId === promoId,
-              );
+              const campaign = applyPromoPaidToCampaign(snapshot.campaign, result);
 
-              if (!account || (account.closePromo === closePromo && account.statusLabel === statusLabel)) {
-                return snapshot;
-              }
+              if (campaign === snapshot.campaign) return snapshot;
 
-              return {
-                ...snapshot,
-                campaign: {
-                  ...snapshot.campaign,
-                  addedAccounts: snapshot.campaign.addedAccounts.map(
-                    (item) =>
-                      item.addedAccountsId === promoId
-                        ? { ...item, closePromo, statusLabel }
-                        : item,
-                  ),
-                },
-              };
+              return { ...snapshot, campaign };
             };
 
             const baseline = applyToSnapshot(state.baseline);
             const draft = applyToSnapshot(state.draft);
 
             if (baseline === state.baseline && draft === state.draft) {
+              return state;
+            }
+
+            return { baseline, draft };
+          });
+        },
+
+        applyWhatsAppUpdates: (params, updates) => {
+          set((state) => {
+            const applyToSnapshot = (
+              snapshot: TCampaignManagementDraft | null,
+            ): TCampaignManagementDraft | null => {
+              if (
+                !snapshot ||
+                !isSameCampaignContext(snapshot.params, params)
+              ) {
+                return snapshot;
+              }
+
+              const campaign = applyWhatsAppUpdatesToCampaign(
+                snapshot.campaign,
+                updates,
+              );
+
+              return campaign === snapshot.campaign
+                ? snapshot
+                : { ...snapshot, campaign };
+            };
+
+            const baseline = applyToSnapshot(state.baseline);
+            const draft = applyToSnapshot(state.draft);
+
+            if (
+              baseline === state.baseline &&
+              draft === state.draft
+            ) {
               return state;
             }
 
@@ -980,19 +1004,20 @@ export const useCampaignManagementStore =
           });
         },
 
-        applySavedCampaign: (submittedDraft, campaign) => {
-          set(() => {
+        applySavedCampaign: (params, campaign) => {
+          set((state) => {
+            if (!state.draft || !isSameCampaignContext(state.draft.params, params)) {
+              return state;
+            }
+
             const savedDraft: TCampaignManagementDraft = {
-              params: submittedDraft.params,
+              params,
               campaign,
             };
 
-            const baseline = structuredClone(savedDraft);
-            const draft = structuredClone(savedDraft);
-            
             return {
-              baseline,
-              draft,
+              baseline: structuredClone(savedDraft),
+              draft: structuredClone(savedDraft),
               meta: createCampaignManagementMeta(),
             };
           });

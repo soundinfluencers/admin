@@ -16,8 +16,21 @@ import type {
 import EditIcon from '@/shared/assets/icons/edit.svg?react';
 import ExternalLinkIcon from '@/shared/assets/icons/external-link.svg?react';
 import TrashIcon from "@/shared/assets/icons/trash.svg?react";
+import MailIcon from "@/shared/assets/icons/mail.svg?react";
 
 import s from "../ui/campaign-accounts-table.module.scss";
+
+const STATUS_SORT_ORDER: Readonly<Record<string, number>> = {
+  Requested: 0,
+  Accepted: 1,
+  Posted: 2,
+  "Insights Submitted": 3,
+  Declined: 4,
+};
+
+const getStatusSortOrder = (
+  status: CampaignAccount["statusLabel"],
+): number => STATUS_SORT_ORDER[status ?? ""] ?? 5;
 
 type CampaignAccount = ICampaignDetails["addedAccounts"][number];
 
@@ -32,6 +45,9 @@ interface ColumnsParams {
   onUpdateAccountMetricField: (addedAccountsId: string, field: TEditableField, value: number) => void;
   onPromoPaid: (result: IMarkPromoPaidResponse["data"]) => void | Promise<void>;
   onAccountRemove: (addedAccountsId: string) => void;
+  canSendMessage: boolean;
+  isMessageActionDisabled: boolean;
+  onOpenMessagePreview: (influencerId: string, trigger: HTMLButtonElement) => void;
 }
 
 export const getCampaignAccountsTableColumns = ({
@@ -45,6 +61,9 @@ export const getCampaignAccountsTableColumns = ({
   onUpdateAccountMetricField,
   onPromoPaid,
   onAccountRemove,
+  canSendMessage,
+  isMessageActionDisabled,
+  onOpenMessagePreview,
 }: ColumnsParams): ColumnDef<CampaignAccount>[] => [
   {
     accessorKey: "username",
@@ -68,6 +87,8 @@ export const getCampaignAccountsTableColumns = ({
   {
     accessorKey: "followers",
     header: "Followers",
+    enableSorting: true,
+    sortingFn: "basic",
     size: 83,
     footer: ({ table }) =>
       table.options.data.reduce((sum, account) => sum + account.followers, 0),
@@ -159,14 +180,19 @@ export const getCampaignAccountsTableColumns = ({
     },
   },
   {
-    accessorKey: "cpm",
+    id: "cpm",
+    accessorFn: (account) => account.cpm ?? 0,
     header: "CPM",
+    enableSorting: true,
+    sortingFn: "basic",
     size: 63,
     cell: ({ row }) => row.original.cpm ?? 0,
   },
   {
     accessorKey: "impressions",
     header: "Impressions",
+    enableSorting: true,
+    sortingFn: "basic",
     size: 86,
     cell: ({ row }) => {
       const account = row.original;
@@ -189,6 +215,8 @@ export const getCampaignAccountsTableColumns = ({
   {
     accessorKey: "like",
     header: "Likes",
+    enableSorting: true,
+    sortingFn: "basic",
     size: 63,
     cell: ({ row }) => {
       const account = row.original;
@@ -211,6 +239,8 @@ export const getCampaignAccountsTableColumns = ({
   {
     accessorKey: "comments",
     header: "Comments",
+    enableSorting: true,
+    sortingFn: "basic",
     size: 78,
     cell: ({ row }) => {
       const account = row.original;
@@ -233,6 +263,8 @@ export const getCampaignAccountsTableColumns = ({
   {
     accessorKey: "saves",
     header: "Saves",
+    enableSorting: true,
+    sortingFn: "basic",
     size: 58,
     cell: ({ row }) => {
       const account = row.original;
@@ -255,6 +287,8 @@ export const getCampaignAccountsTableColumns = ({
   {
     accessorKey: "shares",
     header: "Shares",
+    enableSorting: true,
+    sortingFn: "basic",
     size: 63,
     cell: ({ row }) => {
       const account = row.original;
@@ -277,6 +311,10 @@ export const getCampaignAccountsTableColumns = ({
   {
     accessorKey: "statusLabel",
     header: "Status",
+    enableSorting: true,
+    sortingFn: (rowA, rowB) =>
+      getStatusSortOrder(rowA.original.statusLabel) -
+      getStatusSortOrder(rowB.original.statusLabel),
     size: 135,
     meta: { align: "center" },
     cell: ({ row }) => row.original.statusLabel ? (
@@ -322,6 +360,27 @@ export const getCampaignAccountsTableColumns = ({
       
       return (
         <div className={s.actions}>
+          {canSendMessage && (
+            <button
+              type="button"
+              className={s.action}
+              disabled={isMessageActionDisabled}
+              onClick={(event) => {
+                if (isMessageActionDisabled) return;
+
+                onOpenMessagePreview(
+                  account.influencerId,
+                  event.currentTarget,
+                );
+              }}
+              aria-label={`Preview message for ${account.username}`}
+              title="Preview message"
+              data-action="previewMessage"
+            >
+              <MailIcon aria-hidden="true" className={s.icon} />
+            </button>
+          )}
+          
           <button
             type="button"
             className={s.action}

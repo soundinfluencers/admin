@@ -1,5 +1,6 @@
 import type { TSocialMedia } from "@/shared/constants/social-media-taxonomy.ts";
 import type { TCurrency } from "@/shared/constants/currency-taxonomy.ts";
+import type { TWhatsAppStatus } from "./campaign-whatsapp.types.ts";
 
 export const CAMPAIGN_STATUSES = {
   UNDER_REVIEW: 'under_review',
@@ -18,20 +19,6 @@ export const CAMPAIGN_STATUS_LABELS = {
   [CAMPAIGN_STATUSES.PROPOSAL]: 'Proposal',
   [CAMPAIGN_STATUSES.PENDING]: 'Pending',
 } satisfies Record<TCampaignStatus, string>;
-
-export const WHATSAPP_STATUS = {
-  SENT: "sent",
-  NOT_SENT: "not_sent",
-  FAILED: "failed",
-} as const;
-
-export type TWhatsAppStatus = (typeof WHATSAPP_STATUS)[keyof typeof WHATSAPP_STATUS];
-
-export const WHATSAPP_STATUS_LABELS = {
-  [WHATSAPP_STATUS.SENT]: 'Sent',
-  [WHATSAPP_STATUS.NOT_SENT]: 'Not Sent',
-  [WHATSAPP_STATUS.FAILED]: 'Failed',
-} satisfies Record<TWhatsAppStatus, string>;
 
 interface ISelectedContent {
   campaignContentItemId: string;
@@ -175,6 +162,7 @@ export interface ICampaignDetails {
   hiddenColumns: string[];
   cpm: number;
   canEdit: boolean;
+  isPaused: boolean;
   internalCost: number;
   existingOptions: number[];
 }

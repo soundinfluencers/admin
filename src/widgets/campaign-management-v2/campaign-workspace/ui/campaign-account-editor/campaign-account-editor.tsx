@@ -223,7 +223,7 @@ export const CampaignAccountEditor = ({
           readOnly={readOnly}
           key={`description:${selectedContent?._id ?? "no-content"}`}
           label="Description"
-          placeholder="post description…"
+          placeholder="Enter new post description…"
           options={descriptionOptions}
           selectedId={account.selectedContent?.descriptionId ?? null}
           onSelect={handleDescriptionSelect}
@@ -234,14 +234,14 @@ export const CampaignAccountEditor = ({
       </EditSection>
 
       <EditSection
-        title="Additional brief"
+        title="Brief"
         subtitle="Select a saved brief, edit it for all accounts using it, or create a new one."
       >
         <CampaignTextEditor
           readOnly={readOnly}
           key={`brief:${selectedContent?._id ?? "no-content"}`}
           label="Brief"
-          placeholder="additional brief…"
+          placeholder="Enter new brief…"
           options={briefOptions}
           selectedId={account.selectedContent?.additionalBriefId ?? null}
           onSelect={handleBriefSelect}

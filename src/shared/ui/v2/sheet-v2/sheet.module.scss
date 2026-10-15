@@ -1,0 +1,162 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgb(0 0 0 / 40%);
+
+  &[data-state="open"] {
+    animation: overlay-in 220ms ease-out both;
+  }
+
+  &[data-state="closed"] {
+    animation: overlay-out 180ms ease-in both;
+  }
+}
+
+.content {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: min(496px, 100%);
+  height: 100dvh;
+  min-width: 0;
+  overflow: hidden;
+
+  border-left: 1px solid #DFE5EE;
+  background: var(--white);
+  box-shadow: 0 18px 48px -8px rgba(27, 36, 54, 0.18);
+  color: #1B2436;
+
+  &[data-state="open"] {
+    animation: sheet-in 220ms ease-out both;
+  }
+
+  &[data-state="closed"] {
+    animation: sheet-out 180ms ease-in both;
+  }
+}
+
+.header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 16px 16px 20px;
+  border-bottom: 1px solid #DFE5EE;
+}
+
+.titleGroup {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  overflow-wrap: anywhere;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.description {
+  color: #6C778B;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.close {
+  @include mixins.reset-button;
+
+  display: flex;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  border-radius: 6px;
+  background: var(--white);
+  color: #6C778B;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  min-height: 59px;
+  border-top: 1px solid #DFE5EE;
+  background: var(--white);
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sheet-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes overlay-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .content,
+  .overlay {
+    animation: none;
+  }
+}

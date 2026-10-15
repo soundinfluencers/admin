@@ -62,6 +62,34 @@ export const ProposalOptionToolbar = ({
     return () => resizeObserver.disconnect();
   }, [options, updateScrollState]);
 
+  useEffect(() => {
+    const container = scrollRef.current;
+
+    if (!container) return;
+
+    const selectedButton = container.querySelector<HTMLButtonElement>(
+      'button[aria-pressed="true"]',
+    );
+
+    if (!selectedButton) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const buttonRect = selectedButton.getBoundingClientRect();
+
+    const visibleLeft = containerRect.left + container.clientLeft;
+    const visibleRight = visibleLeft + container.clientWidth - 5;
+
+    if (buttonRect.left < visibleLeft) {
+      container.scrollBy({
+        left: buttonRect.left - visibleLeft,
+      });
+    } else if (buttonRect.right > visibleRight) {
+      container.scrollBy({
+        left: buttonRect.right - visibleRight,
+      });
+    }
+  }, [selectedOptionIndex, options]);
+
   const scrollOptions = (direction: number) => {
     const element = scrollRef.current;
     if (!element) return;

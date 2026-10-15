@@ -3,6 +3,7 @@ import { RootRedirect } from "./root-redirect.tsx";
 import { ProtectedOnly, PublicOnly } from "./guards.tsx";
 import { PublicLayout } from "@/app/providers/router/ui/public-layout.tsx";
 import { AdminLayout } from "@/app/providers/router/ui/admin-layout.tsx";
+import { CampaignDraftLifecycle } from "@/app/providers/router/campaign-draft-lifecycle.tsx";
 
 //App pages
 import { LoginPage } from "@/pages/login";
@@ -32,7 +33,11 @@ import { RequestsPage } from "@/pages/requests-page";
 export const ROUTER = createBrowserRouter([
   {
     path: "/",
-    element: <Outlet/>,
+    element: (
+      <CampaignDraftLifecycle>
+        <Outlet/>
+      </CampaignDraftLifecycle>
+    ),
     children: [
       { index: true, element: <RootRedirect/> },
 
@@ -72,7 +77,7 @@ export const ROUTER = createBrowserRouter([
                     path: "campaign-management/:status/:campaignId",
                     element: <CampaignManagementPage/>,
                   },
-                  
+
                   // {
                   //   path: "campaign-management",
                   //   children: [

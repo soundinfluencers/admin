@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { SOCIAL_MEDIA_ICONS } from "@/shared/config/social-media-icons.ts";
 
 import type { ICampaignDetails } from "@/entities/campaign/model/campaign-details.types.ts";
@@ -48,15 +47,16 @@ export const CampaignAccountsList = ({
         </div>
 
         {!readOnly && (
-          <Link
+          <button
+            type="button"
             className={s.add}
-            to={""}
+            disabled
+            title="Adding influencers is not available yet"
             aria-label="Add account"
-            onClick={() => alert("Function don`t implemented yet!")}
           >
             <Plus className={s.icon}/>
             Add
-          </Link>
+          </button>
         )}
       </div>
 

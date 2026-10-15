@@ -26,6 +26,7 @@ export const useCampaignDetailsQuery = (
       : skipToken,
 
     staleTime: 0,
+    refetchOnMount: "always",
     refetchOnWindowFocus: false,
   });
 };

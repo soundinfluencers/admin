@@ -15,6 +15,10 @@
   background: rgb(0 0 0 / 40%);
 }
 
+.overlayAboveSheet {
+  z-index: 1100;
+}
+
 .content {
   box-sizing: border-box;
   width: 100%;

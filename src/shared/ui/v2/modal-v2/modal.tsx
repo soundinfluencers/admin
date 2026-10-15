@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode, ComponentPropsWithoutRef } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import clsx from "clsx";
 
@@ -14,6 +14,10 @@ interface ModalProps {
   children: ReactNode;
   trigger?: ReactElement;
   className?: string;
+  layer?: "default" | "above-sheet";
+  onCloseAutoFocus?: ComponentPropsWithoutRef<
+    typeof Dialog.Content
+  >["onCloseAutoFocus"];
 }
 
 export const Modal = ({
@@ -24,6 +28,8 @@ export const Modal = ({
   children,
   trigger,
   className,
+  layer = "default",
+  onCloseAutoFocus,
 }: ModalProps) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -34,9 +40,15 @@ export const Modal = ({
       )}
 
       <Dialog.Portal>
-        <Dialog.Overlay className={s.overlay}>
+        <Dialog.Overlay
+          className={clsx(
+            s.overlay,
+            layer === "above-sheet" && s.overlayAboveSheet,
+          )}
+        >
           <Dialog.Content
             className={clsx(s.content, className)}
+            onCloseAutoFocus={onCloseAutoFocus}
             {...(!description ? { "aria-describedby": undefined } : {})}
           >
             <div className={s.header}>

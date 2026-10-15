@@ -1,9 +1,18 @@
 import { $api } from '@/app/api/http.ts';
+
 import type {
-  ICampaignListResponse, IDeleteCampaignParams,
-  IUpdateCampaignParams, IUpdateCampaignResponse,
+  ApiRequestConfig,
+  ApiRequestOptions,
+} from "@/app/api/types.ts";
+
+import type {
+  ICampaignListResponse, 
+  IDeleteCampaignParams,
+  IUpdateCampaignParams, 
+  IUpdateCampaignResponse,
   TGetCampaignParams,
 } from "@/entities/campaign/model/campaign.types.ts";
+
 import type {
   ICampaignDetails,
   ICampaignDetailsRequestParams,
@@ -11,8 +20,14 @@ import type {
   ICreateProposalOptionRequestParams,
   ICreateProposalResponse,
   IMarkPromoPaidParams,
-  IMarkPromoPaidResponse, IUpdateCampaignDetailsRequestParams, IUpdateCampaignDetailsResponse,
+  IMarkPromoPaidResponse, 
+  IUpdateCampaignDetailsRequestParams, 
+  IUpdateCampaignDetailsResponse,
 } from "../model/campaign-details.types.ts";
+
+import type { ISendCampaignWhatsAppRequest, ISendCampaignWhatsAppResponse } from "../model/campaign-whatsapp.types.ts";
+
+import type { ISendCampaignEmailRequest } from "../model/campaign-email.types";
 
 export const getAllCampaigns = async (params: TGetCampaignParams) => {
   const { data } = await $api.get<ICampaignListResponse>('/admin/campaigns', {
@@ -43,15 +58,22 @@ export const uploadCampaignsXlsx = async (file: File) => {
   await $api.post('/admin/campaigns/xlsx', formData);
 };
 
-export const getCampaignById = async ({
-  campaignId,
-  status,
-  optionIndex,
-}: ICampaignDetailsRequestParams): Promise<ICampaignDetails> => {
-  const { data } = await $api.get<ICampaignDetailsResponse>(`/admin/campaigns/${status}/${campaignId}`,
-    {
-      params: { optionIndex },
-    },
+export const getCampaignById = async (
+  {
+    campaignId,
+    status,
+    optionIndex,
+  }: ICampaignDetailsRequestParams,
+  options: ApiRequestOptions = {},
+): Promise<ICampaignDetails> => {
+  const config: ApiRequestConfig = {
+    params: { optionIndex },
+    silentError: options.silentError,
+  };
+
+  const { data } = await $api.get<ICampaignDetailsResponse>(
+    `/admin/campaigns/${status}/${campaignId}`,
+    config,
   );
 
   return data.data;
@@ -96,4 +118,61 @@ export const createProposalOption = async ({
   );
 
   return data.data;
+};
+
+export const closeCampaign = async (
+  campaignId: string,
+): Promise<void> => {
+  await $api.post<void>(
+    `/admin/campaigns/${encodeURIComponent(campaignId)}/close`,
+  );
+};
+
+export const reopenCampaign = async (
+  campaignId: string,
+): Promise<void> => {
+  await $api.post<void>(
+    `/admin/campaigns/${encodeURIComponent(campaignId)}/reopen`,
+  );
+};
+
+export const downloadCampaignPdf = async (
+  campaignId: string,
+): Promise<Blob> => {
+  const { data } = await $api.get<Blob>(
+    `/campaigns/${encodeURIComponent(campaignId)}/pdf`,
+    {
+      responseType: "blob",
+      timeout: 15_000,
+    },
+  );
+
+  return data;
+};
+
+export const sendCampaignWhatsAppOne = async (
+  body: ISendCampaignWhatsAppRequest,
+  options: ApiRequestOptions = {},
+): Promise<ISendCampaignWhatsAppResponse> => {
+  const config: ApiRequestConfig = {
+    silentError: options.silentError,
+  };
+
+  const { data } = await $api.post<ISendCampaignWhatsAppResponse>(
+    "/admin/campaigns/whatsapp/one",
+    body,
+    config,
+  );
+
+  return data;
+};
+
+
+export const sendCampaignEmail = async ({
+  campaignId,
+  promoId,
+}: ISendCampaignEmailRequest): Promise<void> => {
+  await $api.post<void>(
+    `/admin/campaigns/mail/${encodeURIComponent(campaignId)}/${encodeURIComponent(promoId)}`,
+  );
 };
