@@ -17,9 +17,9 @@ const getEditableCampaignSnapshot = (
   snapshot: TCampaignManagementDraft,
 ) => {
   const { campaign, params } = snapshot;
-  
-  if (params.status === "completed") return null;
 
+  if (params.status === "completed") return null;
+  
   return {
     campaignName: campaign.campaignName,
     price: campaign.price,
@@ -77,7 +77,9 @@ const getEditableCampaignSnapshot = (
       taggedUser: content.taggedUser ?? "",
       taggedLink: content.taggedLink ?? "",
 
-      additionalBrief: (content.additionalBrief ?? []).map((item) => ({
+      additionalBrief: (Array.isArray(content.additionalBrief)
+        ? content.additionalBrief
+        : []).map((item) => ({
         _id: item._id,
         additionalBrief: item.additionalBrief,
       })),
@@ -96,7 +98,7 @@ export const selectCampaignIsDirty = (
   state: TCampaignManagementState,
 ): boolean => {
   if (!state.draft) return false;
-  
+
   if (
     !state.baseline ||
     !isSameCampaignContext(state.draft.params, state.baseline.params)

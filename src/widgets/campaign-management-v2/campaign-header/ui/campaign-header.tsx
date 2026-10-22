@@ -1,5 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
+import { Button } from "@/shared/ui/v2/button-v2";
+
+import RotateIcon from "@/shared/assets/icons/rotate.svg?react";
+import SaveIcon from "@/shared/assets/icons/save.svg?react";
 
 import {
   CAMPAIGN_STATUS_LABELS,
@@ -11,13 +15,12 @@ import {
   type TCurrency,
 } from "@/shared/constants/currency-taxonomy.ts";
 
-import CircleLoaderIcon from "@/shared/assets/icons/loader-circle.svg?react";
-
 import s from './campaign-header.module.scss';
 
 interface CampaignHeaderProps {
   onSave: () => void;
   isSaveDisabled: boolean;
+  isDirty: boolean;
   isSaving: boolean;
   campaignName: string;
   onCampaignNameChange: (campaignName: string) => void;
@@ -27,12 +30,14 @@ interface CampaignHeaderProps {
   onReset: () => void;
   isResetDisabled: boolean;
   readOnly: boolean;
+  isEditingDisabled?: boolean;
 }
 
 export const CampaignHeader = ({
   onSave,
   isSaving,
   isSaveDisabled,
+  isDirty,
   campaignName,
   onCampaignNameChange,
   campaignStatus,
@@ -41,16 +46,24 @@ export const CampaignHeader = ({
   onReset,
   isResetDisabled,
   readOnly,
+  isEditingDisabled = false,
 }: CampaignHeaderProps) => {
   const [draft, setDraft] = useState(campaignName);
+  const [wasEditingDisabled, setWasEditingDisabled] = useState(isEditingDisabled);
   const skipNextBlurSaveRef = useRef(false);
+  const saveDisabledReason = !isDirty && !isSaving ? "No changes to save" : undefined;
 
   useEffect(() => {
     setDraft(campaignName);
   }, [campaignName]);
 
+  if (wasEditingDisabled !== isEditingDisabled) {
+    setWasEditingDisabled(isEditingDisabled);
+    setDraft(campaignName);
+  }
+
   const handleBlur = () => {
-    if (readOnly) {
+    if (readOnly || isEditingDisabled) {
       skipNextBlurSaveRef.current = false;
       setDraft(campaignName);
       return;
@@ -76,7 +89,7 @@ export const CampaignHeader = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (readOnly) return;
+    if (readOnly || isEditingDisabled) return;
 
     if (e.key === "Enter") {
       e.preventDefault();
@@ -91,6 +104,12 @@ export const CampaignHeader = ({
     }
   };
 
+  const normalizedPendingStatus = campaignStatus === "pending" || campaignStatus === "under_review"
+    ? "under_review"
+    : campaignStatus;
+
+  const statusLabel = CAMPAIGN_STATUS_LABELS[normalizedPendingStatus];
+
   return (
     <div className={s.header}>
       <h1 className="visually-hidden">{campaignName}</h1>
@@ -100,8 +119,8 @@ export const CampaignHeader = ({
           id="campaign-name"
           className={s.input}
           type="text"
-          readOnly={readOnly}
-          value={readOnly ? campaignName : draft}
+          readOnly={readOnly || isEditingDisabled}
+          value={readOnly || isEditingDisabled ? campaignName : draft}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
@@ -110,13 +129,13 @@ export const CampaignHeader = ({
         />
 
         <div className={clsx(s.campaignStatus, {
-          [s.underReview]: campaignStatus === "under_review",
+          [s.underReview]: campaignStatus === "under_review" || campaignStatus === "pending",
           [s.distributing]: campaignStatus === "distributing",
           [s.completed]: campaignStatus === "completed",
           [s.proposal]: campaignStatus === "proposal",
           // [s.pause]: campaignStatus === "pause",
         })}>
-          <span>Status: {CAMPAIGN_STATUS_LABELS[campaignStatus]}</span>
+          <span>{statusLabel}</span>
         </div>
       </div>
 
@@ -125,41 +144,30 @@ export const CampaignHeader = ({
 
         {!readOnly && (
           <>
-            <button
-              className={s.action}
-              type="button"
-              onClick={onReset}
+            <Button
+              label="Reset"
+              icon={RotateIcon}
               disabled={isResetDisabled}
               aria-label="Reset changes"
+              onClick={onReset}
+            />
+            
+            <span
+              className={s.saveAction}
+              title={saveDisabledReason}
             >
-              Reset
-            </button>
-
-            <button
-              className={clsx(s.action, s.save)}
-              type="button"
-              onClick={onSave}
-              disabled={isSaveDisabled || isSaving}
-              aria-label="Save campaign changes"
-              aria-busy={isSaving}
-            >
-              {isSaving ? (
-                <>
-                 <span
-                  className={s.indicator}
-                  role="status"
-                  aria-label="Save campaign"
-                 >
-                    <CircleLoaderIcon
-                      className={s.loader}
-                      aria-hidden="true"
-                      focusable="false"
-                    />
-                 </span>
-                  {"Saving…"}
-                </>
-              ) : "Save"}
-            </button>
+              <Button
+                variant="primary"
+                label="Save"
+                loadingLabel="Saving…"
+                icon={SaveIcon}
+                isLoading={isSaving}
+                disabled={isSaveDisabled || isSaving}
+                aria-label="Save campaign changes"
+                aria-description={saveDisabledReason}
+                onClick={onSave}
+              />
+            </span>
           </>
         )}
       </div>

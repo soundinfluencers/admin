@@ -2,6 +2,7 @@ import CircleCheckIcon from "@/shared/assets/icons/circle-check.svg?react";
 import TrashIcon from "@/shared/assets/icons/trash.svg?react";
 
 import s from './screenshot-preview.module.scss';
+import { Button } from "@/shared/ui/v2/button-v2";
 
 interface ScreenshotPreviewProps {
   url: string;
@@ -34,15 +35,13 @@ export const ScreenshotPreview = ({
         <p className={s.statusLabel}>Screenshot available</p>
       </div>
 
-      <button
-        type="button"
-        className={s.removeBtn}
+      <Button
+        variant="danger"
+        label="Remove screenshot"
+        icon={TrashIcon}
         disabled={isRemoveDisabled}
         onClick={onRemoveScreenshot}
-      >
-        <TrashIcon aria-hidden="true" />
-        Remove screenshot
-      </button>
+      />
     </div>
   </>
 );

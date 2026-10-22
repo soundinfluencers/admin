@@ -302,6 +302,11 @@ export const useProposalOptionActions = ({
 
     if (!getCurrentProposalDraft(execution)) return;
 
+    if (action.type === "copy") {
+      setProposalDialog({ type: "create" });
+      return;
+    }
+
     await executeProposalAction(action, savedCampaign, execution);
   };
 
@@ -325,6 +330,11 @@ export const useProposalOptionActions = ({
 
     if (!restoredDraft) return;
 
+    if (action.type === "copy") {
+      setProposalDialog({ type: "create" });
+      return;
+    }
+    
     void executeProposalAction(action, restoredDraft.campaign);
   };
 
@@ -332,6 +342,14 @@ export const useProposalOptionActions = ({
     isCreatingOption,
     isCreateOptionModalOpen: proposalDialog?.type === "create",
     isUnsavedChangesModalOpen: proposalDialog?.type === "confirm",
+
+    proposalUnsavedChangesDescription:
+      proposalDialog?.type === "confirm" &&
+      proposalDialog.action.type === "copy"
+        ? "Save or discard your changes before creating a copy. " +
+        "You will return to the creation dialog. " +
+        "The copy will not be created automatically."
+        : undefined,
 
     openCreateOptionModal,
     closeCreateOptionModal,

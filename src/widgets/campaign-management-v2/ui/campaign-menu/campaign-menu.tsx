@@ -1,16 +1,14 @@
-import clsx from "clsx";
 import { useRef } from "react";
 import { Sheet, type SheetProps } from "@/shared/ui/v2/sheet-v2";
+import { Button } from "@/shared/ui/v2/button-v2";
 import { UnsavedChangesModal } from "../unsaved-changes-modal/unsaved-changes-modal.tsx";
-import { CampaignWhatsAppAccounts } from "./campaign-whatsapp-accounts.tsx";
+import { CampaignWhatsAppSection } from "./campaign-whatsapp-section.tsx";
 
-import { WHATSAPP_STATUS } from "@/entities/campaign/model/campaign-whatsapp.types.ts";
 import type { ICampaignDetails } from "@/entities/campaign/model/campaign-details.types.ts";
 import type { TCampaignWhatsAppAttempts } from "@/features/campaign-management/send-campaign-whatsapp";
 
 import DownloadIcon from "@/shared/assets/icons/download.svg?react";
 import PauseIcon from "@/shared/assets/icons/pause.svg?react";
-import SendIcon from "@/shared/assets/icons/send.svg?react";
 import CheckIcon from "@/shared/assets/icons/check-circle.svg?react";
 import RefreshIcon from '@/shared/assets/icons/refresh.svg?react';
 
@@ -70,25 +68,7 @@ export const CampaignMenu = ({
   const statusButtonRef = useRef<HTMLButtonElement>(null);
   const sendWhatsAppButtonRef = useRef<HTMLButtonElement>(null);
   const confirmationTriggerRef = useRef<"pdf" | "status" | "whatsapp">("pdf");
-
-  const isPdfBusy = isSaving || isDownloadingPdf;
-
-  const counts = {
-    [WHATSAPP_STATUS.SENT]: 0,
-    [WHATSAPP_STATUS.NOT_SENT]: 0,
-    [WHATSAPP_STATUS.FAILED]: 0,
-    sending: 0,
-    unknown: 0,
-  };
-
-  for (const account of accounts) {
-    const status =
-      whatsAppAttempts[account.influencerId] ??
-      account.whatsappStatus;
-
-    counts[status] += 1;
-  }
-
+  
   return (
     <Sheet
       open={open}
@@ -110,16 +90,15 @@ export const CampaignMenu = ({
             <span className={s.footerLabel}>
               Campaign management
             </span>
-
-            <button
+            
+            <Button
               ref={statusButtonRef}
-              type="button"
-              className={clsx(
-                s.button,
-                canCloseCampaign ? s.dangerButton : s.primaryButton,
-              )}
+              variant={canCloseCampaign ? "danger" : "primary"}
+              label={canCloseCampaign ? "Close campaign" : "Reopen campaign"}
+              loadingLabel={canCloseCampaign ? "Closing…" : "Reopening…"}
+              icon={canCloseCampaign ? CheckIcon : RefreshIcon}
+              isLoading={isChangingCampaignStatus}
               disabled={isMenuBusy}
-              aria-busy={isChangingCampaignStatus}
               onClick={() => {
                 confirmationTriggerRef.current = "status";
 
@@ -129,28 +108,11 @@ export const CampaignMenu = ({
                   onReopenCampaign();
                 }
               }}
-            >
-              {isChangingCampaignStatus ? (
-                <span className={s.pdfLoader} aria-hidden="true" />
-              ) : canCloseCampaign ? (
-                <CheckIcon aria-hidden="true" className={s.icon} />
-              ) : (
-                <RefreshIcon aria-hidden="true" className={s.icon} />
-              )}
-
-              {canCloseCampaign
-                ? isChangingCampaignStatus
-                  ? "Closing…"
-                  : "Close campaign"
-                : isChangingCampaignStatus
-                  ? "Reopening…"
-                  : "Reopen campaign"}
-            </button>
+            />
           </div>
         ) : undefined
       }
     >
-
       <section className={s.actionsSection}>
         <h3
           ref={actionsTitleRef}
@@ -161,102 +123,42 @@ export const CampaignMenu = ({
         </h3>
 
         <div className={s.actions}>
-          <button
+          <Button
             ref={downloadButtonRef}
-            type="button"
-            className={s.button}
+            label="Download PDF"
+            loadingLabel="Downloading…"
+            isLoading={isDownloadingPdf}
+            icon={DownloadIcon}
             onClick={() => {
               confirmationTriggerRef.current = "pdf";
               onDownloadPdf();
             }}
             disabled={isMenuBusy}
-            aria-busy={isPdfBusy}
-          >
-            {isPdfBusy ? (
-              <span className={s.pdfLoader} aria-hidden="true" />
-            ) : (
-              <DownloadIcon aria-hidden="true" className={s.icon} />
-            )}
-            
-            {isDownloadingPdf ? "Downloading…" : "Download PDF"}
-          </button>
+          />
 
           {!canReopenCampaign && (
-            <button
-              type="button"
-              className={s.button}
+            <Button 
+              label="Pause campaign"
+              icon={PauseIcon}
+              title={"Pause campaign is not available yet"}
               disabled
-            >
-              <PauseIcon aria-hidden="true" className={s.icon}/>
-              Pause campaign
-            </button>
+            />
           )}
         </div>
       </section>
 
-      <section className={s.messagesSection}>
-        <div className={s.messagesHeader}>
-          <div className={s.heading}>
-            <h3 className={s.messagesTitle}>
-              WhatsApp messages
-            </h3>
-
-            {canSendWhatsApp && (
-              <button
-                ref={sendWhatsAppButtonRef}
-                type="button"
-                className={clsx(s.button, s.primaryButton)}
-                disabled={isMenuBusy || accounts.length === 0}
-                aria-busy={isSendingWhatsApp}
-                onClick={() => {
-                  confirmationTriggerRef.current = "whatsapp";
-                  onSendWhatsApp();
-                }}
-              >
-                {isSendingWhatsApp ? (
-                  <span className={s.pdfLoader} aria-hidden="true" />
-                ) : (
-                  <SendIcon aria-hidden="true" className={s.icon} />
-                )}
-
-                {isSendingWhatsApp ? "Sending…" : "Send to all"}
-              </button>
-            )}
-          </div>
-
-          <div className={s.summary}>
-            <span className={s.sentCount}>
-              {counts[WHATSAPP_STATUS.SENT]} sent
-            </span>
-            ·
-            <span>
-              {counts[WHATSAPP_STATUS.NOT_SENT]} not sent
-            </span>
-            ·
-            <span className={s.failedCount}>
-              {counts[WHATSAPP_STATUS.FAILED]} failed
-            </span>
-            
-            {counts.sending > 0 && (
-              <>
-                ·
-                <span>{counts.sending} sending</span>
-              </>
-            )}
-            
-            {counts.unknown > 0 && (
-              <>
-                ·
-                <span>{counts.unknown} unknown</span>
-              </>
-            )}
-
-            <span>/ {accounts.length} accounts</span>
-          </div>
-        </div>
-
-        <CampaignWhatsAppAccounts accounts={accounts} attempts={whatsAppAttempts}/>
-      </section>
+      <CampaignWhatsAppSection
+        accounts={accounts}
+        whatsAppAttempts={whatsAppAttempts}
+        canSendWhatsApp={canSendWhatsApp}
+        isSendingWhatsApp={isSendingWhatsApp}
+        isMenuBusy={isMenuBusy}
+        sendWhatsAppButtonRef={sendWhatsAppButtonRef}
+        onSendWhatsApp={() => {
+          confirmationTriggerRef.current = "whatsapp";
+          onSendWhatsApp();
+        }}
+      />
 
       <UnsavedChangesModal
         open={isMenuConfirmationOpen}

@@ -4,6 +4,7 @@ import { CampaignAccountHeader } from "../campaign-account-header/campaign-accou
 import { CampaignAccountEditor } from "../campaign-account-editor/campaign-account-editor.tsx";
 import { CampaignAccountAudience } from "../campaign-account-audience/campaign-account-audience.tsx";
 import { CampaignAccountsTable } from "../campaign-accounts-table/ui/campaign-accounts-table.tsx";
+import { CampaignStrategyTable } from "../campaign-strategy-table/ui/campaign-strategy-table";
 
 import type { TCampaignView } from "@/shared/constants/campaign-view.ts";
 import type {
@@ -22,6 +23,8 @@ interface CampaignWorkspaceProps {
   canMarkAsPaid: boolean;
   canEditPostDetails: boolean;
   readOnly: boolean;
+  isInsightsLocked: boolean;
+  isInsightsActionBlocked: () => boolean;
   onAccountContentChange: (addedAccountsId: string, campaignContentItemId: string) => void;
   onCreateContentForAccount: (addedAccountsId: string, mainLink: string) => void;
   onAccountDescriptionChange: (addedAccountsId: string, descriptionId: string) => void;
@@ -54,6 +57,8 @@ export const CampaignWorkspace = ({
   canMarkAsPaid,
   canEditPostDetails,
   readOnly,
+  isInsightsLocked,
+  isInsightsActionBlocked,
   onAccountContentChange,
   onCreateContentForAccount,
   onAccountDescriptionChange,
@@ -87,10 +92,16 @@ export const CampaignWorkspace = ({
     accounts[0] ?? 
     null;
 
+  if (view === "strategy_table") {
+    return <CampaignStrategyTable campaign={campaign} />;
+  }
+
   if (view === "insights") {
     return (
       <CampaignAccountsTable
-        canRemoveAccount={!readOnly}
+        editorRevision={editorRevision}
+        canRemoveAccount={!readOnly && !isInsightsLocked}
+        isInsightsActionBlocked={isInsightsActionBlocked}
         campaignId={campaign.campaignId}
         accounts={campaign.addedAccounts}
         canEditMetrics={canEditMetrics}
@@ -122,6 +133,7 @@ export const CampaignWorkspace = ({
         {selectedAccount ? (
           <>
             <CampaignAccountHeader
+              isRemoveDisabled={isInsightsLocked}
               readOnly={readOnly}
               username={selectedAccount.username}
               socialMedia={selectedAccount.socialMedia}
@@ -131,6 +143,7 @@ export const CampaignWorkspace = ({
 
             {view === "strategy" ? (
               <CampaignAccountEditor
+                disabled={isInsightsLocked}
                 readOnly={readOnly}
                 key={`${selectedAccount.addedAccountsId}:${editorRevision}`}
                 account={selectedAccount}
@@ -155,6 +168,13 @@ export const CampaignWorkspace = ({
                 key={selectedAccount.addedAccountsId}
                 countries={selectedAccount.countries}
                 genres={selectedAccount.genres}
+                averageViews={selectedAccount.averageViews}
+                engagementRate={selectedAccount.engagementRate}
+                profileType={selectedAccount.profileType}
+                additionalCategories={[
+                  ...selectedAccount.communityThemeTopics,
+                  ...selectedAccount.creatorContentFocus,
+                ]}
               />
             )}
           </>

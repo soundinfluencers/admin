@@ -1,6 +1,6 @@
 import { useRef, type ChangeEvent } from "react";
-import clsx from "clsx";
 
+import { Button } from "@/shared/ui/v2/button-v2";
 import { useScreenshotEditor } from "../model/use-screenshot-editor";
 
 import { ScreenshotSelectionArea } from "./screenshot-selection-area";
@@ -11,6 +11,7 @@ import s from './screenshot-editor.module.scss';
 
 interface ScreenshotEditorProps {
   value: string;
+  disabled?: boolean;
   username: string;
   onApply: (url: string) => void;
   onCancel: () => void;
@@ -18,6 +19,7 @@ interface ScreenshotEditorProps {
 
 export const ScreenshotEditor = ({
   value,
+  disabled = false,
   username,
   onApply,
   onCancel,
@@ -38,7 +40,7 @@ export const ScreenshotEditor = ({
   } = useScreenshotEditor({ value });
 
   const handleChooseImage = () => {
-    fileInputRef.current?.click();
+    if (!disabled) fileInputRef.current?.click();
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -46,13 +48,13 @@ export const ScreenshotEditor = ({
     
     event.currentTarget.value = "";
 
-    if (!file) return;
+    if (!file || disabled) return;
 
     uploadFile(file);
   };
 
   const handleApply = () => {
-    if (!canApply) return;
+    if (disabled || !canApply) return;
 
     onApply(screenshotUrl);
   };
@@ -66,7 +68,7 @@ export const ScreenshotEditor = ({
         type="file"
         accept="image/*"
         hidden
-        disabled={isUploading}
+        disabled={disabled || isUploading}
         onChange={handleFileChange}
       />
 
@@ -75,16 +77,19 @@ export const ScreenshotEditor = ({
           <ScreenshotPreview
             url={screenshotUrl}
             username={username}
-            isRemoveDisabled={isUploading}
-            onRemoveScreenshot={removeScreenshot}
+            isRemoveDisabled={disabled || isUploading}
+            onRemoveScreenshot={() => { if (!disabled) removeScreenshot(); }}
           />
         ) : (
           <ScreenshotSelectionArea
+            disabled={disabled}
             state={selectionState}
             errorMessage={error}
             canRetry={canRetry}
             onChooseImage={handleChooseImage}
-            onRetryUpload={retryUpload}
+            onRetryUpload={() => { 
+              if (!disabled) retryUpload(); 
+            }}
           />
         )}
 
@@ -98,22 +103,18 @@ export const ScreenshotEditor = ({
       </div>
 
       <div className={s.actions}>
-        <button
-          type="button"
+        <Button 
+          label="Cancel"
           onClick={onCancel}
-          className={s.action}
-        >
-          Cancel
-        </button>
-
-        <button
-          type="button"
-          disabled={!canApply}
+          disabled={isUploading}
+        />
+        
+        <Button 
+          variant="primary"
+          label="Apply"
+          disabled={disabled || !canApply}
           onClick={handleApply}
-          className={clsx(s.action, s.save)}
-        >
-          Apply
-        </button>
+        />
       </div>
     </>
   );

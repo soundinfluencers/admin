@@ -10,6 +10,7 @@ import s from './campaign-info.module.scss';
 interface CampaignInfoProps {
   campaign: ICampaignDetails;
   readOnly: boolean;
+  isBudgetDisabled?: boolean;
   reach: number;
   onPriceChange: (price: number) => void;
   onCurrencyChange: (currency: TCurrency) => void;
@@ -18,6 +19,7 @@ interface CampaignInfoProps {
 export const CampaignInfo = ({
   campaign,
   readOnly,
+  isBudgetDisabled = false,
   reach,
   onPriceChange,
   onCurrencyChange,
@@ -46,6 +48,7 @@ export const CampaignInfo = ({
         <dd className={s.value}>
           <BudgetControl
             readOnly={readOnly}
+            disabled={isBudgetDisabled}
             price={budgetPrice}
             currency={campaign.displayCurrency}
             canChangeCurrency={canChangeCurrency}

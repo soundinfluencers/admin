@@ -7,6 +7,7 @@ import s from './edit-post-link.module.scss';
 
 interface EditPostLinkProps {
   value: string;
+  disabled?: boolean;
   username: string;
   onApply: (value: string) => void;
   trigger: ReactElement;
@@ -14,6 +15,7 @@ interface EditPostLinkProps {
 
 export const EditPostLink = ({
   value,
+  disabled = false,
   username,
   onApply,
   trigger,
@@ -22,6 +24,7 @@ export const EditPostLink = ({
 
   const handleApply = (nextValue: string) => {
     
+    if (disabled) return;
     onApply(nextValue);
     setOpen(false);
   };
@@ -36,6 +39,7 @@ export const EditPostLink = ({
       trigger={trigger}
     >
       <EditPostLinkForm
+        disabled={disabled}
         value={value}
         onApply={handleApply}
         onCancel={() => setOpen(false)}

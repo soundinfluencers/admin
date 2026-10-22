@@ -44,6 +44,7 @@ import {
 } from "../store/campaign-management.comparison";
 
 interface UseCampaignMenuActionsParams {
+  isActionUnavailable: () => boolean;
   params: ICampaignDetailsRequestParams | null;
   isSaving: boolean;
   canReset: boolean;
@@ -71,11 +72,11 @@ type MenuAction =
   type: "message-preview";
   influencerId: string;
 };
+
 type ConfirmationAction = MenuAction;
-type RunningAction =
-  | MenuAction["type"]
-  | "message-send"
-  | "email-send";
+
+type RunningAction = MenuAction["type"] | "message-send" | "email-send";
+
 type Continuation = "current" | "save" | "discard";
 
 export const useCampaignMenuActions = ({
@@ -86,6 +87,7 @@ export const useCampaignMenuActions = ({
   saveCampaign,
   onStatusChanged,
   synchronizeWhatsApp,
+  isActionUnavailable,
 }: UseCampaignMenuActionsParams) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -188,6 +190,22 @@ export const useCampaignMenuActions = ({
     return state;
   };
 
+  const getSavedCampaignForWhatsApp = () => {
+    const baseline = getCurrentState()?.baseline;
+
+    if (
+      !baseline ||
+      !params ||
+      !isSameCampaignContext(baseline.params, params)
+    ) {
+      throw new Error(
+        "Saved campaign data is unavailable for WhatsApp preparation",
+      );
+    }
+
+    return baseline.campaign;
+  };
+
   const isExecutionCurrent = (execution: Execution) =>
     execution.active &&
     executionRef.current === execution &&
@@ -284,7 +302,8 @@ export const useCampaignMenuActions = ({
       !params ||
       !state?.draft ||
       !execution ||
-      isMenuActionBlocked()
+      isMenuActionBlocked() ||
+      isActionUnavailable()
     ) {
       return;
     }
@@ -357,21 +376,12 @@ export const useCampaignMenuActions = ({
         action.type === "whatsapp" ||
         action.type === "message-preview"
       ) {
-        const baseline = getCurrentState()?.baseline;
-
-        if (
-          !baseline ||
-          !isSameCampaignContext(baseline.params, params)
-        ) {
-          throw new Error(
-            "Saved campaign data is unavailable for WhatsApp preparation",
-          );
-        }
+        const savedCampaign = getSavedCampaignForWhatsApp();
 
         if (action.type === "message-preview") {
           const preview = buildCampaignWhatsAppPreview(
             params.campaignId,
-            baseline.campaign,
+            savedCampaign,
             action.influencerId,
           );
 
@@ -381,7 +391,7 @@ export const useCampaignMenuActions = ({
 
         const requests = buildCampaignWhatsAppRequests(
           params.campaignId,
-          baseline.campaign,
+          savedCampaign,
         );
 
         if (requests.length === 0) return;
@@ -476,7 +486,8 @@ export const useCampaignMenuActions = ({
       !execution ||
       !canSendWhatsApp ||
       !isExecutionCurrent(execution) ||
-      isMenuActionBlocked()
+      isMenuActionBlocked() ||
+      isActionUnavailable()
     ) {
       return;
     }
@@ -521,7 +532,8 @@ export const useCampaignMenuActions = ({
       !execution ||
       !canSendWhatsApp ||
       !isExecutionCurrent(execution) ||
-      isMenuActionBlocked()
+      isMenuActionBlocked() ||
+      isActionUnavailable()
     ) {
       return;
     }
@@ -533,9 +545,10 @@ export const useCampaignMenuActions = ({
       const promoId = preview.data.placements[0]?.addedAccountsId;
 
       if (!promoId) {
-        throw new Error(
-          "Campaign placement is unavailable for Email sending",
+        notifyUnhandledApiError(
+          new Error("Campaign placement is unavailable for Email sending"),
         );
+        return;
       }
 
       await sendEmail({

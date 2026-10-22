@@ -1,65 +1,147 @@
 import { PageBreadcrumbs } from "@/shared/ui/v2/page-breadcrumbs-v2/page-breadcrumbs.tsx";
-import type { Ref } from "react";
+import { useEffect, useRef, useState, type Ref } from "react";
+import { toast } from "react-toastify";
+import { useCopyToClipboard } from "@/shared/hooks/use-copy-to-clipboard";
+import { Button } from "@/shared/ui/v2/button-v2";
 
+import ImportIcon from "@/shared/assets/icons/import.svg?react";
 import RefreshIcon from '@/shared/assets/icons/refresh.svg?react';
+import LinkIcon from "@/shared/assets/icons/link.svg?react";
+import BurgerIcon from "@/shared/assets/icons/burger-menu.svg?react";
 
 import s from './campaign-navigation.module.scss';
 
 interface CampaignNavigationProps {
   items: { label: string; to?: string }[];
-  isUpdating?: boolean; // add loading state
+  shareLink?: string;
+  isUpdatingInsights: boolean;
+  isPreparingInsights: boolean;
+  isUpdateInsightsDisabled: boolean;
+  onUpdateInsights: () => void;
+  canImportXlsx: boolean;
+  isImportXlsxDisabled: boolean;
+  onImportXlsx: () => void;
+  importButtonRef?: Ref<HTMLButtonElement>;
+  hasData: boolean;
   disabled?: boolean;
   onMenuClick: () => void;
   isMenuOpen: boolean;
   menuButtonRef?: Ref<HTMLButtonElement>;
-  showActions?: boolean;
+  showManagementActions?: boolean;
+  canUpdateInsights: boolean;
 }
 
 export const CampaignNavigation = ({
   items,
-  isUpdating,
+  shareLink,
+  isUpdatingInsights,
+  isPreparingInsights,
+  isUpdateInsightsDisabled,
+  onUpdateInsights,
+  canImportXlsx,
+  isImportXlsxDisabled,
+  onImportXlsx,
+  importButtonRef,
+  hasData,
   disabled,
   onMenuClick,
   isMenuOpen,
   menuButtonRef,
-  showActions = true,
+  showManagementActions = true,
+  canUpdateInsights,
 }: CampaignNavigationProps) => {
+  const [isCopied, setIsCopied] = useState(false);
+  const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyToClipboard = useCopyToClipboard();
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimeoutRef.current !== null) {
+        clearTimeout(copiedTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const copyShareLink = async () => {
+    if (!shareLink) return;
+
+    if (copiedTimeoutRef.current !== null) {
+      clearTimeout(copiedTimeoutRef.current);
+      copiedTimeoutRef.current = null;
+    }
+    
+    setIsCopied(false);
+
+    const success = await copyToClipboard(shareLink);
+
+    if (success) {
+      setIsCopied(true);
+      
+      copiedTimeoutRef.current = setTimeout(() => {
+        copiedTimeoutRef.current = null;
+        setIsCopied(false);
+      }, 1000);
+    } else {
+      toast.error("Could not copy the link.");
+    }
+  };
+
   return (
     <div className={s.navigation}>
-      <PageBreadcrumbs items={items} />
+      <PageBreadcrumbs items={items}/>
 
-      {showActions && (
-        <div className={s.actions}>
-          <button
-            className={s.action}
-            type="button"
-            onClick={() => alert("Function don`t implement yet!")}
-            disabled={isUpdating || disabled}
-            aria-busy={isUpdating}
+      <div className={s.actions}>
+        {showManagementActions && canImportXlsx && hasData && (
+          <Button
+            ref={importButtonRef}
+            label="Import XLSX"
+            icon={ImportIcon}
+            aria-haspopup="dialog"
+            disabled={disabled || isImportXlsxDisabled}
+            onClick={onImportXlsx}
+          />
+        )}
+        
+        {showManagementActions && canUpdateInsights && hasData && (
+          <Button
+            label="Update insights"
+            loadingLabel="Updating…"
+            isLoading={isUpdatingInsights || isPreparingInsights}
+            icon={RefreshIcon}
+            onClick={onUpdateInsights}
+            disabled={isUpdateInsightsDisabled || disabled}
+          />
+        )}
+
+        {hasData && (
+          <span
+            className={s.shareAction}
+            title={!shareLink ? "Share link is unavailable" : undefined}
           >
-            <RefreshIcon
-              className={isUpdating ? s.spinning : undefined}
-              width={16}
-              height={16}
-              aria-hidden="true"
+            <Button
+              label={isCopied ? "Copied" : "Share link"}
+              reserveLabel="Share link"
+              icon={LinkIcon}
+              onClick={() => void copyShareLink()}
+              disabled={disabled || !shareLink}
+              aria-description={!shareLink ? "Share link is unavailable" : undefined}
             />
-            Update insights
-          </button>
+          </span>
+        )}
 
-          <button
+        {showManagementActions && hasData && (
+          <Button
             ref={menuButtonRef}
-            className={s.action}
-            type="button"
+            label="Menu"
+            icon={BurgerIcon}
             aria-label="Open campaign menu"
             aria-haspopup="dialog"
             aria-expanded={isMenuOpen}
-            onClick={onMenuClick}
             disabled={disabled}
-          >
-            Menu
-          </button>
-        </div>
-      )}
+            onClick={onMenuClick}
+          />
+        )}
+      </div>
     </div>
   );
 };

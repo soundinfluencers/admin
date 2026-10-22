@@ -61,9 +61,14 @@
 .error {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 
   font-size: 12px;
   font-weight: 500;
   color: #C6404E;
+  
+  >svg {
+    width: 12px;
+    height: 12px;
+  }
 }

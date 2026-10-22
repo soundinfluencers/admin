@@ -1,10 +1,10 @@
-import { Fragment, useState, type ComponentProps } from "react";
-import clsx from "clsx";
+import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { toast } from "react-toastify";
 
 import { useCopyToClipboard } from "@/shared/hooks/use-copy-to-clipboard";
 import { Modal } from "@/shared/ui/v2/modal-v2/modal";
-import { Spinner } from "@/shared/ui/v2/spinner";
+import { Button } from "@/shared/ui/v2/button-v2";
+import { CampaignMessagePreviewContent } from "./campaign-message-preview-content.tsx";
 
 import {
   getCampaignWhatsAppMessageBlocks,
@@ -19,25 +19,6 @@ import SendIcon from "@/shared/assets/icons/send.svg?react";
 import CopyIcon from "@/shared/assets/icons/copy.svg?react";
 
 import s from "./campaign-message-preview-modal.module.scss";
-
-const MessageText = ({ text }: { text: string }) => (
-  <>
-    {text.split(/(https?:\/\/\S+)/gi).map((part, index) =>
-      /^https?:\/\//i.test(part) ? (
-        <a
-          key={index}
-          href={part}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {part}
-        </a>
-      ) : (
-        <Fragment key={index}>{part}</Fragment>
-      ),
-    )}
-  </>
-);
 
 interface CampaignMessagePreviewModalProps {
   preview: CampaignWhatsAppPreview;
@@ -58,8 +39,33 @@ export const CampaignMessagePreviewModal = ({
   isSendingEmail,
   onSendEmail,
 }: CampaignMessagePreviewModalProps) => {
-  const [copiedChannel, setCopiedChannel] =
-    useState<"whatsapp" | "email" | null>(null);
+  const [copiedChannel, setCopiedChannel] = useState<"whatsapp" | "email" | null>(null);
+  const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearCopiedTimeout = () => {
+    if (copiedTimeoutRef.current !== null) {
+      clearTimeout(copiedTimeoutRef.current);
+      copiedTimeoutRef.current = null;
+    }
+  };
+
+  const showCopied = (channel: "whatsapp" | "email") => {
+    clearCopiedTimeout();
+    setCopiedChannel(channel);
+
+    copiedTimeoutRef.current = setTimeout(() => {
+      copiedTimeoutRef.current = null;
+      setCopiedChannel(null);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimeoutRef.current !== null) {
+        clearTimeout(copiedTimeoutRef.current);
+      }
+    };
+  }, []);
   
   const copyToClipboard = useCopyToClipboard();
 
@@ -76,25 +82,23 @@ export const CampaignMessagePreviewModal = ({
   .join(" · ");
 
   const copyWhatsApp = async () => {
+    clearCopiedTimeout();
     setCopiedChannel(null);
 
-    const success = await copyToClipboard(
-      preview.request.message,
-    );
+    const success = await copyToClipboard(preview.request.message);
 
     if (success) {
-      setCopiedChannel("whatsapp");
+      showCopied("whatsapp");
     } else {
       toast.error("Could not copy the message.");
     }
   };
 
   const copyEmail = async () => {
+    clearCopiedTimeout();
     setCopiedChannel(null);
 
-    const { text, html } = formatCampaignEmailMessage(
-      preview.data,
-    );
+    const { text, html } = formatCampaignEmailMessage(preview.data);
 
     if (
       typeof ClipboardItem !== "undefined" &&
@@ -114,7 +118,8 @@ export const CampaignMessagePreviewModal = ({
           }),
         ]);
 
-        setCopiedChannel("email");
+        showCopied("email");
+
         return;
       } catch {
         // try to copy regular text.
@@ -125,7 +130,7 @@ export const CampaignMessagePreviewModal = ({
       const success = await copyToClipboard(text);
 
       if (success) {
-        setCopiedChannel("email");
+        showCopied("email");
         toast.info("Message copied without formatting.");
       } else {
         toast.error("Could not copy the message.");
@@ -150,100 +155,45 @@ export const CampaignMessagePreviewModal = ({
     >
       
       <div className={s.scrollArea}>
-        <div className={s.preview}>
-          {blocks.map((block, index) => {
-            if (block.type === "placement") {
-              return (
-                <dl
-                  key={block.addedAccountsId}
-                  className={s.placement}
-                >
-                  {block.fields.map(([label, value]) => (
-                    <Fragment key={label}>
-                      <dt className={s.label}>{label}</dt>
-
-                      <dd className={s.value}>
-                        <MessageText text={value} />
-                      </dd>
-                    </Fragment>
-                  ))}
-                </dl>
-              );
-            }
-
-            if (block.type === "heading") {
-              return (
-                <h3 key={`text-${index}`} className={s.heading}>
-                  {block.text}
-                </h3>
-              );
-            }
-
-            return (
-              <p key={`text-${index}`} className={s.text}>
-                <MessageText text={block.text} />
-              </p>
-            );
-          })}
-        </div>
+        <CampaignMessagePreviewContent blocks={blocks} />
       </div>
 
       <div className={s.footer}>
         <div className={s.actionGroup}>
-          <button
-            type="button"
-            className={clsx(s.button, s.copyWhatsAppButton)}
-            onClick={() => {
-              void copyWhatsApp();
-            }}
-          >
-            <CopyIcon className={s.icon} aria-hidden="true" />
-            {copiedChannel === "whatsapp" ? "Copied" : "Copy WhatsApp"}
-          </button>
-
-          <button
-            type="button"
-            className={clsx(s.button, s.copyEmailButton)}
-            onClick={() => {
-              void copyEmail();
-            }}
-          >
-            <CopyIcon className={s.icon} aria-hidden="true" />
-            {copiedChannel === "email" ? "Copied" : "Copy Email"}
-          </button>
+          <Button 
+            label={copiedChannel === "whatsapp" ? "Copied" : "Copy WhatsApp"}
+            reserveLabel="Copy WhatsApp"
+            icon={CopyIcon}
+            onClick={() => void copyWhatsApp()}
+          />
+          
+          <Button
+            label={copiedChannel === "email" ? "Copied" : "Copy Email"}
+            reserveLabel="Copy Email"
+            icon={CopyIcon}
+            onClick={() => void copyEmail()}
+          />
         </div>
 
         <div className={s.actionGroup}>
-          <button
-            type="button"
-            className={s.button}
+          <Button 
+            label="Send Email"
+            loadingLabel="Sending…"
+            icon={SendIcon}
+            isLoading={isSendingEmail}
             disabled={isBusy}
-            aria-busy={isSendingEmail}
             onClick={onSendEmail}
-          >
-            {isSendingEmail ? (
-              <Spinner/>
-            ) : (
-              <SendIcon className={s.icon} aria-hidden="true" />
-            )}
-            {isSendingEmail ? "Sending…" : "Send Email"}
-          </button>
-
-          <button
-            type="button"
-            className={clsx(s.button, s.primaryButton)}
+          />
+          
+          <Button
+            variant="primary"
+            label="Send WhatsApp"
+            loadingLabel="Sending…"
+            icon={SendIcon}
+            isLoading={isSending}
             disabled={isBusy}
-            aria-busy={isSending}
             onClick={onSendWhatsApp}
-          >
-            {isSending ? (
-              <Spinner/>
-            ) : (
-              <SendIcon className={s.icon} aria-hidden="true" />
-            )}
-
-            {isSending ? "Sending…" : "Send WhatsApp"}
-          </button>
+          />
         </div>
       </div>
     </Modal>

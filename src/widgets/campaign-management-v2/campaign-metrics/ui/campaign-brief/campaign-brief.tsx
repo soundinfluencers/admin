@@ -8,9 +8,11 @@ import Eye from '@/shared/assets/icons/eye.svg?react';
 import EyeClose from '@/shared/assets/icons/eye-off.svg?react';
 
 import s from '../metric-content.module.scss';
+import { IconButton } from "@/shared/ui/v2/icon-button";
 
 interface CampaignBriefProps {
   readOnly: boolean;
+  isBudgetDisabled: boolean;
   submitted: string;
   followers: number;
   price: number;
@@ -26,6 +28,7 @@ interface CampaignBriefProps {
 
 export const CampaignBrief = ({
   readOnly,
+  isBudgetDisabled,
   submitted,
   followers,
   price,
@@ -60,6 +63,7 @@ export const CampaignBrief = ({
         <dd className={s.value}>
           {isHidePrice ?  "••••" : (
             <BudgetControl
+              disabled={isBudgetDisabled}
               readOnly={readOnly}
               price={price} 
               currency={currency}
@@ -69,14 +73,14 @@ export const CampaignBrief = ({
             />
           )}
         </dd>
-        <button
-          type="button"
+        
+        <IconButton
           className={s.hideBtn}
-          onClick={() => onPriceHiddenChange(!isHidePrice)}
+          icon={isHidePrice ? EyeClose : Eye}
           aria-label={isHidePrice ? "Show budget" : "Hide budget"}
-        >
-          {isHidePrice ? <EyeClose aria-hidden="true"/> : <Eye aria-hidden="true"/>}
-        </button>
+          disabled={isBudgetDisabled}
+          onClick={() => onPriceHiddenChange(!isHidePrice)}
+        />
       </div>
 
       <div className={s.row}>

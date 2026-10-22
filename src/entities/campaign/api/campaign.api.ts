@@ -14,14 +14,17 @@ import type {
 } from "@/entities/campaign/model/campaign.types.ts";
 
 import type {
+  IAppendCampaignXlsxRequestParams,
+  IApproveProposalOptionParams, IApproveProposalOptionResponse,
   ICampaignDetails,
   ICampaignDetailsRequestParams,
   ICampaignDetailsResponse,
   ICreateProposalOptionRequestParams,
   ICreateProposalResponse,
+  IDeleteProposalOptionParams,
   IMarkPromoPaidParams,
-  IMarkPromoPaidResponse, 
-  IUpdateCampaignDetailsRequestParams, 
+  IMarkPromoPaidResponse,
+  IUpdateCampaignDetailsRequestParams,
   IUpdateCampaignDetailsResponse,
 } from "../model/campaign-details.types.ts";
 
@@ -56,6 +59,26 @@ export const uploadCampaignsXlsx = async (file: File) => {
   formData.append('file', file);
 
   await $api.post('/admin/campaigns/xlsx', formData);
+};
+
+export const appendCampaignXlsx = async ({
+    campaignId,
+    file,
+  }: IAppendCampaignXlsxRequestParams,
+  options: ApiRequestOptions = {},
+): Promise<void> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const config: ApiRequestConfig = {
+    silentError: options.silentError,
+  };
+
+  await $api.post<void>(
+    `/admin/campaigns/${encodeURIComponent(campaignId)}/xlsx`,
+    formData,
+    config,
+  );
 };
 
 export const getCampaignById = async (
@@ -120,6 +143,38 @@ export const createProposalOption = async ({
   return data.data;
 };
 
+export const deleteProposalOption = async ({
+  campaignId,
+  optionIndex,
+}: IDeleteProposalOptionParams): Promise<void> => {
+  // A missing index would delete the entire campaign. Zero is a valid index.
+  if (!Number.isInteger(optionIndex) || optionIndex < 0) {
+    throw new Error("A valid proposal option index is required.");
+  }
+
+  await $api.delete<void>(
+    `/proposal-system/${encodeURIComponent(campaignId)}`,
+    { params: { optionIndex } },
+  );
+};
+
+export const approveProposalOption = async ({
+  campaignId,
+  optionIndex,
+}: IApproveProposalOptionParams): Promise<
+  IApproveProposalOptionResponse["data"]
+> => {
+  const { data } = await $api.post<IApproveProposalOptionResponse>(
+    `/admin/campaigns/proposal/${encodeURIComponent(campaignId)}/approve`,
+    undefined,
+    {
+      params: { optionIndex },
+    },
+  );
+
+  return data.data;
+};
+
 export const closeCampaign = async (
   campaignId: string,
 ): Promise<void> => {
@@ -176,3 +231,21 @@ export const sendCampaignEmail = async ({
     `/admin/campaigns/mail/${encodeURIComponent(campaignId)}/${encodeURIComponent(promoId)}`,
   );
 };
+
+
+export const updateCampaignInsights = async (
+  body: Pick<ICampaignDetails, "campaignId" | "campaignName">,
+  options: ApiRequestOptions = {},
+): Promise<void> => {
+  const config: ApiRequestConfig = {
+    silentError: options.silentError,
+    timeout: 0,
+  };
+
+  await $api.patch(
+    "/scrapers/post-details/all",
+    body,
+    config,
+  );
+};
+

@@ -1004,7 +1004,7 @@ export const useCampaignManagementStore =
           });
         },
 
-        applySavedCampaign: (params, campaign) => {
+        applySavedCampaign: (params, campaign, submittedCampaign) => {
           set((state) => {
             if (!state.draft || !isSameCampaignContext(state.draft.params, params)) {
               return state;
@@ -1017,7 +1017,10 @@ export const useCampaignManagementStore =
 
             return {
               baseline: structuredClone(savedDraft),
-              draft: structuredClone(savedDraft),
+              // Insights preparation must notice edits made while its Save was pending.
+              draft: submittedCampaign && state.draft.campaign !== submittedCampaign
+                ? state.draft
+                : structuredClone(savedDraft),
               meta: createCampaignManagementMeta(),
             };
           });

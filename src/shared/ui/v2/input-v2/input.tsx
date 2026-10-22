@@ -65,7 +65,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
         {error && (
           <span id={errorId} className={s.error}>
-            <CircleAlertIcon aria-hidden="true" />
+            <CircleAlertIcon aria-hidden="true" className={s.icon}/>
             {error}
           </span>
         )}

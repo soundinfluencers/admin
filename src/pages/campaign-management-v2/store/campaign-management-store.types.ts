@@ -27,7 +27,7 @@ export type TCampaignManagementActions = {
   initializeDraft: (draft: TCampaignManagementDraft) => void;
   resetDraft: () => void;
   restoreBaseline: () => void;
-  applySavedCampaign: (params: ICampaignDetailsRequestParams, campaign: ICampaignDetails) => void;
+  applySavedCampaign: (params: ICampaignDetailsRequestParams, campaign: ICampaignDetails, submittedCampaign?: ICampaignDetails) => void;
 
   updateCampaignName: (name: string) => void;
   setPriceHidden: (hidden: boolean) => void;

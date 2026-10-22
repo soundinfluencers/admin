@@ -5,14 +5,17 @@ import Eye from '@/shared/assets/icons/eye.svg?react';
 import EyeClose from '@/shared/assets/icons/eye-off.svg?react';
 
 import s from '../metric-content.module.scss';
+import { IconButton } from "@/shared/ui/v2/icon-button";
 
 interface CampaignPerformanceProps {
+  disabled?: boolean;
   cpm: number;
   isHideCpmAndResult: boolean;
   onCpmAndResultHiddenChange: (hidden: boolean) => void;
 }
 
 export const CampaignPerformance = ({
+  disabled = false,
   cpm,
   isHideCpmAndResult,
   onCpmAndResultHiddenChange,
@@ -25,14 +28,13 @@ export const CampaignPerformance = ({
           {isHideCpmAndResult ? "••••" : formatCpm(cpm)}
         </dd>
 
-        <button
-          type="button"
+        <IconButton
           className={s.hideBtn}
-          onClick={() => onCpmAndResultHiddenChange(!isHideCpmAndResult)}
+          icon={isHideCpmAndResult ? EyeClose : Eye}
           aria-label={isHideCpmAndResult ? "Show cpm and result" : "Hide cpm and result"}
-        >
-          {isHideCpmAndResult ? <EyeClose aria-hidden="true"/> : <Eye aria-hidden="true"/>}
-        </button>
+          disabled={disabled}
+          onClick={() => onCpmAndResultHiddenChange(!isHideCpmAndResult)}
+        />
       </div>
 
       <div className={s.row}>

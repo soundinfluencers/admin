@@ -14,6 +14,7 @@ import s from './budget-control.module.scss';
 
 interface BudgetControlProps {
   readOnly: boolean;
+  disabled?: boolean;
   price: number;
   currency: TCurrency;
   canChangeCurrency: boolean;
@@ -25,6 +26,7 @@ const INTEGER_INPUT_PATTERN = /^\d*$/;
 
 export const BudgetControl = ({
   readOnly,
+  disabled = false,
   price,
   onPriceChange,
   canChangeCurrency,
@@ -32,14 +34,20 @@ export const BudgetControl = ({
   onCurrencyChange,
 }: BudgetControlProps) => {
   const [draft, setDraft] = useState(() => String(price));
+  const [wasDisabled, setWasDisabled] = useState(disabled);
   const skipNextBlurSaveRef = useRef(false);
 
   useEffect(() => {
     setDraft(String(price));
   }, [price]);
 
+  if (wasDisabled !== disabled) {
+    setWasDisabled(disabled);
+    setDraft(String(price));
+  }
+
   const handleChange = (rawValue: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     if (INTEGER_INPUT_PATTERN.test(rawValue)) {
       setDraft(rawValue);
@@ -47,7 +55,7 @@ export const BudgetControl = ({
   };
 
   const handleBlur = () => {
-    if (readOnly) {
+    if (readOnly || disabled) {
       skipNextBlurSaveRef.current = false;
       setDraft(String(price));
       return;
@@ -78,7 +86,7 @@ export const BudgetControl = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     if (e.key === "Enter") {
       e.preventDefault();
@@ -94,7 +102,7 @@ export const BudgetControl = ({
   };
 
   const handleCurrencyChange = (value: string) => {
-    if (readOnly || !canChangeCurrency) return;
+    if (readOnly || disabled || !canChangeCurrency) return;
     
     if (isCurrency(value)) {
       onCurrencyChange(value);
@@ -109,7 +117,8 @@ export const BudgetControl = ({
         type="text"
         inputMode="numeric"
         readOnly={readOnly}
-        value={readOnly ? String(price) : draft}
+        disabled={disabled}
+        value={readOnly || disabled ? String(price) : draft}
         onChange={(e) => handleChange(e.target.value)}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
@@ -119,7 +128,7 @@ export const BudgetControl = ({
       <Select.Root
         value={currency}
         onValueChange={handleCurrencyChange}
-        disabled={readOnly || !canChangeCurrency}
+        disabled={readOnly || disabled || !canChangeCurrency}
       >
         <Select.Trigger className={s.trigger} aria-label="Currency">
           <Select.Value />

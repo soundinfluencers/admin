@@ -1,9 +1,9 @@
-import clsx from "clsx";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Form } from "@/shared/ui";
 import { TextInput } from "@/shared/ui/v2/react-hook-form-inputs/text-input-v2";
+import { Button } from "@/shared/ui/v2/button-v2";
 
 import {
   postLinkSchema,
@@ -14,12 +14,14 @@ import s from "./edit-post-link.module.scss";
 
 interface EditPostLinkFormProps {
   value: string;
+  disabled?: boolean;
   onApply: (value: string) => void;
   onCancel: () => void;
 }
 
 export const EditPostLinkForm = ({
   value,
+  disabled = false,
   onApply,
   onCancel,
 }: EditPostLinkFormProps) => {
@@ -45,7 +47,7 @@ export const EditPostLinkForm = ({
   const isUnchanged = postLink.trim() === value.trim();
 
   const onSubmit = (data: TPostLinkFormValues) => {
-    onApply(data.postLink);
+    if (!disabled) onApply(data.postLink);
   };
 
   return (
@@ -62,26 +64,22 @@ export const EditPostLinkForm = ({
         inputMode="url"
         autoComplete="off"
         spellCheck={false}
-        readOnly={isSubmitting}
+        readOnly={disabled || isSubmitting}
         rootClassName={s.rootInput}
       />
 
       <div className={s.actions}>
-        <button
-          type="button"
+        <Button 
+          label="Cancel"
           onClick={onCancel}
-          className={s.action}
-        >
-          Cancel
-        </button>
-
-        <button
+        />
+        
+        <Button
           type="submit"
-          disabled={!isValid || isUnchanged || isSubmitting}
-          className={clsx(s.action, s.save)}
-        >
-          Apply
-        </button>
+          variant="primary"
+          label="Apply"
+          disabled={disabled || !isValid || isUnchanged || isSubmitting}
+        />
       </div>
     </Form>
   );

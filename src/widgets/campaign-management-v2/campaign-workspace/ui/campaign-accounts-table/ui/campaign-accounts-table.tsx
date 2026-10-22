@@ -9,7 +9,9 @@ import type {
 } from "@/entities/campaign/model/campaign-details.types.ts";
 
 interface CampaignAccountsTableProps {
+  editorRevision: number;
   canRemoveAccount: boolean;
+  isInsightsActionBlocked: () => boolean;
   campaignId: string;
   accounts: ICampaignDetails["addedAccounts"];
   canEditMetrics: boolean;
@@ -30,7 +32,9 @@ const getAccountRowId = (account: ICampaignDetails["addedAccounts"][number]): st
 };
 
 export const CampaignAccountsTable = ({
+  editorRevision,
   canRemoveAccount,
+  isInsightsActionBlocked,
   campaignId,
   accounts,
   canEditMetrics,
@@ -48,7 +52,9 @@ export const CampaignAccountsTable = ({
 
   const columns = useMemo(
     () => getCampaignAccountsTableColumns({
+      editorRevision,
       canRemoveAccount,
+      isInsightsActionBlocked,
       campaignId,
       canEditMetrics,
       canMarkAsPaid,
@@ -63,7 +69,9 @@ export const CampaignAccountsTable = ({
       onOpenMessagePreview,
     }),
     [
+      editorRevision,
       canRemoveAccount,
+      isInsightsActionBlocked,
       campaignId, 
       canEditMetrics, 
       canMarkAsPaid,

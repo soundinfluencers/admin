@@ -1,11 +1,13 @@
+import { Button } from "@/shared/ui/v2/button-v2";
 import { SOCIAL_MEDIA_LABELS, type TSocialMedia } from "@/shared/constants/social-media-taxonomy.ts";
 
-import Trash from "@/shared/assets/icons/trash.svg?react";
+import TrashIcon from "@/shared/assets/icons/trash.svg?react";
 
 import s from './campaign-account-header.module.scss';
 
 interface CampaignAccountHeaderProps {
   readOnly: boolean;
+  isRemoveDisabled: boolean;
   username: string;
   socialMedia: TSocialMedia;
   followers: number;
@@ -14,6 +16,7 @@ interface CampaignAccountHeaderProps {
 
 export const CampaignAccountHeader = ({
   readOnly,
+  isRemoveDisabled,
   username,
   socialMedia,
   followers,
@@ -29,15 +32,14 @@ export const CampaignAccountHeader = ({
       </div>
 
       {!readOnly && (
-        <button
-          type="button"
-          className={s.removeBtn}
-          onClick={onRemove}
+        <Button
+          variant="danger"
+          label="Remove influencer"
+          icon={TrashIcon}
+          disabled={isRemoveDisabled}
           aria-label="Remove account"
-        >
-          <Trash className={s.icon}/>
-          Remove influencer
-        </button>
+          onClick={onRemove}
+        />
       )}
     </div>
   );

@@ -3,8 +3,16 @@ import { useCampaignDetailsQuery } from "@/entities/campaign/api/use-campaigns-q
 import type { ICampaignDetailsRequestParams } from "@/entities/campaign/model/campaign-details.types.ts";
 import { useCampaignManagementStore } from "../store/campaign-management.store.ts";
 
+interface DeletedOptionRecovery {
+  isCurrent: () => boolean;
+  onSnapshotApplied: () => void;
+  onError: () => void;
+}
+
 export const useCampaignDraft = (
   params: ICampaignDetailsRequestParams | null,
+  enabled = true,
+  recovery?: DeletedOptionRecovery,
 ) => {
   const {
     data: serverCampaign,
@@ -12,7 +20,7 @@ export const useCampaignDraft = (
     error: queryError,
     isFetchedAfterMount,
     isFetching,
-  } = useCampaignDetailsQuery(params);
+  } = useCampaignDetailsQuery(params, enabled, recovery !== undefined);
 
   const draft = useCampaignManagementStore((state) => state.draft);
   const initializeDraft = useCampaignManagementStore((state) => state.initializeDraft);
@@ -26,6 +34,8 @@ export const useCampaignDraft = (
 
   useEffect(() => {
     if (
+      !enabled ||
+      (recovery && !recovery.isCurrent()) ||
       !params ||
       !serverCampaign ||
       isCurrentDraft ||
@@ -40,7 +50,14 @@ export const useCampaignDraft = (
       params,
       campaign: serverCampaign,
     });
-  }, [params, serverCampaign, isCurrentDraft, initializeDraft, isFetchedAfterMount, isFetching, isQueryError]);
+    recovery?.onSnapshotApplied();
+  }, [enabled, recovery, params, serverCampaign, isCurrentDraft, initializeDraft, isFetchedAfterMount, isFetching, isQueryError]);
+
+  useEffect(() => {
+    if (enabled && isQueryError && !isFetching && recovery?.isCurrent()) {
+      recovery.onError();
+    }
+  }, [enabled, recovery, isQueryError, isFetching]);
 
   const campaign = isCurrentDraft ? draft.campaign : null;
   const isError = campaign === null && isQueryError && !isFetching;

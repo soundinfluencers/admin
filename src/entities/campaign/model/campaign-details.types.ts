@@ -1,6 +1,12 @@
 import type { TSocialMedia } from "@/shared/constants/social-media-taxonomy.ts";
 import type { TCurrency } from "@/shared/constants/currency-taxonomy.ts";
 import type { TWhatsAppStatus } from "./campaign-whatsapp.types.ts";
+import type {
+  TCommunityMusicGenre,
+  TCommunityThemeTopic,
+  TCreatorContentFocus,
+  TCreatorMusicGenre,
+} from "@/shared/constants/music-taxonomy";
 
 export const CAMPAIGN_STATUSES = {
   UNDER_REVIEW: 'under_review',
@@ -43,6 +49,8 @@ interface IAccountCountry {
   percentage: number;
 }
 
+export type CampaignAccountGenre = TCommunityMusicGenre | TCreatorMusicGenre;
+
 interface IAddedAccount {
   addedAccountsId: string;
   socialAccountId: string;
@@ -68,7 +76,9 @@ interface IAddedAccount {
   shares: number;
   saves: number;
   rating: number;
-  genres: string[]; //TODO: check backend contracts
+  genres: CampaignAccountGenre[];
+  creatorContentFocus: TCreatorContentFocus[];
+  communityThemeTopics: TCommunityThemeTopic[];
   countries: IAccountCountry[];
   logoUrl: string;
   profileType: "community" | "creator";
@@ -81,6 +91,8 @@ interface IAddedAccount {
   phoneNumber: string;
   statusLabel: string;
   cpm: number | undefined;
+  averageViews: number;
+  engagementRate: number;
 }
 
 export type TEditableField = keyof Pick<
@@ -150,7 +162,7 @@ export interface ICampaignDetails {
   addedBundles: IAddedBundle[];
   selectedOffer: IAddedOffer;
   campaignContent: ICampaignContent[];
-  shareLink: string;
+  shareLink: string | null;
   totalFollowers: number;
   totalImpressions: number;
   totalLikes: number;
@@ -323,4 +335,27 @@ export interface ICreateProposalResponse {
     campaignId: string;
     optionIndex: number;
   };
+}
+
+export interface IDeleteProposalOptionParams {
+  campaignId: string;
+  optionIndex: number;
+}
+
+export interface IApproveProposalOptionParams {
+  campaignId: string;
+  optionIndex: number;
+}
+
+export interface IApproveProposalOptionResponse {
+  statusCode: number;
+  message: string;
+  data: {
+    campaignId: string;
+  };
+}
+
+export interface IAppendCampaignXlsxRequestParams {
+  campaignId: string;
+  file: File;
 }

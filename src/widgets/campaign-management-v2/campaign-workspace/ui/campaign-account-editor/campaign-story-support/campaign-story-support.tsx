@@ -8,6 +8,7 @@ import s from './campaign-story-support.module.scss';
 
 interface CampaignStorySupportProps {
   readOnly: boolean;
+  disabled?: boolean;
   storyLink: string;
   storyTag: string;
   selectedId: string | null;
@@ -17,6 +18,7 @@ interface CampaignStorySupportProps {
 
 export const CampaignStorySupport = ({
   readOnly,
+  disabled = false,
   storyLink,
   storyTag,
   selectedId,
@@ -29,13 +31,13 @@ export const CampaignStorySupport = ({
   const [draftTag, setDraftTag] = useState<string | null>(null);
   const [draftLink, setDraftLink] = useState<string | null>(null);
 
-  const isDisabled = !selectedId;
+  const isDisabled = disabled || !selectedId;
 
   const tagValue = readOnly ? storyTag : draftTag ?? storyTag;
   const linkValue = readOnly ? storyLink : draftLink ?? storyLink;
 
   const handleTagApply = () => {
-    if (readOnly || !selectedId || draftTag === null) return;
+    if (readOnly || disabled || !selectedId || draftTag === null) return;
 
     if (draftTag !== storyTag) {
       onStoryTagChange(draftTag);
@@ -45,7 +47,7 @@ export const CampaignStorySupport = ({
   };
 
   const handleLinkApply = () => {
-    if (readOnly || !selectedId || draftLink === null) return;
+    if (readOnly || disabled || !selectedId || draftLink === null) return;
 
     const nextLink = draftLink.trim();
 

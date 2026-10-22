@@ -1,7 +1,7 @@
 import clsx from "clsx";
+import { Spinner } from "@/shared/ui/v2/spinner";
 
-import CircleLoaderIcon from "@/shared/assets/icons/loader-circle.svg?react";
-import CircleCheckIcon from "@/shared/assets/icons/circle-check.svg?react";
+import CircleAlertIcon from "@/shared/assets/icons/circle-alert.svg?react";
 
 import s from './screenshot-status.module.scss';
 
@@ -17,7 +17,7 @@ export const ScreenshotStatus = (props: ScreenshotStatusProps) => (
     {props.status === "uploading" ? (
       <>
         <span className={s.indicator}>
-          <CircleLoaderIcon className={s.loader} aria-hidden="true" focusable="false" />
+          <Spinner/>
         </span>
 
         <div className={s.fileDetails}>
@@ -27,7 +27,7 @@ export const ScreenshotStatus = (props: ScreenshotStatusProps) => (
       </>
     ) : (
       <>
-        <CircleCheckIcon aria-hidden="true" />
+        <CircleAlertIcon aria-hidden="true" />
         <p>Screenshot removed. Apply to confirm.</p>
       </>
     )}

@@ -1,0 +1,58 @@
+.countries {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.chart {
+  flex-shrink: 0;
+  width: 160px;
+  height: 160px;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.legendItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.marker {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.countryName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.percentage {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: #6C778B;
+  font-weight: 600;
+}
+
+.message,
+.error {
+  margin: 0;
+  font-size: 13px;
+}
+
+.message {
+  color: #64748b;
+}
+
+.error {
+  color: #b42318;
+}

@@ -1,5 +1,4 @@
 @use '@/app/styles/utils/mixins' as mixins;
-@use './mixins' as local;
 
 .selectionArea {
   display: flex;
@@ -85,19 +84,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.chooseButton {
-  @include mixins.reset-button;
-  @include local.button-base;
-  border: 1px solid #DFE5EE;
-
-  &:disabled {
-    opacity: 0.7;
-    background: #F4F6F9;
-
-    cursor: not-allowed;
-  }
 }
 
 .errorMessage {

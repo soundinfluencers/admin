@@ -1,8 +1,6 @@
 import type { ComponentProps } from "react";
-import clsx from "clsx";
 import { Modal } from "@/shared/ui/v2/modal-v2/modal.tsx";
-
-import CircleLoaderIcon from "@/shared/assets/icons/loader-circle.svg?react";
+import { Button } from "@/shared/ui/v2/button-v2";
 
 import s from "./unsaved-changes-modal.module.scss";
 
@@ -47,48 +45,28 @@ export const UnsavedChangesModal = ({
       </p>
 
       <div className={s.actions}>
-        <button
-          type="button"
-          className={clsx(s.button, s.cancel)}
+        <Button
+          className={s.cancel}
+          label="Cancel"
           disabled={isSaving}
           onClick={() => handleOpenChange(false)}
-        >
-          Cancel
-        </button>
-
-        <button
-          type="button"
-          className={clsx(s.button, s.discard)}
+        />
+        
+        <Button
+          variant="danger"
+          label="Discard and continue"
           disabled={isSaving}
           onClick={onDiscard}
-        >
-          Discard and continue
-        </button>
-
-        <button
-          type="button"
-          className={clsx(s.button, s.save)}
+        />
+        
+        <Button
+          variant="primary"
+          label="Save and continue"
+          loadingLabel="Saving…"
+          isLoading={isSaving}
           disabled={isSaving}
-          aria-busy={isSaving}
           onClick={onSave}
-        >
-          {isSaving ? (
-            <>
-                 <span
-                   className={s.indicator}
-                   role="status"
-                   aria-label="Save campaign"
-                 >
-                    <CircleLoaderIcon
-                      className={s.loader}
-                      aria-hidden="true"
-                      focusable="false"
-                    />
-                  </span>
-              {"Saving…"}
-            </>
-          ) : "Save and continue"}
-        </button>
+        />
       </div>
     </Modal>
   );

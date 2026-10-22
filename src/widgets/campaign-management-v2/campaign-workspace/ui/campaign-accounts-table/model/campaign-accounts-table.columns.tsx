@@ -1,9 +1,10 @@
 import clsx from "clsx";
-import { EditPostLink } from "@/features/campaign-management/edit-post-link";
-import { EditScreenshot } from "@/features/campaign-management/edit-screenshot";
-import { InlineIntegerInput } from "@/shared/ui/v2/inline-integer-input";
 import { MarkPromoAsPaid } from "@/features/campaign-management/mark-promo-as-paid";
-import { SOCIAL_MEDIA_ICONS } from "@/shared/config/social-media-icons.ts";
+import { CampaignTableAccount } from "../../campaign-table-account/campaign-table-account.tsx";
+import { CampaignPostLinkCell } from "../ui/campaign-post-link-cell.tsx";
+import { CampaignScreenshotCell } from "../ui/campaign-screenshot-cell.tsx";
+import { CampaignMetricCell } from "../ui/campaign-metric-cell.tsx";
+import { CampaignAccountActionsCell } from "../ui/campaign-account-actions-cell.tsx";
 
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -12,11 +13,6 @@ import type {
   IMarkPromoPaidResponse,
   TEditableField,
 } from "@/entities/campaign/model/campaign-details.types.ts";
-
-import EditIcon from '@/shared/assets/icons/edit.svg?react';
-import ExternalLinkIcon from '@/shared/assets/icons/external-link.svg?react';
-import TrashIcon from "@/shared/assets/icons/trash.svg?react";
-import MailIcon from "@/shared/assets/icons/mail.svg?react";
 
 import s from "../ui/campaign-accounts-table.module.scss";
 
@@ -35,7 +31,9 @@ const getStatusSortOrder = (
 type CampaignAccount = ICampaignDetails["addedAccounts"][number];
 
 interface ColumnsParams {
+  editorRevision: number;
   canRemoveAccount: boolean;
+  isInsightsActionBlocked: () => boolean;
   campaignId: string;
   canEditMetrics: boolean;
   canMarkAsPaid: boolean;
@@ -51,7 +49,9 @@ interface ColumnsParams {
 }
 
 export const getCampaignAccountsTableColumns = ({
+  editorRevision,
   canRemoveAccount,
+  isInsightsActionBlocked,
   campaignId,
   canEditMetrics,
   canMarkAsPaid,
@@ -69,20 +69,12 @@ export const getCampaignAccountsTableColumns = ({
     accessorKey: "username",
     header: "Account",
     size: 200,
-    cell: ({ row }) => {
-      const Icon = SOCIAL_MEDIA_ICONS[row.original.socialMedia];
-
-      return (
-        <div className={s.account}>
-          <span className={s.avatar} aria-hidden="true">
-            <Icon/>
-          </span>
-          <span className={s.username} title={row.original.username}>
-            {row.original.username}
-          </span>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <CampaignTableAccount
+        socialMedia={row.original.socialMedia}
+        username={row.original.username}
+      />
+    ),
   },
   {
     accessorKey: "followers",
@@ -101,38 +93,12 @@ export const getCampaignAccountsTableColumns = ({
       const account = row.original;
 
       return (
-        <div className={s.actions}>
-          <EditPostLink
-            username={account.username}
-            value={account.postLink ?? ""}
-            onApply={(postLink) =>
-              onUpdatePostLink(account.addedAccountsId, postLink)
-            }
-            trigger={
-              <button 
-                type="button"
-                className={s.action}
-                disabled={!canEditPostDetails}
-                title={account.postLink ? "Edit post link" : "Add post link"}
-                aria-label={account.postLink ? "Edit post link" : "Add post link"}
-              >
-                <EditIcon aria-hidden="true" className={s.icon}/>
-              </button>
-            }
-          />
-
-          {account.postLink && (
-            <a 
-              href={account.postLink}
-              className={s.action}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Open post link in a new tab"
-            >
-              <ExternalLinkIcon aria-hidden="true" className={s.icon}/>
-            </a>  
-          )}
-        </div>
+        <CampaignPostLinkCell
+          account={account}
+          editorRevision={editorRevision}
+          canEditPostDetails={canEditPostDetails}
+          onUpdatePostLink={onUpdatePostLink}
+        />
       );
     },
   },
@@ -142,40 +108,13 @@ export const getCampaignAccountsTableColumns = ({
     size: 70,
     cell: ({ row }) => {
       const account = row.original;
-      const screenshot = account.screenshot ?? "";
-
       return (
-        <div className={s.actions}>
-          <EditScreenshot
-            value={screenshot}
-            username={account.username}
-            onApply={(url) =>
-              onUpdateScreenshot(account.addedAccountsId, url)
-            }
-            trigger={
-              <button
-                type="button"
-                className={s.action}
-                disabled={!canEditPostDetails}
-                aria-label={`Manage screenshot for ${account.username}`}
-              >
-                <EditIcon aria-hidden="true" className={s.icon}/>
-              </button>
-            }
-          />
-          
-          {screenshot && (
-            <a
-              className={s.action}
-              href={screenshot}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`View screenshot for ${account.username}`}
-            >
-              <ExternalLinkIcon aria-hidden="true" className={s.icon}/>
-            </a>
-          )}
-        </div>
+        <CampaignScreenshotCell
+          account={account}
+          editorRevision={editorRevision}
+          canEditPostDetails={canEditPostDetails}
+          onUpdateScreenshot={onUpdateScreenshot}
+        />
       );
     },
   },
@@ -197,13 +136,10 @@ export const getCampaignAccountsTableColumns = ({
     cell: ({ row }) => {
       const account = row.original;
       
-      if (!canEditMetrics) {
-        return account.impressions;
-      }
-      
       return (
-        <InlineIntegerInput
+        <CampaignMetricCell
           value={account.impressions}
+          canEditMetrics={canEditMetrics}
           onApply={(value) => onUpdateAccountMetricField(account.addedAccountsId, "impressions", value)}
           aria-label={`Impressions for ${account.username}`}
         />
@@ -221,13 +157,10 @@ export const getCampaignAccountsTableColumns = ({
     cell: ({ row }) => {
       const account = row.original;
 
-      if (!canEditMetrics) {
-        return account.like;
-      }
-
       return (
-        <InlineIntegerInput
+        <CampaignMetricCell
           value={account.like}
+          canEditMetrics={canEditMetrics}
           onApply={(value) => onUpdateAccountMetricField(account.addedAccountsId, "like", value)}
           aria-label={`Likes for ${account.username}`}
         />
@@ -245,13 +178,10 @@ export const getCampaignAccountsTableColumns = ({
     cell: ({ row }) => {
       const account = row.original;
       
-      if (!canEditMetrics) {
-        return account.comments;
-      }
-      
       return (
-        <InlineIntegerInput
+        <CampaignMetricCell
           value={account.comments}
+          canEditMetrics={canEditMetrics}
           onApply={(value) => onUpdateAccountMetricField(account.addedAccountsId, "comments", value)}
           aria-label={`Comments for ${account.username}`}
         />
@@ -269,13 +199,10 @@ export const getCampaignAccountsTableColumns = ({
     cell: ({ row }) => {
       const account = row.original;
       
-      if (!canEditMetrics) {
-        return account.saves;
-      }
-      
       return (
-        <InlineIntegerInput
+        <CampaignMetricCell
           value={account.saves}
+          canEditMetrics={canEditMetrics}
           onApply={(value) => onUpdateAccountMetricField(account.addedAccountsId, "saves", value)}
           aria-label={`Saves for ${account.username}`}
         />
@@ -293,13 +220,10 @@ export const getCampaignAccountsTableColumns = ({
     cell: ({ row }) => {
       const account = row.original;
       
-      if (!canEditMetrics) {
-        return account.shares;
-      }
-      
       return (
-        <InlineIntegerInput
+        <CampaignMetricCell
           value={account.shares}
+          canEditMetrics={canEditMetrics}
           onApply={(value) => onUpdateAccountMetricField(account.addedAccountsId, "shares", value)}
           aria-label={`Shares for ${account.username}`}
         />
@@ -341,6 +265,7 @@ export const getCampaignAccountsTableColumns = ({
       
       return (
         <MarkPromoAsPaid
+          isActionBlocked={isInsightsActionBlocked}
           campaignId={campaignId}
           promoId={account.addedAccountsId}
           closePromo={account.closePromo}
@@ -359,44 +284,14 @@ export const getCampaignAccountsTableColumns = ({
       const account = row.original;
       
       return (
-        <div className={s.actions}>
-          {canSendMessage && (
-            <button
-              type="button"
-              className={s.action}
-              disabled={isMessageActionDisabled}
-              onClick={(event) => {
-                if (isMessageActionDisabled) return;
-
-                onOpenMessagePreview(
-                  account.influencerId,
-                  event.currentTarget,
-                );
-              }}
-              aria-label={`Preview message for ${account.username}`}
-              title="Preview message"
-              data-action="previewMessage"
-            >
-              <MailIcon aria-hidden="true" className={s.icon} />
-            </button>
-          )}
-          
-          <button
-            type="button"
-            className={s.action}
-            disabled={!canRemoveAccount}
-            onClick={() => {
-              if (!canRemoveAccount) return;
-
-              onAccountRemove(account.addedAccountsId);
-            }}
-            aria-label={`Remove account ${account.username}`}
-            title="Remove account"
-            data-action="removeAccount"
-          >
-            <TrashIcon aria-hidden="true" className={s.icon}/>
-          </button>
-        </div>
+        <CampaignAccountActionsCell
+          account={account}
+          canSendMessage={canSendMessage}
+          isMessageActionDisabled={isMessageActionDisabled}
+          canRemoveAccount={canRemoveAccount}
+          onOpenMessagePreview={onOpenMessagePreview}
+          onAccountRemove={onAccountRemove}
+        />
       );
     },
   },

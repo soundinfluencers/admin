@@ -1,13 +1,15 @@
 import { useId, useState } from "react";
-import clsx from "clsx";
 import * as Popover from "@radix-ui/react-popover";
+import { Button } from "@/shared/ui/v2/button-v2";
+import { IconButton } from "@/shared/ui/v2/icon-button";
+import { ButtonLink } from "@/shared/ui/v2/button-link";
 import { EditorField } from "../editor-field/editor-field.tsx";
 import { CampaignDateRequest } from "./campaign-date-request/campaign-date-request.tsx";
 
-import Plus from "@/shared/assets/icons/plus.svg?react";
-import Chevron from '@/shared/assets/icons/chevron-right.svg?react';
-import ExternalLink from '@/shared/assets/icons/external-link.svg?react';
-import Trash from '@/shared/assets/icons/trash.svg?react';
+import PlusIcon from "@/shared/assets/icons/plus.svg?react";
+import ChevronIcon from '@/shared/assets/icons/chevron-right.svg?react';
+import ExternalLinkIcon from '@/shared/assets/icons/external-link.svg?react';
+import TrashIcon from '@/shared/assets/icons/trash.svg?react';
 
 import s from './campaign-placement-assignment.module.scss';
 
@@ -19,6 +21,7 @@ type ContentOption = {
 
 interface CampaignPlacementAssignmentProps {
   readOnly: boolean;
+  disabled?: boolean;
   options: ContentOption[];
   dateRequest: string;
   selectedId: string | null;
@@ -30,6 +33,7 @@ interface CampaignPlacementAssignmentProps {
 
 export const CampaignPlacementAssignment = ({
   readOnly,
+  disabled = false,
   options,
   dateRequest,
   selectedId,
@@ -63,14 +67,14 @@ export const CampaignPlacementAssignment = ({
   };
 
   const handleCreateNew = () => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     setDraftText("");
     setIsCreating(true);
   };
 
   const handleApply = () => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     if (draftText === null) return;
 
@@ -89,7 +93,7 @@ export const CampaignPlacementAssignment = ({
   };
 
   const handleDelete = (id: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onDelete(id);
 
@@ -105,15 +109,14 @@ export const CampaignPlacementAssignment = ({
         htmlFor={isCreating ? inputId : triggerId}
         action={
           !readOnly ? (
-            <button
-              type="button"
-              className={s.addBtn}
+            <Button 
+              size="small"
+              label="New"
+              icon={PlusIcon}
+              disabled={disabled || hasDraft}
               onClick={handleCreateNew}
-              disabled={hasDraft}
-            >
-              <Plus className={s.plusIcon}/>
-              New
-            </button>
+              aria-label="Add new content"
+            />
           ) : null
         }
       >
@@ -126,7 +129,7 @@ export const CampaignPlacementAssignment = ({
                   id={inputId}
                   className={s.input}
                   value={text}
-                  disabled={!selectedOption && !isCreating}
+                  disabled={disabled || (!selectedOption && !isCreating)}
                   placeholder={
                     isCreating ? `Enter content link…` : `Select or create content link…`
                   }
@@ -149,7 +152,7 @@ export const CampaignPlacementAssignment = ({
                       title="Open content in a new tab"
                     >
                       {text}
-                      <ExternalLink aria-hidden="true"/>
+                      <ExternalLinkIcon aria-hidden="true"/>
                     </a>
                   ) : (
                     <span>{selectedOption?.label ?? "Select or create content"}</span>
@@ -169,9 +172,9 @@ export const CampaignPlacementAssignment = ({
                   type="button"
                   className={s.selectTrigger}
                   aria-label="Select assigned video"
-                  disabled={readOnly || hasDraft || options.length === 0}
+                  disabled={readOnly || disabled || hasDraft || options.length === 0}
                 >
-                  <Chevron aria-hidden="true"/>
+                  <ChevronIcon aria-hidden="true"/>
                 </button>
               </Popover.Trigger>
             </div>
@@ -198,34 +201,35 @@ export const CampaignPlacementAssignment = ({
                         type="button"
                         className={s.option}
                         title={option.mainLink}
-                        onClick={() => onContentSelect(option.id)}
+                        disabled={disabled}
+                        onClick={() => { 
+                          if (!disabled) onContentSelect(option.id); 
+                        }}
                       >
                         {option.mainLink}
                       </button>
                     </Popover.Close>
 
                     <div className={s.optionActions}>
-                      <a
+                      <ButtonLink
+                        size="small"
+                        icon={ExternalLinkIcon}
                         href={option.mainLink}
-                        className={s.optionAction}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`Open ${option.label} in a new tab`}
                         title="Open content in a new tab"
-                      >
-                        <ExternalLink aria-hidden="true"/>
-                      </a>
+                      />
 
                       {!readOnly && (
-                        <button
-                          type="button"
-                          className={clsx(s.optionAction, s.removeBtn)}
-                          onClick={() => handleDelete(option.id)}
+                        <IconButton
+                          variant="danger"
+                          icon={TrashIcon}
+                          disabled={disabled}
                           aria-label={`Delete ${option.label}`}
                           title="Delete content"
-                        >
-                          <Trash aria-hidden="true"/>
-                        </button>
+                          onClick={() => handleDelete(option.id)}
+                        />
                       )}
                     </div>
                   </div>
@@ -237,27 +241,27 @@ export const CampaignPlacementAssignment = ({
 
         {!readOnly && hasDraft && (
           <div className={s.actions}>
-            <button
-              type="button"
-              className={clsx(s.action, s.apply)}
-              onClick={handleApply}
-            >
-              Apply
-            </button>
-
-            <button
-              type="button"
-              className={clsx(s.action, s.cancel)}
+            <Button 
+              size="small"
+              label="Cancel"
+              disabled={disabled}
               onClick={handleCancel}
-            >
-              Cancel
-            </button>
+            />
+            
+            <Button
+              variant="primary"
+              size="small"
+              label="Apply"
+              disabled={disabled}
+              onClick={handleApply}
+            />
           </div>
         )}
       </EditorField>
 
       <CampaignDateRequest
         readOnly={readOnly}
+        disabled={disabled}
         value={dateRequest}
         onChange={onDateRequestChange}
       />

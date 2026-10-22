@@ -2,12 +2,13 @@ import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-quer
 import { markPromoAsPaid } from "@/entities/campaign";
 import { toast } from "react-toastify";
 
+import { IconButton } from "@/shared/ui/v2/icon-button";
+
 import type {
   ICampaignDetails,
   IMarkPromoPaidResponse,
 } from "@/entities/campaign/model/campaign-details.types.ts";
 
-import CircleLoaderIcon from "@/shared/assets/icons/loader-circle.svg?react";
 import CheckIcon from "@/shared/assets/icons/check.svg?react";
 
 import s from './mark-promo-as-paid.module.scss';
@@ -17,6 +18,7 @@ interface MarkPromoAsPaidProps {
   promoId: string;
   closePromo: ICampaignDetails["addedAccounts"][number]["closePromo"];
   canMarkAsPaid: boolean;
+  isActionBlocked?: () => boolean;
   onPaid: (result: IMarkPromoPaidResponse["data"]) => void | Promise<void>;
 }
 
@@ -25,6 +27,7 @@ export const MarkPromoAsPaid = ({
   promoId,
   closePromo,
   canMarkAsPaid,
+  isActionBlocked,
   onPaid,
 }: MarkPromoAsPaidProps) => {
   const queryClient = useQueryClient();
@@ -54,40 +57,21 @@ export const MarkPromoAsPaid = ({
     isPending;
 
   const handleClick = () => {
+    if (isActionBlocked?.()) return;
     if (isDisabled || queryClient.isMutating(mutationFilters) > 0) return;
 
     mutate({ campaignId, promoId });
   };
 
   return (
-    <div
-      className={s.root}
-      aria-busy={isPending}
-    >
-      {isPending ? (
-        <span
-          className={s.indicator}
-          role="status"
-          aria-label="Closing promo"
-        >
-          <CircleLoaderIcon
-            className={s.loader}
-            aria-hidden="true"
-            focusable="false"
-          />
-        </span>
-      ) : (
-        <button
-          type="button"
-          className={s.button}
-          onClick={handleClick}
-          disabled={isDisabled}
-          data-paid={isPaid}
-          aria-label={isPaid ? "Promo paid" : "Mark promo as paid"}
-        >
-          {isPaid && <CheckIcon aria-hidden="true" focusable="false" />}
-        </button>
-      )}
-    </div>
+    <IconButton
+      className={s.button}
+      icon={isPaid ? CheckIcon : undefined}
+      aria-label={isPaid ? "Promo paid" : "Mark promo as paid"}
+      disabled={isDisabled}
+      isLoading={isPending}
+      onClick={handleClick}
+      data-paid={isPaid}
+    />
   );
 };

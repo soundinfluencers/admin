@@ -4,7 +4,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   min-width: 0;
   max-width: 100%;
 }
@@ -17,14 +17,14 @@
 .optionsGroup {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
   max-width: 100%;
 }
 
 .scroll {
   min-width: 0;
-  max-width: 400px;
+  max-width: 350px;
   overflow-x: auto;
   overflow-y: hidden;
   border: 1px solid #dfe5ee;
@@ -108,24 +108,5 @@
 }
 
 .createButton {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: auto;
-  max-width: 100%;
-  padding: 8px 14px;
-  
-  background: var(--white);
-  border: 1px solid #dfe5ee;
-  border-radius: 8px;
-  
   color: #536fe8;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: normal;
-  white-space: normal;
-
-  svg {
-    flex-shrink: 0;
-  }
 }

@@ -30,26 +30,3 @@
   border-top: 1px solid #DFE5EE;
   background: #FFF;
 }
-
-.action {
-  @include mixins.reset-button;
-  display: flex;
-  height: 34px;
-  justify-content: center;
-  align-items: center;
-  padding: 0 14px;
-  gap: 6px;
-
-  border-radius: 8px;
-  border: 1px solid #DFE5EE;
-  background: var(--white);
-
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.save {
-  border: 0 solid #536FE8;
-  background: #536FE8;
-  color: var(--white);
-}

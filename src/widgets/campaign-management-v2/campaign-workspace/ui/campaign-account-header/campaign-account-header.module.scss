@@ -23,31 +23,3 @@
     font-size: var(--text-sm);
   }
 }
-
-.removeBtn {
-  @include mixins.reset-button;
-  display: flex;
-  padding: 8px 12px;
-  align-items: center;
-  gap: 6px;
-
-  border-radius: 8px;
-  border: 1px solid #C6404E;
-
-  color: #C6404E;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  line-height: 1px;
-
-  transition: background-color var(--transition-base);
-
-  .icon {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-  }
-
-  @include mixins.hover {
-    background-color: #f1c0c0;
-  }
-}

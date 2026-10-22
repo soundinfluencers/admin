@@ -37,31 +37,7 @@
   }
   
   .add {
-    @include mixins.reset-button;
-    display: flex;
-    padding: 6px 8px;
-    align-items: center;
-    gap: 4px;
-
-    border-radius: 6px;
-    border: 1px solid #DFE5EE;
-    background: #F7F8FC;
-
-    font-size: var(--text-sm);
-    font-weight: 600;
-    line-height: 16px;
-    
-    transition: opacity var(--transition-base);
-    
-    .icon {
-      width: 12px;
-      height: 12px;
-      flex-shrink: 0;
-    }
-    
-    @include mixins.hover {
-      opacity: 0.8;
-    }
+    --button-link-height: 30px;
   }
 }
 

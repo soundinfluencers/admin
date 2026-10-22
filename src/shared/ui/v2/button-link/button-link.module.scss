@@ -1,0 +1,153 @@
+@use "@/app/styles/utils/mixins" as mixins;
+@use "@/app/styles/utils/breakpoints" as breakpoints;
+
+.link {
+  --button-link-height: 34px;
+  --button-link-padding-x: 14px;
+  --button-link-font-size: 14px;
+  --button-link-line-height: 20px;
+  --button-link-icon-size: 16px;
+
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  height: var(--button-link-height);
+  min-height: var(--button-link-height);
+  padding: 0 var(--button-link-padding-x);
+
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: var(--button-link-font-size);
+  font-weight: 600;
+  line-height: var(--button-link-line-height);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+
+  &:focus-visible {
+    outline: 2px solid #536fe8;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.small {
+  --button-link-height: 28px;
+  --button-link-padding-x: 10px;
+  --button-link-font-size: 12px;
+  --button-link-line-height: 16px;
+  --button-link-icon-size: 16px;
+}
+
+.medium {
+  --button-link-height: 34px;
+  --button-link-padding-x: 14px;
+  --button-link-font-size: 14px;
+  --button-link-line-height: 20px;
+  --button-link-icon-size: 16px;
+}
+
+.large {
+  --button-link-height: 44px;
+  --button-link-padding-x: 16px;
+  --button-link-font-size: 14px;
+  --button-link-line-height: 20px;
+  --button-link-icon-size: 18px;
+}
+
+.text {
+  @include breakpoints.tablet {
+    @media (pointer: coarse) {
+      height: max(var(--button-link-height), 44px);
+      min-height: max(var(--button-link-height), 44px);
+    }
+  }
+}
+
+.iconOnly {
+  width: var(--button-link-height);
+  min-width: var(--button-link-height);
+  padding: 0;
+  border-radius: 6px;
+}
+
+.base {
+  border-color: #dfe5ee;
+  background: var(--white, #fff);
+  color: var(--black-blue, #202934);
+
+  &.iconOnly {
+    color: #536fe8;
+  }
+
+  @include mixins.hover {
+    border-color: #bcc8ff;
+    background: #f8faff;
+  }
+}
+
+.primary {
+  border-color: #536fe8;
+  background: #536fe8;
+  color: var(--white, #fff);
+
+  @include mixins.hover {
+    border-color: #435ed0;
+    background: #435ed0;
+  }
+}
+
+.danger {
+  border-color: #c6404e;
+  background: var(--white, #fff);
+  color: #c6404e;
+
+  &.iconOnly {
+    border-color: #dfe5ee;
+  }
+
+  @include mixins.hover {
+    border-color: #c6404e;
+    background: #fff1f2;
+  }
+}
+
+.iconSlot {
+  display: inline-flex;
+  flex: 0 0 var(--button-link-icon-size);
+  align-items: center;
+  justify-content: center;
+
+  width: var(--button-link-icon-size);
+  height: var(--button-link-icon-size);
+
+  > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.label {
+  display: block;
+}
+
+.fullWidth {
+  width: 100%;
+}

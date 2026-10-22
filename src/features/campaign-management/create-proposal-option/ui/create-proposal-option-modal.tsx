@@ -1,7 +1,5 @@
-import clsx from "clsx";
 import { Modal } from "@/shared/ui/v2/modal-v2/modal.tsx";
-
-import CircleLoaderIcon from "@/shared/assets/icons/loader-circle.svg?react";
+import { Button } from "@/shared/ui/v2/button-v2";
 
 import s from "./create-proposal-option-modal.module.scss";
 
@@ -43,39 +41,27 @@ export const CreateProposalOptionModal = ({
       </div>
 
       <div className={s.actions}>
-        <button
-          type="button"
-          className={s.action}
+        <Button
+          className={s.cancelButton}
+          label="Cancel"
+          disabled={isPending}
+          onClick={() => handleOpenChange(false)}
+        />
+        
+        <Button 
+          label="Create empty"
           disabled
           title="Creating an empty option is not available yet"
-        >
-          Create empty
-        </button>
+        />
 
-        <button
-          type="button"
-          className={clsx(s.action, s.copy)}
+        <Button
+          variant="primary"
+          label="Create copy"
+          loadingLabel="Creating…"
+          isLoading={isPending}
           disabled={isPending || !onCreateCopy}
           onClick={onCreateCopy}
-          aria-busy={isPending}
-        >
-          {isPending ? (
-            <>
-              <span
-               className={s.indicator}
-               role="status"
-               aria-label="Creating proposal option"
-              >
-                <CircleLoaderIcon
-                  className={s.loader}
-                  aria-hidden="true"
-                  focusable="false"
-                />
-              </span>
-              {"Creating…"}
-            </>
-          ) : "Create copy"}
-        </button>
+        />
       </div>
     </Modal>
   );

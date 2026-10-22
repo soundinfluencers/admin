@@ -3,8 +3,10 @@ import ImageOff from "@/shared/assets/icons/image-off.svg?react";
 import RefreshIcon from "@/shared/assets/icons/refresh.svg?react";
 
 import s from './screenshot-selection-area.module.scss';
+import { Button } from "@/shared/ui/v2/button-v2";
 
 interface ScreenshotSelectionAreaProps {
+  disabled?: boolean;
   state: "idle" | "uploading" | "error";
   errorMessage: string | null;
   canRetry: boolean;
@@ -14,6 +16,7 @@ interface ScreenshotSelectionAreaProps {
 
 export const ScreenshotSelectionArea = ({
   state,
+  disabled = false,
   errorMessage,
   canRetry,
   onChooseImage,
@@ -26,9 +29,9 @@ export const ScreenshotSelectionArea = ({
   >
     <span className={s.iconContainer}>
       {state === "error" ? (
-        <ImageOff aria-hidden="true" className={s.icon} />
+        <ImageOff aria-hidden="true" className={s.icon}/>
       ) : (
-        <ImageUpIcon aria-hidden="true" className={s.icon} />
+        <ImageUpIcon aria-hidden="true" className={s.icon}/>
       )}
     </span>
 
@@ -45,24 +48,19 @@ export const ScreenshotSelectionArea = ({
 
     <div className={s.retryActions}>
       {state === "error" && canRetry && (
-        <button
-          className={s.chooseButton}
-          type="button"
+        <Button
+          label="Retry upload"
+          icon={RefreshIcon}
+          disabled={disabled}
           onClick={onRetryUpload}
-        >
-          <RefreshIcon aria-hidden="true" />
-          Retry upload
-        </button>
+        />
       )}
 
-      <button
-        type="button"
-        className={s.chooseButton}
-        disabled={state === "uploading"}
+      <Button
+        label="Choose image"
+        disabled={disabled || state === "uploading"}
         onClick={onChooseImage}
-      >
-        Choose image
-      </button>
+      />
     </div>
   </div>
 );

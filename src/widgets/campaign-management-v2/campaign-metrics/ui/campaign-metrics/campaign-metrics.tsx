@@ -12,7 +12,6 @@ import type { TCurrency } from "@/shared/constants/currency-taxonomy.ts";
 
 import s from './campaign-metrics.module.scss';
 
-
 interface CampaignMetricsProps {
   campaign: ICampaignDetails;
   reach: number;
@@ -21,6 +20,7 @@ interface CampaignMetricsProps {
   onPriceChange: (price: number) => void;
   onCurrencyChange: (currency: TCurrency) => void;
   readOnly: boolean;
+  isBudgetDisabled: boolean;
 }
 
 export const CampaignMetrics = ({
@@ -31,17 +31,19 @@ export const CampaignMetrics = ({
   onPriceChange,
   onCurrencyChange,
   readOnly,
+  isBudgetDisabled,
 }: CampaignMetricsProps) => {
   const budgetPrice =
     campaign.pricesByCurrency?.[campaign.displayCurrency] ??
     campaign.price;
 
-  const canChangeCurrency = !readOnly && campaign.pricesByCurrency != null;
+  const canChangeCurrency = !readOnly && !isBudgetDisabled && campaign.pricesByCurrency != null;
   
   return (
     <div className={s.cards}>
       <MetricCard title="Brief" icon={<File />}>
         <CampaignBrief
+          isBudgetDisabled={isBudgetDisabled}
           readOnly={readOnly}
           submitted={campaign.creationDate}
           followers={reach}
@@ -69,6 +71,7 @@ export const CampaignMetrics = ({
       
       <MetricCard title="Performance" icon={<Activity />}>
         <CampaignPerformance
+          disabled={isBudgetDisabled}
           cpm={campaign.cpm}
           isHideCpmAndResult={campaign.isCpmAndResultHidden}
           onCpmAndResultHiddenChange={onCpmAndResultHiddenChange}

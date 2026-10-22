@@ -1,13 +1,15 @@
 import { useId, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import clsx from "clsx";
+import { Button } from "@/shared/ui/v2/button-v2";
+
 import { EditorField } from "../editor-field/editor-field.tsx";
 
-import Plus from "@/shared/assets/icons/plus.svg?react";
-import Chevron from '@/shared/assets/icons/chevron-right.svg?react';
-import Trash from '@/shared/assets/icons/trash.svg?react';
+import PlusIcon from "@/shared/assets/icons/plus.svg?react";
+import ChevronIcon from '@/shared/assets/icons/chevron-right.svg?react';
+import TrashIcon from '@/shared/assets/icons/trash.svg?react';
 
 import s from './campaign-text-editor.module.scss';
+import { IconButton } from "@/shared/ui/v2/icon-button";
 
 type TextOption = {
   id: string;
@@ -16,6 +18,7 @@ type TextOption = {
 
 interface CampaignTextEditorProps {
   readOnly: boolean;
+  disabled?: boolean;
   label: string;
   placeholder: string;
   options: TextOption[];
@@ -29,6 +32,7 @@ interface CampaignTextEditorProps {
 
 export const CampaignTextEditor = ({
   readOnly,
+  disabled = false,
   label,
   placeholder,
   options,
@@ -57,14 +61,14 @@ export const CampaignTextEditor = ({
   };
 
   const handleCreateNew = () => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     setDraftText("");
     setIsCreating(true);
   };
 
   const handleDelete = (id: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onDelete(id);
 
@@ -74,7 +78,7 @@ export const CampaignTextEditor = ({
   };
 
   const handleApply = () => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     if (draftText === null) return;
 
@@ -103,15 +107,13 @@ export const CampaignTextEditor = ({
       htmlFor={inputId}
       action={
         !readOnly ? (
-          <button
-            type="button"
-            className={s.addBtn}
+          <Button
+            size="small"
+            label="New"
+            icon={PlusIcon}
+            disabled={disabled || hasDraft}
             onClick={handleCreateNew}
-            disabled={hasDraft}
-          >
-            <Plus className={s.plusIcon} aria-hidden="true"/>
-            New
-          </button>
+          />
         ) : null
       }
     >
@@ -122,7 +124,7 @@ export const CampaignTextEditor = ({
               id={inputId}
               className={s.textarea}
               value={text}
-              readOnly={readOnly}
+              readOnly={readOnly || disabled}
               disabled={!selectedOption && !isCreating}
               placeholder={
                 isCreating ? `Enter ${placeholder}` : `Select or create ${placeholder}`
@@ -142,9 +144,9 @@ export const CampaignTextEditor = ({
                 type="button"
                 className={s.selectTrigger}
                 aria-label={`Select ${label.toLowerCase()}`}
-                disabled={readOnly || hasDraft || options.length === 0}
+                disabled={readOnly || disabled || hasDraft || options.length === 0}
               >
-                <Chevron aria-hidden="true"/>
+                <ChevronIcon aria-hidden="true"/>
               </button>
             </Popover.Trigger>
           </div>
@@ -170,21 +172,22 @@ export const CampaignTextEditor = ({
                     <button
                       type="button"
                       className={s.option}
-                      onClick={() => onSelect(option.id)}
+                      disabled={disabled}
+                      onClick={() => { if (!disabled) onSelect(option.id); }}
                     >
                       {option.text}
                     </button>
                   </Popover.Close>
 
                   {!readOnly && (
-                    <button
-                      type="button"
-                      className={s.removeBtn}
-                      onClick={() => handleDelete(option.id)}
+                    <IconButton
+                      variant="danger"
+                      icon={TrashIcon}
+                      disabled={disabled}
                       aria-label={`Delete ${label.toLowerCase()}`}
-                    >
-                      <Trash aria-hidden="true"/>
-                    </button>
+                      title="Delete item"
+                      onClick={() => handleDelete(option.id)}
+                    />
                   )}
                 </div>
               ))}
@@ -195,21 +198,20 @@ export const CampaignTextEditor = ({
 
       {!readOnly && hasDraft && (
         <div className={s.actions}>
-          <button 
-            type="button"
-            className={clsx(s.action, s.apply)}
-            onClick={handleApply}
-          >
-            Apply
-          </button>
-
-          <button 
-            type="button"
-            className={clsx(s.action, s.cancel)}
+          <Button
+            size="small"
+            label="Cancel"
+            disabled={disabled}
             onClick={handleCancel}
-          >
-            Cancel
-          </button>
+          />
+
+          <Button
+            variant="primary"
+            size="small"
+            label="Apply"
+            disabled={disabled}
+            onClick={handleApply}
+          />
         </div>
       )}
     </EditorField>

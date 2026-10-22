@@ -14,12 +14,14 @@ import s from "./campaign-date-request.module.scss";
 
 interface CampaignDateRequestProps {
   readOnly: boolean;
+  disabled?: boolean;
   value: string;
   onChange: (dateRequest: string) => void;
 }
 
 export const CampaignDateRequest = ({
   readOnly,
+  disabled = false,
   value,
   onChange,
 }: CampaignDateRequestProps) => {
@@ -33,7 +35,7 @@ export const CampaignDateRequest = ({
   const mode = readOnly ? parsed.mode : draftMode ?? parsed.mode;
 
   const applyValue = (nextValue: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     if (nextValue !== value) {
       onChange(nextValue);
@@ -41,7 +43,7 @@ export const CampaignDateRequest = ({
   };
 
   const handleModeChange = (nextMode: TDateRequestMode) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     if (nextMode === "ASAP") {
       setDraftMode(null);
@@ -54,7 +56,7 @@ export const CampaignDateRequest = ({
   };
 
   const handleDateChange = (date: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     setDraftMode(mode);
     applyValue(formatDateRequest(mode, date));
@@ -78,7 +80,7 @@ export const CampaignDateRequest = ({
               handleModeChange(nextMode);
             }
           }}
-          disabled={readOnly}
+          disabled={readOnly || disabled}
         >
           <Select.Trigger id={modeId} className={s.dateMode}>
             <Select.Value />
@@ -114,7 +116,7 @@ export const CampaignDateRequest = ({
             id={dateId}
             className={s.input}
             type="date"
-            readOnly={readOnly}
+            readOnly={readOnly || disabled}
             aria-label={`Publication date ${mode.toLowerCase()}`}
             min="2000-01-01"
             max="2099-12-31"

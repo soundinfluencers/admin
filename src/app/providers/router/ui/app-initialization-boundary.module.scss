@@ -1,0 +1,9 @@
+.screen {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+
+  width: 100%;
+  min-height: 100dvh;
+  padding: 24px;
+}

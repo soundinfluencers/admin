@@ -9,6 +9,7 @@ import s from "./campaign-account-editor.module.scss";
 
 interface CampaignAccountEditorProps {
   readOnly: boolean;
+  disabled?: boolean;
   account: ICampaignDetails["addedAccounts"][number];
   campaignContent: ICampaignDetails["campaignContent"];
   onAccountContentChange: (addedAccountsId: string, campaignContentItemId: string) => void;
@@ -29,6 +30,7 @@ interface CampaignAccountEditorProps {
 
 export const CampaignAccountEditor = ({
   readOnly,
+  disabled = false,
   account,
   campaignContent,
   onAccountContentChange,
@@ -73,7 +75,7 @@ export const CampaignAccountEditor = ({
     : [];
   
   const handleContentSelect = (campaignContentItemId: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onAccountContentChange(
       account.addedAccountsId,
@@ -82,7 +84,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleContentCreate = (mainLink: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onCreateContentForAccount(
       account.addedAccountsId,
@@ -91,7 +93,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleDescriptionSelect = (descriptionId: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onAccountDescriptionChange(
       account.addedAccountsId,
@@ -100,7 +102,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleBriefSelect = (additionalBriefId: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onAccountBriefChange(
       account.addedAccountsId,
@@ -109,7 +111,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleDescriptionCreate = (text: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onCreateDescriptionForAccount(
       account.addedAccountsId,
@@ -118,7 +120,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleBriefCreate = (text: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onCreateBriefForAccount(
       account.addedAccountsId,
@@ -127,7 +129,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleDescriptionUpdate = (descriptionId: string, text: string) => {
-    if (readOnly || !selectedContent) return;
+    if (readOnly || disabled || !selectedContent) return;
     
     onUpdateDescriptionForAccount(
       selectedContent._id,
@@ -137,7 +139,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleBriefUpdate = (additionalBriefId: string, text: string) => {
-    if (readOnly || !selectedContent) return;
+    if (readOnly || disabled || !selectedContent) return;
     
     onUpdateBriefForAccount(
       selectedContent._id,
@@ -147,7 +149,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleDescriptionDelete = (descriptionId: string) => {
-    if (readOnly || !selectedContent) return;
+    if (readOnly || disabled || !selectedContent) return;
     
     onDeleteContentDescription(
       selectedContent._id,
@@ -156,7 +158,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleBriefDelete = (additionalBriefId: string) => {
-    if (readOnly || !selectedContent) return;
+    if (readOnly || disabled || !selectedContent) return;
     
     onDeleteContentBrief(
       selectedContent._id,
@@ -165,7 +167,7 @@ export const CampaignAccountEditor = ({
   };
 
   const handleTaggedUserChange = (taggedUser: string) => {
-    if (readOnly || !selectedContent) return;
+    if (readOnly || disabled || !selectedContent) return;
 
     onUpdateContentTaggedUser(
       selectedContent._id, 
@@ -174,7 +176,7 @@ export const CampaignAccountEditor = ({
   };
 
   const handleTaggedLinkChange = (taggedLink: string) => {
-    if (readOnly || !selectedContent) return;
+    if (readOnly || disabled || !selectedContent) return;
 
     onUpdateContentTaggedLink(
       selectedContent._id, 
@@ -183,7 +185,7 @@ export const CampaignAccountEditor = ({
   };
   
   const handleDateRequestChange = (dateRequest: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
     
     onAccountDateRequestChange(
       account.addedAccountsId, 
@@ -192,7 +194,7 @@ export const CampaignAccountEditor = ({
   };
 
   const handleContentDelete = (campaignContentItemId: string) => {
-    if (readOnly) return;
+    if (readOnly || disabled) return;
 
     onDeleteCampaignContent(campaignContentItemId);
   };
@@ -205,6 +207,7 @@ export const CampaignAccountEditor = ({
       >
         <CampaignPlacementAssignment
           readOnly={readOnly}
+          disabled={disabled}
           options={contentOptions}
           dateRequest={account.dateRequest}
           selectedId={account.selectedContent?.campaignContentItemId ?? null}
@@ -221,6 +224,7 @@ export const CampaignAccountEditor = ({
       >
         <CampaignTextEditor
           readOnly={readOnly}
+          disabled={disabled}
           key={`description:${selectedContent?._id ?? "no-content"}`}
           label="Description"
           placeholder="Enter new post description…"
@@ -239,6 +243,7 @@ export const CampaignAccountEditor = ({
       >
         <CampaignTextEditor
           readOnly={readOnly}
+          disabled={disabled}
           key={`brief:${selectedContent?._id ?? "no-content"}`}
           label="Brief"
           placeholder="Enter new brief…"
@@ -257,6 +262,7 @@ export const CampaignAccountEditor = ({
       >
         <CampaignStorySupport
           readOnly={readOnly}
+          disabled={disabled}
           key={`story-support:${selectedContent?._id ?? "no-content"}`}
           storyLink={selectedContent?.taggedLink ?? ""}
           storyTag={selectedContent?.taggedUser ?? ""}

@@ -1,14 +1,27 @@
 @use "@/app/styles/utils/mixins" as mixins;
+@use "@/app/styles/utils/breakpoints" as breakpoints;
 
 .audienceInsight {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "countries genres"
+    "metrics categories";
   align-self: stretch;
   gap: 16px;
   min-width: 0;
+
+  @include breakpoints.tablet {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "countries"
+      "metrics"
+      "genres"
+      "categories";
+  }
 }
 
 .card {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -24,48 +37,50 @@
   font-weight: 700;
 }
 
-.countries {
-  display: flex;
-  gap: 32px;
+.countriesCard {
+  grid-area: countries;
 }
 
-.chart {
-  flex-shrink: 0;
-  width: 160px;
-  height: 160px;
+.genresCard {
+  grid-area: genres;
 }
 
-.legend {
+.metricsCard {
+  grid-area: metrics;
+}
+
+.categoriesCard {
+  grid-area: categories;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+
+.metric {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 0;
+  gap: 16px;
 }
 
-.legendItem {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 13px;
-}
-
-.marker {
-  flex-shrink: 0;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.countryName {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.percentage {
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+.metricLabel {
   color: #6C778B;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.metricValue {
+  color: var(--black-blue);
+  font-size: 20px;
   font-weight: 600;
+  line-height: 26px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 
 .genreList {

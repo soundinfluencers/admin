@@ -15,6 +15,8 @@ export const useCampaignsQuery = (params: TGetCampaignParams)=> {
 
 export const useCampaignDetailsQuery = (
   params: ICampaignDetailsRequestParams | null,
+  enabled = true,
+  isDeletedOptionRecovery = false,
 ) => {
   return useQuery({
     queryKey: params
@@ -22,9 +24,24 @@ export const useCampaignDetailsQuery = (
       : [...campaignsQueryKeys.details(), null],
 
     queryFn: params
-      ? () => getCampaignById(params)
+      ? async () => {
+        const campaign = await getCampaignById(
+          params,
+          isDeletedOptionRecovery ? { silentError: true } : undefined,
+        );
+        if (isDeletedOptionRecovery && (
+          campaign.campaignId !== params.campaignId ||
+          campaign.status !== "proposal" ||
+          !campaign.existingOptions.includes(0)
+        )) {
+          throw new Error("The remaining proposal option could not be resolved.");
+        }
+        return campaign;
+      }
       : skipToken,
 
+    enabled: params !== null && enabled,
+    ...(isDeletedOptionRecovery && { retry: false }),
     staleTime: 0,
     refetchOnMount: "always",
     refetchOnWindowFocus: false,

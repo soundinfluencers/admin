@@ -1,0 +1,63 @@
+@use "@/app/styles/utils/mixins" as mixins;
+
+.loader {
+  --loader-unit: 1.5px;
+  --loader-duration: 1.3s;
+
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.label {
+  @include mixins.visually-hidden;
+}
+
+.bars {
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--loader-unit));
+  height: calc(89 * var(--loader-unit));
+}
+
+.bar {
+  width: calc(12 * var(--loader-unit));
+  height: calc(var(--loader-bar-height) * var(--loader-unit));
+  border-radius: calc(6 * var(--loader-unit)) / calc(var(--loader-bar-radius) * var(--loader-unit));
+  background: linear-gradient(
+    107.52deg,
+    #9edfff 3.56%,
+    #c3e9ff 50.39%,
+    #aec7ff 79.14%,
+    #96abf2 100%
+  );
+
+  opacity: 0;
+  animation: wave var(--loader-duration) ease-in-out infinite;
+  
+  @for $bar from 1 through 9 {
+    &:nth-child(#{$bar}) {
+      animation-delay: calc(
+        var(--loader-duration) / 10 * (#{$bar} - 10)
+      );
+    }
+  }
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  15%,
+  22% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+    opacity: 1;
+  }
+}

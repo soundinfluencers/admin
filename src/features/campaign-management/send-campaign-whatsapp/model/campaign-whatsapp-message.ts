@@ -9,10 +9,12 @@ import {
 } from "@/shared/constants/social-media-taxonomy.ts";
 import { CURRENCY_LABELS } from "@/shared/constants/currency-taxonomy.ts";
 
-const INFLUENCER_DASHBOARD_URL = "https://www.example.com";
+const INFLUENCER_DASHBOARD_URL = "https://go.soundinfluencers.com/influencer";
 
 const PLATFORM_PROMO_DETAILS: Partial<Record<TSocialMedia, string>> = {
   [SOCIAL_MEDIA.INSTAGRAM]: "1 post + 1 story",
+  [SOCIAL_MEDIA.TIKTOK]: "1 post + 1 story",
+  [SOCIAL_MEDIA.FACEBOOK]: "1 post + 1 story",
 };
 
 type CampaignMessageSource = Pick<ICampaignDetails, "addedAccounts">;
@@ -83,9 +85,13 @@ export const buildCampaignWhatsAppMessageData = (
     (account): CampaignWhatsAppPlacement => {
       const content = account.selectedContentItem;
 
+      const normalizedReward = account.initialPrice
+        ? account.initialPrice
+        : (account.price ?? null);
+
       const reward =
-        Number.isFinite(account.initialPrice) && account.currency
-          ? `${account.initialPrice} ${CURRENCY_LABELS[account.currency]}`
+        Number.isFinite(normalizedReward) && account.currency
+          ? `${normalizedReward} ${CURRENCY_LABELS[account.currency]}`
           : "";
 
       return {
@@ -257,15 +263,12 @@ export const formatCampaignEmailMessage = (
 
     const content = formatEmailHtmlText(block.text);
 
-    return `
-        <p style="margin:0 0 16px;">
-          ${
+    const paragraphContent =
       block.type === "heading"
         ? `<strong>${content}</strong>`
-        : content
-    }
-        </p>
-      `;
+        : content;
+
+    return `<p style="margin:0 0 16px;">${paragraphContent}</p>`;
   })
   .join("");
 

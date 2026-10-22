@@ -1,4 +1,5 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
+import { AppInitializationBoundary } from "./ui/app-initialization-boundary.tsx";
 import { RootRedirect } from "./root-redirect.tsx";
 import { ProtectedOnly, PublicOnly } from "./guards.tsx";
 import { PublicLayout } from "@/app/providers/router/ui/public-layout.tsx";
@@ -15,7 +16,6 @@ import { InfluencersListPage } from "@/pages/influencers/influencer-list-page";
 import { InfluencerDetailsPage } from "@/pages/influencers/influencer-details-page";
 import { SocialAccountCreatePage } from "@/pages/influencers/social-account-create-page";
 import { SocialAccountEditPage } from "@/pages/influencers/social-account-edit-page";
-// import { CampaignManagment } from "@/pages/campaign-managment";
 import { CampaignManagementPage } from "@/pages/campaign-management-v2";
 import { InfluencerHistoryPage } from "@/pages/influencer-history/influencer-history-page";
 import { InfluencerHistoryDetailsPage } from "@/pages/influencer-history/influencer-history-details-page";
@@ -35,7 +35,7 @@ export const ROUTER = createBrowserRouter([
     path: "/",
     element: (
       <CampaignDraftLifecycle>
-        <Outlet/>
+        <AppInitializationBoundary />
       </CampaignDraftLifecycle>
     ),
     children: [

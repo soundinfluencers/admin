@@ -58,8 +58,14 @@ function loadManagementHook(dependencies) {
     return loadSource('src/pages/campaign-management-v2/model/use-campaign-management-state.ts', {
         '@/entities/campaign': {},
         '@/entities/campaign/model/apply-whatsapp-updates-to-campaign': loadWhatsAppHelper(),
-        './use-campaign-menu-actions': { useCampaignMenuActions: () => ({
-            isMenuBusy: false, isMenuActionBlocked: () => false,
+        './use-campaign-menu-actions': { useCampaignMenuActions: ({ isSaving }) => ({
+            isMenuBusy: isSaving, isMenuActionBlocked: () => isSaving,
+        }) },
+        './use-approve-proposal-option-actions': { useApproveProposalOptionActions: () => ({
+            isApproveFlowBusy: false, isApproveFlowBlocked: () => false,
+        }) },
+        './use-update-campaign-insights-actions': { useUpdateCampaignInsightsActions: () => ({
+            isInsightsLocked: false, isInsightsActionBlocked: () => false,
         }) },
         ...dependencies,
         './use-campaign-draft.ts': loadSource('src/pages/campaign-management-v2/model/use-campaign-draft.ts', dependencies),
@@ -309,7 +315,7 @@ test('deleting the final shared description and brief keeps the empty-ID fallbac
 function loadUI(file, react = {}, overrides = {}) {
     const source = ts.createSourceFile(file, fs.readFileSync(path.join(root, file), 'utf8'),
         ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-    const dependencies = { 'react/jsx-runtime': jsx, react, clsx: require('clsx') };
+    const dependencies = { 'react/jsx-runtime': jsx, react, clsx: { default: require('clsx') } };
     for (const node of source.statements) {
         if (!ts.isImportDeclaration(node) || !node.importClause || node.importClause.isTypeOnly) continue;
         const id = node.moduleSpecifier.text;
@@ -342,7 +348,41 @@ function loadWhatsAppMessage() {
     });
 }
 
-function createWhatsAppHarness(status = 'distributing') {
+for (const [label, values, expectedReward] of [
+    ['initialPrice=100, price=80', { initialPrice: 100, price: 80 }, '100 €'],
+    ['initialPrice=0, price=30', { initialPrice: 0, price: 30 }, '30 €'],
+    ['initialPrice absent, price=0', { price: 0 }, '0 €'],
+    ['both prices are zero', { initialPrice: 0, price: 0 }, '0 €'],
+    ['both prices are absent', {}, ''],
+    ['initialPrice=0, price absent', { initialPrice: 0 }, ''],
+    ['initialPrice is infinite', { initialPrice: Infinity, price: 30 }, ''],
+    ['fallback price is not finite', { price: NaN }, ''],
+    ['currency is absent', { initialPrice: 100, currency: undefined }, ''],
+]) {
+    test(`WhatsApp Reward: ${label}`, () => {
+        const message = loadWhatsAppMessage();
+        const campaign = { addedAccounts: [{
+            ...fixture().campaign.addedAccounts[0], influencerId: 'influencer-a', currency: 'EUR', ...values,
+        }] };
+        const data = message.buildCampaignWhatsAppMessageData(campaign, 'influencer-a');
+        assert.equal(data.placements[0].reward, expectedReward);
+        const placement = message.getCampaignWhatsAppMessageBlocks(data).find(block => block.type === 'placement');
+        assert.deepEqual(placement.fields.filter(([label]) => label === 'Reward'),
+            expectedReward ? [['Reward', expectedReward]] : []);
+        const whatsapp = message.formatCampaignWhatsAppMessage(data);
+        const email = message.formatCampaignEmailMessage(data);
+        if (expectedReward) {
+            assert.ok(whatsapp.includes(`*Reward:* ${expectedReward}`));
+            assert.ok(email.text.includes(`Reward: ${expectedReward}`));
+        } else {
+            assert.equal(whatsapp.includes('*Reward:*'), false);
+            assert.equal(email.text.includes('Reward:'), false);
+            assert.equal(email.html.includes('<strong>Reward:</strong>'), false);
+        }
+    });
+}
+
+function createWhatsAppHarness(status = 'distributing', withInsights = false) {
     const lifecycle = createHookLifecycle(), store = createStore();
     const input = fixture(status);
     input.campaign.addedAccounts.forEach(account => Object.assign(account, {
@@ -357,14 +397,16 @@ function createWhatsAppHarness(status = 'distributing') {
     store.getState().initializeDraft(input);
     const { QueryClient } = require('@tanstack/react-query');
     const queryClient = new QueryClient();
-    const h = { store, input, lifecycle, queryClient, context: input.params, posts: [], saves: [], gets: [], notifications: [] };
+    const h = { store, input, lifecycle, queryClient, context: input.params, posts: [], saves: [], gets: [], scrapes: [], notifications: [] };
     const defer = (calls, args) => new Promise((resolve, reject) => calls.push({ args, resolve, reject }));
     // Execute real Query mutations, including their pending lock and retry policy, without HTTP.
     const query = {
         useQueryClient: () => queryClient,
         useIsMutating: filters => queryClient.isMutating(filters),
+        useMutationState: ({ filters, select }) => queryClient.getMutationCache().findAll(filters).map(select),
         useMutation: options => ({
             mutateAsync: variables => queryClient.getMutationCache().build(queryClient, options).execute(variables),
+            mutate: variables => { void queryClient.getMutationCache().build(queryClient, options).execute(variables).catch(() => {}); },
             isPending: queryClient.isMutating({ mutationKey: options.mutationKey }) > 0,
         }),
     };
@@ -372,6 +414,7 @@ function createWhatsAppHarness(status = 'distributing') {
         sendCampaignWhatsAppOne: request => defer(h.posts, request),
         updateCampaignById: request => defer(h.saves, request),
         getCampaignById: params => defer(h.gets, params),
+        updateCampaignInsights: (body, options) => defer(h.scrapes, { body, options }),
     };
     const toast = Object.assign(() => {}, Object.fromEntries(['error', 'warning', 'success'].map(type =>
         [type, message => h.notifications.push({ type, message })])));
@@ -392,6 +435,7 @@ function createWhatsAppHarness(status = 'distributing') {
             useDownloadCampaignPdfMutation: () => ({}), useChangeCampaignStatusMutation: () => ({}),
         },
         '@/features/campaign-management/send-campaign-whatsapp': feature,
+        '@/features/campaign-management/send-campaign-email': { useSendCampaignEmailMutation: () => ({ isRunning: () => false }) },
         '../store/campaign-management.store': { useCampaignManagementStore: storeHook },
         '../store/campaign-management.comparison': loadComparison(),
         '@/app/api/errors/notify': notify, 'react-toastify': { toast },
@@ -402,6 +446,15 @@ function createWhatsAppHarness(status = 'distributing') {
         '@/entities/campaign/api/campaign.query-keys.ts': { campaignsQueryKeys },
         './map-campaign-to-update-body': loadSource('src/features/campaign-management/save-campaign/model/map-campaign-to-update-body.ts', {}),
         'react-toastify': { toast }, '@/app/api/errors/notify.ts': notify,
+    });
+    const insightsFeature = loadSource('src/features/campaign-management/update-campaign-insights/model/use-update-campaign-insights-mutation.ts', {
+        '@tanstack/react-query': query, '@/entities/campaign': api, 'react-toastify': { toast },
+    });
+    const insightsActions = loadSource('src/pages/campaign-management-v2/model/use-update-campaign-insights-actions.ts', {
+        react: lifecycle.react, '@tanstack/react-query': query,
+        '@/features/campaign-management/update-campaign-insights': insightsFeature,
+        '../store/campaign-management.store': { useCampaignManagementStore: storeHook },
+        '../store/campaign-management.comparison': loadComparison(),
     });
     const { useCampaignManagementState } = loadManagementHook({
         react: lifecycle.react, 'react-router-dom': { useParams: () => h.context }, '@tanstack/react-query': query,
@@ -418,6 +471,7 @@ function createWhatsAppHarness(status = 'distributing') {
         './url-path-helpers.ts': { isCampaignStatus: value => ['pending', 'distributing', 'completed'].includes(value) },
         '@/shared/constants/campaign-view.ts': loadSource('src/shared/constants/campaign-view.ts', {}),
         './use-campaign-menu-actions': menu,
+        ...(withInsights ? { './use-update-campaign-insights-actions': insightsActions } : {}),
         '@/features/campaign-management/save-campaign': saveFeature,
         '@/features/campaign-management/create-proposal-option': { useCreateProposalOption: () => ({}) },
         '@/app/api/errors/notify.ts': notify, 'react-toastify': { toast },
@@ -436,7 +490,7 @@ function createWhatsAppHarness(status = 'distributing') {
     return h;
 }
 
-test('row preview groups duplicate placements by influencer; opening and copying never send', async () => {
+test('row preview groups duplicate placements by influencer; opening and copying never send', async t => {
     const h = createWhatsAppHarness();
     const { getCampaignAccountsTableColumns } = loadUI(columnsFile);
     const trigger = {};
@@ -452,16 +506,31 @@ test('row preview groups duplicate placements by influencer; opening and copying
     assert.equal((preview.request.message.match(/Hi Synthetic,/g) || []).length, 1);
     assert.equal((preview.request.message.match(/Let us know/g) || []).length, 1);
     const copied = [];
-    const { CampaignMessagePreviewModal } = loadUI(whatsAppRoot + 'ui/campaign-message-preview-modal.tsx', initialReact, {
+    const lifecycle = createHookLifecycle();
+    t.after(() => lifecycle.unmount());
+    const { CampaignMessagePreviewModal } = loadUI(whatsAppRoot + 'ui/campaign-message-preview-modal.tsx', {
+        ...lifecycle.react, Fragment: require('react').Fragment,
+    }, {
         clsx: { default: require('clsx') },
         '@/shared/hooks/use-copy-to-clipboard': { useCopyToClipboard: () => async text => { copied.push(text); return true; } },
         '../model/campaign-whatsapp-message': loadWhatsAppMessage(),
     });
-    const modal = CampaignMessagePreviewModal({ preview, isSending: false, onSendWhatsApp: h.hook.sendMessagePreview });
+    const props = {
+        preview, isSending: false, isSendingEmail: false,
+        onClose: () => assert.fail('Copy must not close the preview'),
+        onSendWhatsApp: h.hook.sendMessagePreview, onSendEmail: () => assert.fail('Copy must not send Email'),
+    };
+    const modal = lifecycle.render(() => CampaignMessagePreviewModal(props));
     const buttons = elements(modal, n => n.type === 'button');
+    assert.equal(buttons.length, 4);
     buttons[0].props.onClick(); await flush();
     assert.deepEqual(copied, [preview.request.message]);
-    assert.equal(buttons[1].props.disabled, true); assert.equal(buttons[2].props.disabled, true);
+    assert.equal(buttons[2].props.disabled, false); assert.equal(buttons[3].props.disabled, false);
+    for (const channel of ['isSending', 'isSendingEmail']) {
+        const busy = lifecycle.render(() => CampaignMessagePreviewModal({ ...props, [channel]: true }));
+        const busyButtons = elements(busy, n => n.type === 'button');
+        assert.equal(busyButtons[2].props.disabled, true); assert.equal(busyButtons[3].props.disabled, true);
+    }
     assert.equal(h.posts.length, 0); assert.equal(h.saves.length, 0); assert.equal(h.gets.length, 0);
 });
 
@@ -870,17 +939,19 @@ function createHookLifecycle() {
 }
 
 const flush = () => new Promise(resolve => setImmediate(resolve));
-function createProposalHarness(store = initialized('proposal').store) {
+function createProposalHarness(store = initialized('proposal').store, withApproval = false) {
     const lifecycle = createHookLifecycle();
     const saves = [], copies = [], navigations = [], queries = [], notifications = [], invalidations = [];
     const defer = (calls, args) => new Promise((resolve, reject) => calls.push({ args, resolve, reject }));
     const h = {
         store, lifecycle, saves, copies, navigations, queries, notifications, invalidations,
+        approvals: [], statusNavigations: [], cancellations: [],
         context: { campaignId: 'synthetic-campaign', status: 'proposal', optionIndex: 0, view: 'strategy' },
         query: {}, navigationError: null, optimisticNavigation: false, invalidationError: null,
     };
     const queryClient = {
-        async cancelQueries() {}, setQueryData() {},
+        isMutating: () => 0,
+        async cancelQueries(filters) { h.cancellations.push(filters); }, setQueryData() {},
         async invalidateQueries(filters) {
             invalidations.push(filters);
             if (h.invalidationError) throw h.invalidationError;
@@ -891,6 +962,7 @@ function createProposalHarness(store = initialized('proposal').store) {
         const mutateAsync = async variables => {
             state.pending = true;
             try {
+                if (options.onMutate) await options.onMutate(variables);
                 const result = await options.mutationFn(variables);
                 await options.onSuccess?.(result, variables);
                 return result;
@@ -925,6 +997,28 @@ function createProposalHarness(store = initialized('proposal').store) {
             '@/entities/campaign': { createProposalOption: variables => defer(copies, variables) },
         }),
     };
+    const approvalDependencies = {};
+    if (withApproval) {
+        const approvalApi = loadSource('src/entities/campaign/api/campaign.api.ts', {
+            '@/app/api/http.ts': { $api: { post: (...args) => defer(h.approvals, args) } },
+        });
+        const approvalFeature = loadSource('src/features/campaign-management/approve-proposal-option/model/use-approve-proposal-option-mutation.ts', {
+            '@tanstack/react-query': { useMutation, useQueryClient: () => queryClient },
+            '@/entities/campaign/api/campaign.api': approvalApi,
+            '@/entities/campaign/api/campaign.query-keys': { campaignsQueryKeys },
+            '@/app/api/errors/notify': errorNotifications,
+        });
+        approvalDependencies['./use-approve-proposal-option-actions'] = loadSource('src/pages/campaign-management-v2/model/use-approve-proposal-option-actions.ts', {
+            react: lifecycle.react,
+            'react-router-dom': {
+                useLocation: () => ({ search: `?proposal-option=${h.context.optionIndex}&tab=${h.context.view}` }),
+                useNavigate: () => async (href, options) => { h.statusNavigations.push({ href, options }); },
+            },
+            '@/features/campaign-management/approve-proposal-option': approvalFeature,
+            '../store/campaign-management.store': { useCampaignManagementStore: Object.assign(selector => selector(store.getState()), { getState: store.getState }) },
+            '../store/campaign-management.comparison': loadComparison(),
+        });
+    }
     const { useCampaignManagementState } = loadManagementHook({
         react: lifecycle.react,
         'react-router-dom': { useParams: () => h.context },
@@ -956,6 +1050,7 @@ function createProposalHarness(store = initialized('proposal').store) {
         '@/shared/constants/campaign-view.ts': loadSource('src/shared/constants/campaign-view.ts', {}),
         '@/features/campaign-management/save-campaign': saveFeature,
         '@/features/campaign-management/create-proposal-option': createFeature,
+        ...approvalDependencies,
         'react-toastify': { toast },
         '@/app/api/errors/notify.ts': errorNotifications,
     });
@@ -971,6 +1066,118 @@ function createProposalHarness(store = initialized('proposal').store) {
     h.render();
     return h;
 }
+
+function createApprovalHarness() {
+    const store = createStore(), input = fixture('proposal');
+    input.params.optionIndex = 4;
+    store.getState().initializeDraft(input);
+    const h = createProposalHarness(store, true);
+    h.context.optionIndex = 4; h.render();
+    h.prepareApproval = async () => {
+        h.hook.updateCampaignName('Unsaved approval name'); h.render();
+        h.hook.openApproveOptionModal(); h.render();
+        await h.hook.confirmApproveOption(); h.render();
+        assert.equal(h.hook.isApproveUnsavedChangesModalOpen, true);
+        assert.equal(h.approvals.length, 0);
+    };
+    h.resolveApproval = async () => {
+        h.approvals[0].resolve({ data: {
+            statusCode: 200, message: 'Synthetic approval response', data: { campaignId: 'synthetic-campaign' },
+        } });
+        await flush(); h.render();
+    };
+    return h;
+}
+
+function assertVisibleSaveControls(state) {
+    const lifecycle = createHookLifecycle();
+    const { CampaignHeader } = loadUI('src/widgets/campaign-management-v2/campaign-header/ui/campaign-header.tsx', lifecycle.react, {
+        '@/entities/campaign/model/campaign-details.types.ts': loadSource('src/entities/campaign/model/campaign-details.types.ts', {}),
+        '@/shared/constants/currency-taxonomy.ts': loadSource('src/shared/constants/currency-taxonomy.ts', {}),
+    });
+    const tree = lifecycle.render(() => CampaignHeader({
+        onSave: state.saveCampaign, isSaveDisabled: !state.canSave, isDirty: state.isDirty, isSaving: state.isSaving,
+        campaignName: state.data.campaignName, onCampaignNameChange: state.updateCampaignName,
+        campaignStatus: state.data.status, internalCost: 0, currency: state.data.displayCurrency,
+        onReset: state.resetDraft, isResetDisabled: !state.canReset, readOnly: state.isReadOnly,
+    }));
+    assert.equal(state.isReadOnly, false);
+    const save = elements(tree, node => node.type === 'button' && node.props['aria-label'] === 'Save campaign changes');
+    const reset = elements(tree, node => node.type === 'button' && node.props['aria-label'] === 'Reset changes');
+    assert.equal(save.length, 1); assert.equal(reset.length, 1);
+    assert.equal(save[0].props.disabled, !state.canSave || state.isSaving);
+    assert.equal(reset[0].props.disabled, !state.canReset);
+    lifecycle.unmount();
+}
+
+test('Save controls reflect clean, dirty and pending states without becoming readOnly', async () => {
+    const h = createProposalHarness(initialized('pending').store); h.context.status = 'pending'; h.render();
+    assert.equal(h.hook.canSave, false); assertVisibleSaveControls(h.hook);
+    h.hook.saveCampaign(); assert.equal(h.saves.length, 0);
+    h.hook.updateCampaignName('Dirty save'); h.render();
+    assert.equal(h.hook.canSave, true); assertVisibleSaveControls(h.hook);
+    h.hook.saveCampaign(); h.render();
+    assert.equal(h.saves.length, 1); assert.equal(h.hook.isSaving, true);
+    assert.equal(h.hook.canSave, false); assertVisibleSaveControls(h.hook);
+    h.hook.saveCampaign(); assert.equal(h.saves.length, 1);
+    h.saves[0].resolve({ ...fixture('pending').campaign, campaignName: 'Dirty save' }); await flush(); h.render();
+    assert.equal(h.hook.isDirty, false); assert.equal(h.hook.canSave, false); assertVisibleSaveControls(h.hook);
+});
+
+test('Directly approve: Save returns to confirmation; only explicit Approve sends nonzero optionIndex in query', async () => {
+    const h = createApprovalHarness(); await h.prepareApproval();
+    assert.equal(h.hook.canSave, false); assert.equal(h.hook.canReset, false); assertVisibleSaveControls(h.hook);
+    const before = h.store.getState(); h.hook.saveCampaign(); h.hook.resetDraft();
+    assert.equal(h.saves.length, 0); assert.equal(h.store.getState(), before);
+    const saving = h.hook.saveBeforeApprove(); h.render();
+    assert.equal(h.saves.length, 1); assert.equal(h.hook.isPreparingApproval, true); assertVisibleSaveControls(h.hook);
+    h.saves[0].resolve({ ...fixture('proposal').campaign, campaignName: 'Confirmed approval name' });
+    await saving; h.render();
+    assert.equal(h.hook.isApproveOptionModalOpen, true); assert.equal(h.hook.isDirty, false);
+    assert.equal(h.approvals.length, 0); assertVisibleSaveControls(h.hook);
+    const approving = h.hook.confirmApproveOption(); void h.hook.confirmApproveOption(); await flush(); h.render();
+    assert.equal(h.approvals.length, 1);
+    assert.deepEqual(h.approvals[0].args, [
+        '/admin/campaigns/proposal/synthetic-campaign/approve', undefined, { params: { optionIndex: 4 } },
+    ]);
+    assert.equal(h.hook.isApprovingOption, true); assert.equal(h.hook.canSave, false); assertVisibleSaveControls(h.hook);
+    await h.resolveApproval(); await approving;
+    assert.equal(h.statusNavigations.length, 1);
+    assert.equal(h.statusNavigations[0].href, '/dashboard/campaigns/campaign-management/pending/synthetic-campaign?tab=strategy');
+    assert.deepEqual(h.statusNavigations[0].options, { replace: true });
+    assert.ok(h.invalidations.every(filter => filter.refetchType === 'none'));
+});
+
+test('Directly approve: Discard returns to confirmation and resets editors without approving', async () => {
+    const h = createApprovalHarness(); await h.prepareApproval();
+    h.hook.discardBeforeApprove(); h.render();
+    assert.equal(h.hook.isApproveOptionModalOpen, true); assert.equal(h.hook.isDirty, false);
+    assert.equal(h.hook.editorRevision, 1); assert.equal(h.saves.length, 0); assert.equal(h.approvals.length, 0);
+    assert.equal(h.store.getState().draft.campaign.campaignName, 'Synthetic campaign'); assertVisibleSaveControls(h.hook);
+    const approving = h.hook.confirmApproveOption(); await flush();
+    assert.equal(h.approvals.length, 1); assert.equal(h.approvals[0].args[2].params.optionIndex, 4);
+    await h.resolveApproval(); await approving;
+});
+
+test('Directly approve: Cancel and closing confirmation preserve dirty draft without Save or Approve', async () => {
+    const h = createApprovalHarness(); await h.prepareApproval();
+    const before = h.store.getState();
+    h.hook.cancelApprovePreparation(); h.render();
+    assert.equal(h.hook.isApproveOptionModalOpen, true); assert.equal(h.hook.isApproveUnsavedChangesModalOpen, false);
+    assert.equal(h.hook.canSave, false); assertVisibleSaveControls(h.hook);
+    h.hook.closeApproveOptionModal(); h.render(); await flush();
+    assert.equal(h.store.getState(), before); assert.equal(h.hook.isDirty, true); assert.equal(h.hook.canSave, true);
+    assert.equal(h.saves.length, 0); assert.equal(h.approvals.length, 0); assertVisibleSaveControls(h.hook);
+});
+
+test('Directly approve: failed Save remains in Unsaved changes and never approves', async () => {
+    const h = createApprovalHarness(); await h.prepareApproval();
+    const saving = h.hook.saveBeforeApprove();
+    h.saves[0].reject(new Error('Save rejected')); await saving; h.render();
+    assert.equal(h.hook.isApproveUnsavedChangesModalOpen, true); assert.equal(h.hook.isPreparingApproval, false);
+    assert.equal(h.hook.isDirty, true); assert.equal(h.approvals.length, 0); assert.equal(h.statusNavigations.length, 0);
+    assert.equal(h.notifications.length, 1); assert.equal(h.notifications[0].message, 'Save rejected');
+});
 
 test('option changes during Save prevent Copy even while the store still contains the old option', async () => {
     const h = createProposalHarness(); h.confirmCopy();
@@ -1027,10 +1234,12 @@ for (const optimistic of [false, true]) {
         h.optimisticNavigation = optimistic; h.confirmCopy();
         const saving = h.hook.saveAndContinueProposalAction();
         const saved = { ...fixture('proposal').campaign, campaignName: 'Saved response' };
-        h.saves[0].resolve(saved); await flush();
+        h.saves[0].resolve(saved); await saving; h.render();
+        assert.equal(h.copies.length, 0); assert.equal(h.hook.isCreateOptionModalOpen, true);
+        h.hook.createProposalCopy(); await flush();
         assert.equal(h.copies[0].args.body.campaignName, 'Saved response');
         h.copies[0].resolve({ campaignId: 'synthetic-campaign', optionIndex: 7 });
-        await assert.doesNotReject(saving);
+        await flush();
         assert.equal(h.notifications.length, 1);
         const { message, options } = h.notifications[0];
         assert.match(message.props.children[0], /was created/); assert.equal(options.autoClose, false);
@@ -1065,19 +1274,21 @@ test('GET failure after navigating to the created option remains a loading error
     h.hook.createProposalCopy(); assert.equal(h.copies.length, 1);
 });
 
-test('View changes preserve Save and continue; failed creation does not roll back the saved baseline', async () => {
+test('View changes preserve Save preparation; explicit Copy failure does not roll back the saved baseline', async () => {
     const h = createProposalHarness(); h.confirmCopy();
     const saving = h.hook.saveAndContinueProposalAction();
     h.context.view = 'audience'; h.render();
-    h.saves[0].resolve({ ...fixture('proposal').campaign, campaignName: 'Confirmed name' }); await flush();
+    h.saves[0].resolve({ ...fixture('proposal').campaign, campaignName: 'Confirmed name' }); await saving; h.render();
+    assert.equal(h.copies.length, 0); assert.equal(h.hook.isCreateOptionModalOpen, true);
+    h.hook.createProposalCopy(); await flush();
     assert.equal(h.copies.length, 1);
-    h.copies[0].reject(new Error('POST failed')); await saving;
+    h.copies[0].reject(new Error('POST failed')); await flush();
     assert.equal(h.store.getState().baseline.campaign.campaignName, 'Confirmed name');
     assert.equal(loadComparison().selectCampaignIsDirty(h.store.getState()), false);
     assert.equal(h.notifications[0].message, 'POST failed'); assert.deepEqual(h.navigations, []);
 });
 
-test('failed Save stops continuation; Cancel preserves draft; Discard copies baseline', async () => {
+test('failed Save stops continuation; Cancel preserves draft; Discard requires explicit Copy of baseline', async () => {
     const h = createProposalHarness(); h.confirmCopy();
     const saving = h.hook.saveAndContinueProposalAction();
     h.saves[0].reject(new Error('PATCH failed')); await saving; h.render();
@@ -1085,21 +1296,29 @@ test('failed Save stops continuation; Cancel preserves draft; Discard copies bas
     h.hook.cancelProposalAction(); h.render();
     assert.equal(h.hook.isCreateOptionModalOpen, true);
     assert.equal(h.store.getState().draft.campaign.campaignName, 'Unsaved name');
-    h.hook.createProposalCopy(); h.render(); h.hook.discardAndContinueProposalAction();
+    h.hook.createProposalCopy(); h.render(); h.hook.discardAndContinueProposalAction(); h.render();
+    assert.equal(h.copies.length, 0); assert.equal(h.hook.isCreateOptionModalOpen, true);
+    h.hook.createProposalCopy();
     assert.equal(h.copies[0].args.body.campaignName, 'Synthetic campaign');
     h.copies[0].resolve({ campaignId: 'synthetic-campaign', optionIndex: 1 }); await flush();
 });
 
-test('Save then Copy uses PATCH response and server option index before initializing from a full GET', async () => {
-    const h = createProposalHarness(); h.confirmCopy();
+test('Save then explicit Copy uses PATCH response and server option index before initializing from a full GET', async () => {
+    const h = createProposalHarness();
+    h.hook.openCreateOptionModal(); h.render(); assertVisibleSaveControls(h.hook);
+    h.confirmCopy(); assertVisibleSaveControls(h.hook);
     const saving = h.hook.saveAndContinueProposalAction(); h.render();
     assert.equal(h.hook.isSaving, true); assert.equal(h.hook.isPending, false);
+    assertVisibleSaveControls(h.hook);
     assert.equal(h.hook.data.campaignName, 'Unsaved name'); assert.equal(h.copies.length, 0);
     const saved = { ...fixture('proposal').campaign, campaignName: 'PATCH response' };
-    h.saves[0].resolve(saved); await flush();
+    h.saves[0].resolve(saved); await saving; h.render();
+    assert.equal(h.copies.length, 0); assert.equal(h.hook.isCreateOptionModalOpen, true);
+    assertVisibleSaveControls(h.hook);
+    h.hook.createProposalCopy(); await flush();
     assert.equal(h.copies.length, 1); assert.equal(h.copies[0].args.body.campaignName, 'PATCH response');
     assert.equal(h.store.getState().baseline.campaign.campaignName, 'PATCH response');
-    h.copies[0].resolve({ campaignId: 'synthetic-campaign', optionIndex: 8 }); await saving; h.render();
+    h.copies[0].resolve({ campaignId: 'synthetic-campaign', optionIndex: 8 }); await flush(); h.render();
     assert.deepEqual(h.navigations, [8]); assert.equal(h.hook.data, null); assert.equal(h.hook.isPending, true);
     assert.equal(h.store.getState().draft.params.optionIndex, 0);
     h.query = { data: { ...saved, campaignName: 'Full new option' }, isFetchedAfterMount: true, isFetching: false };
@@ -1175,8 +1394,10 @@ test('pending request context initializes an under_review response without chang
     h.query = { data: fixture('under_review').campaign, isFetchedAfterMount: true, isFetching: false };
     h.render(); h.render();
     assert.equal(h.hook.data.status, 'under_review'); assert.equal(h.store.getState().draft.params.status, 'pending');
-    assert.equal(h.hook.canSave, true); assert.equal(h.hook.isReadOnly, false);
+    assert.equal(h.hook.canSave, false); assert.equal(h.hook.isReadOnly, false);
     assert.equal(h.hook.canMarkAsPaid, false); assert.equal(h.hook.isDirty, false);
+    h.hook.updateCampaignName('Dirty Under Review draft'); h.render();
+    assert.equal(h.hook.isDirty, true); assert.equal(h.hook.canSave, true);
 });
 
 test('pure Paid transformation preserves unrelated placements and only no-ops when both fields match', () => {
@@ -1348,6 +1569,7 @@ for (const outcome of ['success', 'error']) {
 
 for (const [field, message] of [['addedAccounts', 'without accounts'], ['campaignContent', 'without content']]) {
     test(`ordinary Save preparation failure for ${field} notifies once without PATCH or changing draft`, async () => {
+        // Keep real dirty detection: an empty list must reach Save's mapper validation.
         const { store } = initialized('pending');
         store.setState({ draft: { ...store.getState().draft, campaign: { ...store.getState().draft.campaign, [field]: [] } } });
         const before = store.getState(), h = createProposalHarness(store);
@@ -1437,4 +1659,499 @@ test('Add placeholder is a disabled button without navigation or draft changes',
     assert.equal(add.type, 'button'); assert.equal(add.props.type, 'button'); assert.equal(add.props.disabled, true);
     assert.equal(add.props.href, undefined); assert.equal(add.props.to, undefined); assert.equal(add.props.onClick, undefined);
     assert.equal(store.getState(), before);
+});
+
+const createInsightsHarness = (status = 'distributing') => createWhatsAppHarness(status, true);
+function refreshedInsights(h) {
+    const campaign = structuredClone(h.input.campaign);
+    Object.assign(campaign, {
+        campaignName: 'Server name', price: 9999, totalFollowers: 9999,
+        totalImpressions: 0, totalLikes: 3, totalComments: 6, totalShares: 9, totalSaves: 12, cpm: 0,
+    });
+    campaign.addedAccounts.forEach((account, i) => Object.assign(account, {
+        impressions: 0, like: i, comments: i * 2, shares: i * 3, saves: i * 4, cpm: i,
+        postLink: 'https://example.test/server-post', screenshot: '', rating: 1000, followers: 9999,
+        closePromo: 'close', statusLabel: 'Server status', whatsappStatus: 'sent',
+    }));
+    campaign.addedAccounts.reverse();
+    return campaign;
+}
+async function finishInsights(h, campaign = refreshedInsights(h)) {
+    h.scrapes.at(-1).resolve(); await flush();
+    h.gets.at(-1).resolve(campaign); await flush(); h.render();
+}
+
+// Exercise real page callbacks, including those retained by open forms / async uploads.
+function attemptCampaignEdits(hook) {
+    hook.updateCampaignName('Forbidden edit');
+    hook.setPriceHidden(true); hook.setCpmAndResultHidden(true);
+    hook.setPrice(500); hook.setDisplayCurrency('USD');
+    hook.setAccountSelectedContent('placement-a', 'content-b');
+    hook.setAccountSelectedDescription('placement-a', 'content-a-d2');
+    hook.setAccountSelectedBrief('placement-a', 'content-a-b2');
+    hook.setAccountDateRequest('placement-a', '2026-11-01');
+    hook.setAccountPostLink('placement-a', 'https://example.test/late');
+    hook.setAccountScreenshot('placement-a', 'https://example.test/uploaded');
+    hook.onCreateContentForAccount('placement-a', 'https://example.test/new');
+    hook.onCreateDescriptionForAccount('placement-a', 'New description');
+    hook.onCreateBriefForAccount('placement-a', 'New brief');
+    hook.onUpdateDescriptionForAccount('content-a', 'content-a-d1', 'Changed');
+    hook.onUpdateBriefForAccount('content-a', 'content-a-b1', 'Changed');
+    hook.onUpdateContentTaggedUser('content-a', '@changed');
+    hook.onUpdateContentTaggedLink('content-a', 'https://example.test/changed');
+    for (const field of fields) hook.onUpdateAccountMetricField('placement-a', field, 500);
+    hook.deleteContentDescription('content-a', 'content-a-d1');
+    hook.deleteContentBrief('content-a', 'content-a-b1');
+    hook.deleteCampaignContent('content-a'); hook.removeAccount('placement-a');
+    hook.resetDraft(); hook.saveCampaign(); hook.requestCloseCampaign();
+}
+
+function assertFullInsightsSnapshot(h, refreshed) {
+    const { baseline, draft, meta } = h.store.getState();
+    assert.deepEqual(baseline.campaign, refreshed);
+    assert.deepEqual(draft.campaign, refreshed);
+    assert.deepEqual(h.queryClient.getQueryData(h.cacheKey), refreshed);
+    assert.notEqual(baseline, draft); assert.notEqual(baseline.campaign, draft.campaign);
+    assert.notEqual(draft.campaign, refreshed);
+    assert.notEqual(baseline.campaign.addedAccounts, draft.campaign.addedAccounts);
+    assert.notEqual(baseline.campaign.campaignContent[0], draft.campaign.campaignContent[0]);
+    assert.equal(typeof meta.updatedAt, 'number');
+    assert.equal(meta.expiresAt - meta.updatedAt, 2 * 60 * 60 * 1000);
+    assert.equal(h.hook.isDirty, false);
+}
+
+test('Insights: API sends PATCH with just campaignId/name, silent errors and no response dependency', async () => {
+    const requests = [];
+    const api = loadSource('src/entities/campaign/api/campaign.api.ts', {
+        '@/app/api/http.ts': { $api: { patch: async (...args) => { requests.push(args); } } },
+    });
+    await api.updateCampaignInsights({ campaignId: 'synthetic', campaignName: 'Current name' }, { silentError: true });
+    assert.deepEqual(requests, [[ '/scrapers/post-details/all',
+        { campaignId: 'synthetic', campaignName: 'Current name' }, { silentError: true, timeout: 0 } ]]);
+});
+
+test('Insights: only distributing with matching draft AND baseline can start', async () => {
+    for (const status of ['pending', 'completed', 'proposal']) {
+        const h = createInsightsHarness(status); h.hook.requestUpdateInsights(); await flush();
+        assert.equal(h.scrapes.length, 0); assert.equal(h.hook.canUpdateInsights, false);
+    }
+    for (const change of [
+        () => ({ draft: null }),
+        () => ({ baseline: null }),
+        state => ({ draft: { ...state.draft, params: { ...state.draft.params, status: 'completed' } } }),
+        state => ({ draft: { ...state.draft, params: { ...state.draft.params, campaignId: 'other' } } }),
+        state => ({ baseline: { ...state.baseline, params: { ...state.baseline.params, campaignId: 'other' } } }),
+    ]) {
+        const h = createInsightsHarness();
+        h.store.setState(change(h.store.getState()));
+        h.hook.requestUpdateInsights(); await flush(); assert.equal(h.scrapes.length, 0);
+    }
+});
+
+test('Insights: clean draft sends one PATCH then GET; all locks last through GET without changing readOnly', async () => {
+    const h = createInsightsHarness(), before = h.store.getState();
+    const stale = h.hook;
+    stale.requestUpdateInsights(); stale.requestUpdateInsights(); await flush(); h.render();
+    assert.equal(h.scrapes.length, 1); assert.equal(h.gets.length, 0);
+    assert.equal(h.hook.isUpdatingInsights, true); assert.equal(h.hook.isInsightsLocked, true);
+    assert.equal(h.hook.canUpdateInsights, true); assert.equal(h.hook.isReadOnly, false);
+    assert.equal(h.hook.canSave, false); assert.equal(h.hook.canReset, false);
+    assert.equal(h.hook.canEditMetrics, false); assert.equal(h.hook.canEditPostDetails, false);
+    assert.equal(h.hook.canMarkAsPaid, false);
+    attemptCampaignEdits(stale); attemptCampaignEdits(h.hook);
+    assert.equal(h.store.getState(), before); assert.equal(h.saves.length, 0);
+    h.scrapes[0].resolve(); await flush(); h.render();
+    assert.equal(h.gets.length, 1); assert.equal(h.hook.isInsightsLocked, true);
+    attemptCampaignEdits(stale); attemptCampaignEdits(h.hook);
+    assert.equal(h.store.getState(), before);
+    stale.requestUpdateInsights(); assert.equal(h.scrapes.length, 1);
+    h.gets[0].resolve(refreshedInsights(h)); await flush(); h.render();
+    assert.equal(h.hook.isInsightsLocked, false); assert.equal(h.hook.canReset, true);
+    assert.equal(h.hook.isDirty, false); assert.equal(h.notifications.length, 1);
+    const accepted = h.store.getState();
+    attemptCampaignEdits(stale);
+    assert.equal(h.store.getState(), accepted, 'late callbacks cannot restore pre-refresh form values');
+    h.hook.updateCampaignName('A new edit after completion');
+    assert.equal(h.store.getState().draft.campaign.campaignName, 'A new edit after completion');
+    assert.match(h.notifications[0].message, /Processing completed.*Saved campaign metrics/);
+});
+
+test('Insights: dirty Cancel preserves edits; Discard resets editors and continues with baseline name', async () => {
+    const h = createInsightsHarness(); h.store.getState().updateCampaignName('Unsaved name'); h.render();
+    h.hook.requestUpdateInsights(); h.render();
+    assert.equal(h.hook.isInsightsUnsavedChangesModalOpen, true); assert.equal(h.scrapes.length, 0);
+    assert.equal(h.hook.isInsightsLocked, false); assert.equal(h.hook.isReadOnly, false);
+    h.hook.cancelInsightsPreparation(); h.render();
+    assert.equal(h.hook.isDirty, true); assert.equal(h.scrapes.length, 0);
+    h.hook.requestUpdateInsights(); h.render(); h.hook.discardAndContinueInsights(); await flush(); h.render();
+    assert.equal(h.scrapes.length, 1); assert.equal(h.saves.length, 0); assert.equal(h.hook.editorRevision, 1);
+    assert.equal(h.scrapes[0].args.body.campaignName, h.input.campaign.campaignName);
+    await finishInsights(h);
+});
+
+for (const success of [true, false]) test(`Insights: Save ${success ? 'success continues using saved name' : 'failure stops PATCH'}`, async () => {
+    const h = createInsightsHarness(); h.store.getState().updateCampaignName('Unsaved name'); h.render();
+    h.hook.requestUpdateInsights(); h.render(); h.hook.saveAndContinueInsights(); h.hook.saveAndContinueInsights();
+    await flush(); assert.equal(h.saves.length, 1); assert.equal(h.scrapes.length, 0);
+    if (success) h.saves[0].resolve({ ...structuredClone(h.input.campaign), campaignName: 'Confirmed name' });
+    else h.saves[0].reject(new Error('Save failed'));
+    await flush(); h.render();
+    assert.equal(h.scrapes.length, success ? 1 : 0);
+    if (success) { assert.equal(h.scrapes[0].args.body.campaignName, 'Confirmed name'); await finishInsights(h); }
+    else { assert.equal(h.hook.isInsightsUnsavedChangesModalOpen, true); assert.equal(h.hook.isUpdatingInsights, false); }
+});
+
+test('Insights: a concurrent Save or Paid mutation blocks starting even before rerender', async () => {
+    for (const [mutationKey, variables] of [
+        [['campaigns', 'save'], { params: { campaignId: 'synthetic-campaign' } }],
+        [['campaigns', 'mark-promo-as-paid', { campaignId: 'synthetic-campaign', promoId: 'placement-a' }], { campaignId: 'synthetic-campaign', promoId: 'placement-a' }],
+    ]) {
+        const h = createInsightsHarness(); let complete;
+        const pending = h.queryClient.getMutationCache().build(h.queryClient, {
+            mutationKey, mutationFn: () => new Promise(resolve => { complete = resolve; }),
+        }).execute(variables);
+        h.hook.requestUpdateInsights(); await flush(); h.render();
+        assert.equal(h.scrapes.length, 0); assert.equal(h.hook.isUpdateInsightsDisabled, true);
+        complete(); await pending;
+    }
+});
+
+test('Insights: preparation Save blocks all edits immediately and continuously through PATCH and GET', async () => {
+    const h = createInsightsHarness(); h.hook.updateCampaignName('Submitted name'); h.render();
+    const stale = h.hook;
+    h.hook.requestUpdateInsights(); h.render(); h.hook.saveAndContinueInsights();
+    const before = h.store.getState();
+    attemptCampaignEdits(stale);
+    assert.equal(h.store.getState(), before, 'guard works before React rerenders');
+    await flush(); h.render();
+    assert.equal(h.hook.isPreparingInsights, true); assert.equal(h.hook.isInsightsLocked, true);
+    assert.equal(h.hook.isReadOnly, false); assert.equal(h.hook.canSave, false);
+    attemptCampaignEdits(h.hook); assert.equal(h.store.getState(), before);
+    const unsubscribe = h.store.subscribe(() => assert.equal(stale.isInsightsActionBlocked(), true));
+    h.saves[0].resolve({ ...structuredClone(h.input.campaign), campaignName: 'Submitted name' });
+    await flush(); h.render();
+    assert.equal(h.scrapes.length, 1); assert.equal(h.saves.length, 1);
+    assert.equal(h.hook.isInsightsLocked, true); assert.equal(h.hook.isDirty, false);
+    assert.equal(h.store.getState().baseline.campaign.campaignName, 'Submitted name');
+    await finishInsights(h); unsubscribe();
+    assert.equal(h.hook.isInsightsLocked, false);
+});
+
+test('Insights: status change or leaving and returning during Save cannot resume scraping', async () => {
+    for (const change of ['status', 'leave-and-return']) {
+        const h = createInsightsHarness(); h.hook.updateCampaignName('Save first'); h.render();
+        h.hook.requestUpdateInsights(); h.render(); h.hook.saveAndContinueInsights(); await flush();
+        if (change === 'status') {
+            const state = h.store.getState();
+            h.store.setState({ draft: { ...state.draft, params: { ...state.draft.params, status: 'completed' } } });
+        } else {
+            h.context = { ...h.input.params, campaignId: 'other' }; h.render();
+            h.context = h.input.params; h.render();
+        }
+        h.saves[0].resolve(structuredClone(h.input.campaign)); await flush(); h.render();
+        assert.equal(h.scrapes.length, 0);
+    }
+});
+
+test('Insights: repeated GET failure stays locked without another PATCH or Save', async () => {
+    const h = createInsightsHarness(); h.hook.requestUpdateInsights(); await flush();
+    h.scrapes[0].resolve(); await flush(); h.gets[0].reject(new Error('GET failed')); await flush(); h.render();
+    h.hook.retryInsightsRefresh(); await flush(); h.gets[1].reject(new Error('Still unavailable')); await flush(); h.render();
+    assert.equal(h.hook.isUpdatingInsights, false); assert.equal(h.hook.needsInsightsRefresh, true);
+    assert.equal(h.hook.isInsightsLocked, true); assert.equal(h.scrapes.length, 1); assert.equal(h.saves.length, 0);
+    h.hook.retryInsightsRefresh(); await flush(); h.gets[2].resolve(refreshedInsights(h)); await flush(); h.render();
+    assert.equal(h.hook.isInsightsLocked, false);
+});
+
+test('Insights: PATCH error reports once, releases locks, never automatically retries or GETs', async () => {
+    const h = createInsightsHarness(); h.hook.requestUpdateInsights(); await flush();
+    h.scrapes[0].reject(new Error('Unconfirmed timeout')); await flush(); h.render();
+    assert.equal(h.hook.isInsightsLocked, false); assert.equal(h.hook.needsInsightsRefresh, false);
+    assert.equal(h.gets.length, 0); assert.equal(h.scrapes.length, 1); assert.equal(h.notifications.length, 1);
+    assert.equal(h.notifications[0].type, 'error'); assert.match(h.notifications[0].message, /may have changed/);
+});
+
+test('Insights: failed GET retains full editing lock across remount; GET-only retry replaces the campaign', async () => {
+    const h = createInsightsHarness(); h.hook.requestUpdateInsights(); await flush(); h.scrapes[0].resolve(); await flush();
+    h.gets[0].reject(new Error('GET failed')); await flush(); h.render();
+    assert.equal(h.hook.needsInsightsRefresh, true); assert.equal(h.hook.isUpdatingInsights, false);
+    h.lifecycle.unmount(); h.render();
+    assert.equal(h.hook.isInsightsLocked, true); assert.equal(h.hook.needsInsightsRefresh, true);
+    const before = h.store.getState();
+    attemptCampaignEdits(h.hook); assert.equal(h.store.getState(), before);
+    h.hook.requestUpdateInsights(); h.hook.retryInsightsRefresh(); h.hook.retryInsightsRefresh(); await flush(); h.render();
+    assert.equal(h.scrapes.length, 1); assert.equal(h.gets.length, 2); assert.equal(h.saves.length, 0);
+    assert.equal(h.hook.isInsightsLocked, true); assert.equal(h.hook.needsInsightsRefresh, true);
+    const refreshed = refreshedInsights(h);
+    h.gets[1].resolve(refreshed); await flush(); h.render();
+    assert.equal(h.hook.isInsightsLocked, false); assertFullInsightsSnapshot(h, refreshed);
+});
+
+test('Insights: full server snapshots replace all fields, order, zero/decreased metrics and reset metadata', async () => {
+    const h = createInsightsHarness(); h.hook.requestUpdateInsights(); await flush();
+    const before = h.store.getState(), refreshed = refreshedInsights(h);
+    refreshed.campaignContent[0].descriptions[0].description = 'Server description';
+    refreshed.isPriceHidden = true; refreshed.isCpmAndResultHidden = true;
+    await finishInsights(h, refreshed);
+    assertFullInsightsSnapshot(h, refreshed);
+    assert.notEqual(h.store.getState().meta, before.meta);
+    assert.equal(h.hook.editorRevision, 1);
+});
+
+for (const change of ['removed', 'added']) test(`Insights: ${change} server placements are accepted without matching local composition`, async () => {
+    const h = createInsightsHarness(), refreshed = refreshedInsights(h);
+    if (change === 'removed') refreshed.addedAccounts.pop();
+    else refreshed.addedAccounts.push({ ...refreshed.addedAccounts[0], addedAccountsId: 'extra' });
+    h.hook.requestUpdateInsights(); await flush(); await finishInsights(h, refreshed);
+    assertFullInsightsSnapshot(h, refreshed);
+    assert.equal(h.hook.needsInsightsRefresh, false);
+    assert.equal(h.scrapes.length, 1); assert.equal(h.hook.isInsightsLocked, false);
+});
+
+for (const stage of ['Save', 'PATCH', 'GET']) test(`Insights: switching campaigns during ${stage} never changes the other draft`, async () => {
+    const h = createInsightsHarness();
+    if (stage === 'Save') { h.hook.updateCampaignName('Save first'); h.render(); }
+    h.hook.requestUpdateInsights(); h.render();
+    if (stage === 'Save') h.hook.saveAndContinueInsights();
+    await flush();
+    if (stage === 'GET') { h.scrapes[0].resolve(); await flush(); }
+    const other = fixture(); other.params.campaignId = other.campaign.campaignId = 'other-campaign';
+    h.context = other.params; h.store.getState().initializeDraft(other); h.render();
+    const before = h.store.getState();
+    const editorRevision = h.hook.editorRevision;
+    if (stage === 'Save') h.saves[0].resolve(structuredClone(h.input.campaign));
+    else {
+        if (stage === 'PATCH') { h.scrapes[0].resolve(); await flush(); }
+        h.gets[0].resolve(refreshedInsights(h));
+    }
+    await flush(); h.render();
+    assert.equal(h.store.getState(), before); assert.equal(h.hook.isInsightsLocked, false);
+    assert.equal(h.hook.editorRevision, editorRevision, 'completion must not reset campaign B editors');
+    assert.equal(h.scrapes.length, stage === 'Save' ? 0 : 1);
+});
+
+test('Insights: remount while PATCH or GET is pending keeps its spinner and prevents second PATCH', async () => {
+    for (const stage of ['PATCH', 'GET']) {
+        const h = createInsightsHarness(); h.hook.requestUpdateInsights(); await flush();
+        if (stage === 'GET') { h.scrapes[0].resolve(); await flush(); }
+        h.lifecycle.unmount(); h.render();
+        assert.equal(h.hook.isUpdatingInsights, true); assert.equal(h.hook.isInsightsLocked, true);
+        h.hook.requestUpdateInsights(); await flush(); assert.equal(h.scrapes.length, 1);
+        if (stage === 'PATCH') { h.scrapes[0].resolve(); await flush(); }
+        h.gets[0].resolve(refreshedInsights(h)); await flush(); h.render();
+        assert.equal(h.hook.isInsightsLocked, false);
+        assertFullInsightsSnapshot(h, refreshedInsights(h));
+    }
+});
+
+test('Insights: stale ordinary GET cannot overwrite refreshed query cache', async () => {
+    const h = createInsightsHarness(); let resolveOld, resolveDuring;
+    const old = h.queryClient.fetchQuery({ queryKey: h.cacheKey, queryFn: () => new Promise(resolve => { resolveOld = resolve; }) }).catch(() => {});
+    h.hook.requestUpdateInsights(); await flush(); h.scrapes[0].resolve(); await flush();
+    const during = h.queryClient.fetchQuery({ queryKey: h.cacheKey, queryFn: () => new Promise(resolve => { resolveDuring = resolve; }) }).catch(() => {});
+    const refreshed = refreshedInsights(h); h.gets[0].resolve(refreshed); await flush();
+    resolveOld(h.input.campaign); resolveDuring(h.input.campaign); await Promise.all([old, during]);
+    assert.deepEqual(h.queryClient.getQueryData(h.cacheKey), refreshed);
+});
+
+test('Insights: a GET response for another campaign is rejected and can be retried with GET only', async () => {
+    const h = createInsightsHarness(); h.hook.requestUpdateInsights(); await flush();
+    const before = h.store.getState();
+    const wrong = { ...refreshedInsights(h), campaignId: 'wrong-campaign' };
+    await finishInsights(h, wrong);
+    assert.equal(h.store.getState(), before);
+    assert.notDeepEqual(h.queryClient.getQueryData(h.cacheKey), wrong);
+    assert.equal(h.hook.needsInsightsRefresh, true); assert.equal(h.hook.isInsightsLocked, true);
+    h.hook.retryInsightsRefresh(); await flush();
+    const refreshed = refreshedInsights(h);
+    h.gets[1].resolve(refreshed); await flush(); h.render();
+    assert.equal(h.scrapes.length, 1); assertFullInsightsSnapshot(h, refreshed);
+});
+
+test('Insights: failure to accept a full snapshot keeps editing locked until GET-only recovery succeeds', async () => {
+    const h = createInsightsHarness(), apply = h.store.getState().applySavedCampaign;
+    const refreshed = refreshedInsights(h);
+    h.store.setState({ applySavedCampaign: () => { throw new Error('Snapshot acceptance failed'); } });
+    const before = h.store.getState();
+    h.hook.requestUpdateInsights(); await flush(); await finishInsights(h, refreshed);
+    assert.equal(h.store.getState(), before);
+    assert.equal(h.hook.needsInsightsRefresh, true); assert.equal(h.hook.isInsightsLocked, true);
+    attemptCampaignEdits(h.hook); assert.equal(h.store.getState(), before);
+    h.store.setState({ applySavedCampaign: apply });
+    h.hook.retryInsightsRefresh(); await flush();
+    h.gets[1].resolve(refreshed); await flush(); h.render();
+    assert.equal(h.scrapes.length, 1); assert.equal(h.saves.length, 0);
+    assert.equal(h.hook.isInsightsLocked, false); assertFullInsightsSnapshot(h, refreshed);
+});
+
+test('Insights: an already rendered Paid button checks the live lock before sending', async () => {
+    const h = createInsightsHarness(), paid = [];
+    const { MarkPromoAsPaid } = loadUI('src/features/campaign-management/mark-promo-as-paid/ui/mark-promo-as-paid.tsx', {}, {
+        '@tanstack/react-query': {
+            useQueryClient: () => h.queryClient, useIsMutating: () => 0,
+            useMutation: () => ({ mutate: params => paid.push(params) }),
+        },
+    });
+    const tree = MarkPromoAsPaid({
+        campaignId: h.input.params.campaignId, promoId: 'placement-a', closePromo: 'wait',
+        canMarkAsPaid: true, isActionBlocked: h.hook.isInsightsActionBlocked, onPaid() {},
+    });
+    h.hook.requestUpdateInsights();
+    child(tree, 'button').props.onClick(); assert.equal(paid.length, 0);
+    await flush(); await finishInsights(h);
+    child(tree, 'button').props.onClick(); assert.equal(paid.length, 0);
+    const fresh = MarkPromoAsPaid({
+        campaignId: h.input.params.campaignId, promoId: 'placement-a', closePromo: 'wait',
+        canMarkAsPaid: true, isActionBlocked: h.hook.isInsightsActionBlocked, onPaid() {},
+    });
+    child(fresh, 'button').props.onClick(); assert.equal(paid.length, 1);
+});
+
+test('Insights: Page keeps Reset/Save and Update Insights visible, forwards lock props, retains tabs and share copy', async () => {
+    const h = createInsightsHarness(); h.hook.requestUpdateInsights(); await flush(); h.render();
+    const { CampaignManagementPage } = loadUI('src/pages/campaign-management-v2/ui/campaign-management-page.tsx', {
+        useState: value => [value, () => {}], useRef: value => ({ current: value }),
+    }, { '@/pages/campaign-management-v2/model/use-campaign-management-state.ts': { useCampaignManagementState: () => h.hook } });
+    const page = CampaignManagementPage();
+    const header = child(page, 'CampaignHeader').props, navigation = child(page, 'CampaignNavigation').props;
+    assert.equal(header.readOnly, false); assert.equal(header.isSaveDisabled, true); assert.equal(header.isResetDisabled, true);
+    assert.equal(header.isEditingDisabled, true);
+    assert.equal(navigation.canUpdateInsights, true); assert.equal(navigation.isUpdatingInsights, true);
+    assert.equal(child(page, 'CampaignMetrics').props.isBudgetDisabled, true);
+    assert.equal(child(page, 'CampaignWorkspace').props.isInsightsLocked, true);
+    assert.equal(typeof child(page, 'CampaignToolbar').props.onValueChange, 'function');
+    const { CampaignNavigation } = loadUI('src/widgets/campaign-management-v2/campaign-navigation/ui/campaign-navigation.tsx', {
+        useState: value => [value, () => {}], useRef: value => ({ current: value }), useEffect() {},
+    }, { '@/shared/hooks/use-copy-to-clipboard': { useCopyToClipboard: () => async () => true } });
+    const nav = CampaignNavigation({ ...navigation, shareLink: 'https://example.test/share' });
+    assert.equal(elements(nav, node => node.type === 'Spinner').length, 1);
+    assert.equal(elements(nav, node => node.type === 'button')[1].props.disabled, false);
+    const { CampaignWorkspace } = loadUI(workspaceFile, { useState: () => ['placement-a', () => {}] });
+    const workspace = CampaignWorkspace({ ...child(page, 'CampaignWorkspace').props, view: 'strategy' });
+    assert.equal(child(workspace, 'CampaignAccountHeader').props.readOnly, false);
+    assert.equal(child(workspace, 'CampaignAccountHeader').props.isRemoveDisabled, true);
+    assert.equal(child(workspace, 'CampaignAccountEditor').props.readOnly, false);
+    assert.equal(child(workspace, 'CampaignAccountEditor').props.disabled, true);
+    const insights = CampaignWorkspace({ ...child(page, 'CampaignWorkspace').props, view: 'insights' });
+    assert.equal(child(insights, 'CampaignAccountsTable').props.canRemoveAccount, false);
+    h.scrapes[0].resolve(); await flush();
+    h.gets[0].reject(new Error('GET failed')); await flush(); h.render();
+    const recoveryPage = CampaignManagementPage();
+    const alert = elements(recoveryPage, node => node.props.role === 'alert')[0];
+    assert.deepEqual(elements(alert, node => node.type === 'p').map(node => node.props.children), [
+        'Could not refresh campaign data',
+        'Processing has finished, but the latest campaign data could not be loaded. Editing is temporarily disabled. Retry to load the latest data.',
+    ]);
+    const order = elements(recoveryPage, node => node.type === 'CampaignNavigation' || node === alert || node.type === 'CampaignHeader');
+    assert.deepEqual(order.map(node => node.type), ['CampaignNavigation', 'div', 'CampaignHeader']);
+    const retry = child(alert, 'button');
+    assert.equal(retry.props.children.at(-1), 'Retry data refresh');
+    assert.equal(retry.props.disabled, false); assert.equal(child(alert, 'Spinner'), undefined);
+    assert.equal(child(recoveryPage, 'CampaignWorkspace').props.isInsightsLocked, true);
+    assert.equal(child(recoveryPage, 'CampaignHeader').props.readOnly, false);
+    retry.props.onClick(); await flush(); h.render();
+    const refreshing = elements(CampaignManagementPage(), node => node.props.role === 'alert')[0];
+    assert.equal(child(refreshing, 'button').props.disabled, true);
+    assert.equal(child(refreshing, 'button').props['aria-busy'], true);
+    assert.equal(child(refreshing, 'button').props.children.at(-1), 'Refreshing…');
+    assert.equal(child(refreshing, 'Spinner').props.size, 16);
+    assert.equal(elements(refreshing, node => node.props.role === 'status')[0].props['aria-label'], 'Refreshing campaign data');
+    assert.equal(h.scrapes.length, 1); assert.equal(h.gets.length, 2);
+    await finishInsights(h);
+});
+
+test('Insights: a previously edited name cannot commit on delayed blur during or after refresh', async () => {
+    const h = createInsightsHarness(), lifecycle = createHookLifecycle();
+    const { CampaignHeader } = loadUI('src/widgets/campaign-management-v2/campaign-header/ui/campaign-header.tsx', lifecycle.react, {
+        '@/entities/campaign/model/campaign-details.types.ts': { CAMPAIGN_STATUS_LABELS: { distributing: 'Distributing' } },
+        '@/shared/constants/currency-taxonomy.ts': { CURRENCY_LABELS: { EUR: 'EUR' } },
+    });
+    const render = () => lifecycle.render(() => CampaignHeader({
+        campaignName: h.store.getState().draft.campaign.campaignName,
+        campaignStatus: 'distributing', currency: 'EUR', internalCost: 0,
+        onCampaignNameChange: h.hook.updateCampaignName, onSave: h.hook.saveCampaign, onReset: h.hook.resetDraft,
+        readOnly: h.hook.isReadOnly, isEditingDisabled: h.hook.isInsightsLocked,
+        isSaveDisabled: !h.hook.canSave, isResetDisabled: !h.hook.canReset,
+    }));
+    let tree = render(); child(tree, 'input').props.onChange({ target: { value: 'Uncommitted name' } });
+    tree = render(); const lateBlur = child(tree, 'input').props.onBlur;
+    h.hook.requestUpdateInsights(); await flush(); h.render();
+    const before = h.store.getState(); lateBlur(); assert.equal(h.store.getState(), before);
+    tree = render(); assert.equal(child(tree, 'input').props.readOnly, true);
+    assert.equal(elements(tree, e => e.type === 'button').length, 2);
+    assert.ok(elements(tree, e => e.type === 'button').every(e => e.props.disabled));
+    await finishInsights(h); const accepted = h.store.getState(); lateBlur();
+    assert.equal(h.store.getState(), accepted);
+    tree = render(); assert.equal(child(tree, 'input').props.readOnly, false);
+    assert.equal(child(tree, 'input').props.value, accepted.draft.campaign.campaignName);
+});
+
+test('Insights: open description Apply stays visible but disabled; its old callback cannot restore stale text', async () => {
+    const h = createInsightsHarness(), lifecycle = createHookLifecycle();
+    const { CampaignTextEditor } = loadUI(workspaceRoot + 'campaign-account-editor/campaign-text-editor/campaign-text-editor.tsx', {
+        ...lifecycle.react, useId: () => 'description-id',
+    }, { '@radix-ui/react-popover': Object.fromEntries(['Root', 'Anchor', 'Trigger', 'Portal', 'Content', 'Close'].map(name => [name, `Popover.${name}`])) });
+    const render = () => {
+        const update = h.hook.onUpdateDescriptionForAccount;
+        return lifecycle.render(() => CampaignTextEditor({
+        readOnly: false, disabled: h.hook.isInsightsLocked, label: 'Description', placeholder: 'description',
+        options: [{ id: 'content-a-d1', text: h.store.getState().draft.campaign.campaignContent[0].descriptions[0].description }],
+        selectedId: 'content-a-d1', onSelect() {}, onCreate() {}, onDelete() {},
+        onUpdate: (id, text) => update('content-a', id, text),
+        }));
+    };
+    // Capture the actual page callback, rather than dynamically looking up a new one on Apply.
+    const originalUpdate = h.hook.onUpdateDescriptionForAccount;
+    let tree = render(); child(tree, 'textarea').props.onChange({ target: { value: 'Uncommitted text' } });
+    tree = render();
+    const staleApply = elements(tree, e => e.type === 'button' && e.props.children === 'Apply')[0].props.onClick;
+    h.hook.requestUpdateInsights(); await flush(); h.render();
+    tree = render(); assert.equal(child(tree, 'textarea').props.readOnly, true);
+    const apply = elements(tree, e => e.type === 'button' && e.props.children === 'Apply')[0];
+    assert.equal(apply.props.disabled, true);
+    const before = h.store.getState(); apply.props.onClick(); originalUpdate('content-a', 'content-a-d1', 'Late text');
+    assert.equal(h.store.getState(), before);
+    await finishInsights(h); const accepted = h.store.getState();
+    originalUpdate('content-a', 'content-a-d1', 'Late text');
+    // Old editor callbacks must also stay protected after a successful server replacement.
+    staleApply();
+    assert.equal(h.store.getState(), accepted);
+});
+
+test('Insights: open post/screenshot forms reject late Apply and disable upload changes', async () => {
+    const h = createInsightsHarness();
+    const { EditPostLink } = loadUI('src/features/campaign-management/edit-post-link/ui/edit-post-link.tsx', initialReact);
+    const { EditScreenshot } = loadUI('src/features/campaign-management/edit-screenshot/ui/edit-screenshot.tsx', {
+        useState: () => [true, () => {}],
+    });
+    const onPostLink = h.hook.setAccountPostLink;
+    const beforeLink = EditPostLink({ value: '', onApply: value => onPostLink('placement-a', value) });
+    const onScreenshot = h.hook.setAccountScreenshot;
+    const beforeShot = EditScreenshot({ value: '', onApply: value => onScreenshot('placement-a', value) });
+    h.hook.requestUpdateInsights(); await flush(); h.render();
+    const blockedLink = EditPostLink({ value: '', disabled: true, onApply: () => assert.fail('disabled Apply') });
+    child(blockedLink, 'EditPostLinkForm').props.onApply('https://example.test/late');
+    assert.equal(child(blockedLink, 'EditPostLinkForm').props.disabled, true);
+    const { ScreenshotEditor } = loadUI('src/features/campaign-management/edit-screenshot/ui/screenshot-editor.tsx', {
+        useRef: () => ({ current: null }),
+    }, { '../model/use-screenshot-editor': { useScreenshotEditor: () => ({
+        screenshotUrl: 'https://example.test/uploaded', canApply: true,
+        uploadFile: () => assert.fail('disabled upload'), removeScreenshot: () => assert.fail('disabled remove'),
+    }) } });
+    const shot = ScreenshotEditor({ disabled: true, onApply: () => assert.fail('disabled screenshot Apply') });
+    assert.equal(child(shot, 'input').props.disabled, true);
+    assert.equal(child(shot, 'ScreenshotPreview').props.isRemoveDisabled, true);
+    child(shot, 'ScreenshotPreview').props.onRemoveScreenshot();
+    child(shot, 'input').props.onChange({ currentTarget: { files: [{}], value: '' } });
+    const apply = elements(shot, e => e.type === 'button' && e.props.children === 'Apply')[0];
+    assert.equal(apply.props.disabled, true); apply.props.onClick();
+    const before = h.store.getState();
+    child(beforeLink, 'EditPostLinkForm').props.onApply('https://example.test/late');
+    child(beforeShot, 'ScreenshotEditor').props.onApply('https://example.test/uploaded');
+    assert.equal(h.store.getState(), before);
+    await finishInsights(h); const accepted = h.store.getState();
+    child(beforeLink, 'EditPostLinkForm').props.onApply('https://example.test/late');
+    child(beforeShot, 'ScreenshotEditor').props.onApply('https://example.test/uploaded');
+    assert.equal(h.store.getState(), accepted);
+    assert.equal(child(beforeLink, 'EditPostLinkForm').props.disabled, false);
 });

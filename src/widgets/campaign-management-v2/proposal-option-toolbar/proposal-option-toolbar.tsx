@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { Button } from "@/shared/ui/v2/button-v2";
 
 import ChevronRight from "@/shared/assets/icons/chevron-right.svg?react";
-import Plus from "@/shared/assets/icons/plus.svg?react";
+import CirclePlusIcon from "@/shared/assets/icons/circle-plus.svg?react";
+import CheckIcon from "@/shared/assets/icons/check-circle.svg?react";
+import TrashIcon from "@/shared/assets/icons/trash.svg?react";
 
 import s from './proposal-option-toolbar.module.scss';
 
@@ -10,6 +13,8 @@ interface ProposalOptionToolbarProps {
   selectedOptionIndex: number;
   onOptionChange: (optionIndex: number) => void;
   onCreateOption: () => void;
+  onDeleteOption: (trigger: HTMLButtonElement) => void;
+  onApproveOption: (trigger: HTMLButtonElement) => void;
   disabled?: boolean;
 }
 
@@ -18,6 +23,8 @@ export const ProposalOptionToolbar = ({
   selectedOptionIndex,
   onOptionChange,
   onCreateOption,
+  onDeleteOption,
+  onApproveOption,
   disabled = false,
 }: ProposalOptionToolbarProps) => {
   const labelId = useId();
@@ -148,15 +155,35 @@ export const ProposalOptionToolbar = ({
         )}
       </div>
 
-      <button
-        type="button"
+      <Button
         className={s.createButton}
+        label="Create option"
+        icon={CirclePlusIcon}
         disabled={disabled}
         onClick={onCreateOption}
-      >
-        <Plus width={12} height={12} aria-hidden="true" />
-        Create additional proposal option
-      </button>
+      />
+      
+      <Button
+        variant="primary"
+        label="Approve option"
+        icon={CheckIcon}
+        disabled={disabled}
+        onClick={(event) => {
+          if (!disabled) {
+            onApproveOption(event.currentTarget);
+          }
+        }}
+      />
+      
+      <Button
+        variant="danger"
+        label="Delete option"
+        icon={TrashIcon}
+        disabled={disabled}
+        onClick={(event) => {
+          if (!disabled) onDeleteOption(event.currentTarget);
+        }}
+      />
     </div>
   );
 };

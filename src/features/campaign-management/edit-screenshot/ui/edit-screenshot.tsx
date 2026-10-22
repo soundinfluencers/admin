@@ -7,6 +7,7 @@ import s from './edit-screenshot.module.scss';
 
 interface EditScreenshotProps {
   value: string;
+  disabled?: boolean;
   username: string;
   onApply: (url: string) => void;
   trigger: ReactElement;
@@ -14,6 +15,7 @@ interface EditScreenshotProps {
 
 export const EditScreenshot = ({
   value,
+  disabled = false,
   username,
   onApply,
   trigger,
@@ -21,6 +23,7 @@ export const EditScreenshot = ({
   const [open, setOpen] = useState(false);
 
   const handleApply = (url: string) => {
+    if (disabled) return;
     onApply(url);
     setOpen(false);
   };
@@ -36,6 +39,7 @@ export const EditScreenshot = ({
     >
       {open && (
         <ScreenshotEditor
+          disabled={disabled}
           value={value}
           username={username}
           onApply={handleApply}

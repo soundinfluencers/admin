@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ButtonLink } from "@/shared/ui/v2/button-link";
 import { SOCIAL_MEDIA_ICONS } from "@/shared/config/social-media-icons.ts";
 
 import type { ICampaignDetails } from "@/entities/campaign/model/campaign-details.types.ts";
@@ -47,16 +48,14 @@ export const CampaignAccountsList = ({
         </div>
 
         {!readOnly && (
-          <button
-            type="button"
+          <ButtonLink
             className={s.add}
-            disabled
+            to={""}
+            label="Add"
+            icon={Plus}
             title="Adding influencers is not available yet"
             aria-label="Add account"
-          >
-            <Plus className={s.icon}/>
-            Add
-          </button>
+          />
         )}
       </div>
 
