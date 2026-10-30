@@ -29,15 +29,15 @@ type TAccountInfoField<T> = {
 }
 
 export const ACCOUNT_INFO_FIELDS = [
-  { key: "username", label: "Account name:"},
-  { key: "profileLink", label: "Link:"},
-  { key: "followers", label: "Followers:"},
-  { key: "logoUrl", label: "Logo:"},
-  { key: "profileCategory", label: "Account type:"},
-  { key: "communityMusicGenres", label: "Music genres:"},
-  { key: "communityThemeTopics", label: "Theme topics:"},
-  { key: "countries", label: "Audience insights:"},
-  { label: "Price:", key: "price" },
+  { key: "username", label: "Account name:" },
+  { key: "profileLink", label: "Link:" },
+  { key: "followers", label: "Followers:" },
+  { key: "logoUrl", label: "Logo:" },
+  { key: "profileCategory", label: "Account type:" },
+  { key: "communityMusicGenres", label: "Music genres:" },
+  { key: "communityThemeTopics", label: "Theme topics:" },
+  { key: "countries", label: "Audience insights:" },
+  { key: "price", label: "Price:" },
   {
     key: "initialPrice",
     label: "Initial Price:",
@@ -55,6 +55,6 @@ export const ACCOUNT_INFO_FIELDS = [
       />
     ),
   },
-  { key: "creatorContentFocus", label: "Content focus:"},
-  { key: "creatorMusicGenres", label: "Music genres:"},
+  { key: "creatorContentFocus", label: "Content focus:" },
+  { key: "creatorMusicGenres", label: "Music genres:" },
 ] satisfies TAccountInfoField<TInfluencerAccount>[];

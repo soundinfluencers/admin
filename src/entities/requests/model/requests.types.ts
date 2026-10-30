@@ -104,6 +104,8 @@ export interface ICampaignRequestDetailsDto {
   campaignName: string;
   paymentMethod: TCampaignPaymentMethod;
   items: ICampaignItem[];
+  price: number;
+  displayCurrency: TCurrency;
 }
 
 // Bespoke campaign request
@@ -130,7 +132,7 @@ export interface IBespokeCampaignRequestDetailsDto {
   ticketLink: string;
 }
 
-// Change pric request
+// Change price request
 export interface IPriceUpdateRequestDetailsDto {
   requestId: string;
   group: TRequestFilterStatus;

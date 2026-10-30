@@ -1,5 +1,6 @@
 import React from "react";
 import { PERSONAL_INFO_FIELDS, PAYMENT_METHODS_LABEL } from "../campaign-request-details.config.ts";
+import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
 import type { ICampaignRequestDetailsDto } from "@/entities/requests/model/requests.types.ts";
 
 import s from './personal-info.module.scss';
@@ -19,8 +20,11 @@ export const PersonalInfo: React.FC<PersonalInfoProps> = ({
           {key === 'paymentMethod' && (
             <span className={s.value}>{PAYMENT_METHODS_LABEL[data[key]]}</span>
           )}
-          {key !== 'paymentMethod' && (
+          {key !== 'paymentMethod' && key !== "price" && (
             <span className={s.value}>{data[key]}</span>
+          )}
+          {key === "price" && (
+            <span className={s.value}>{formatCurrency(data.price, data.displayCurrency)}</span>
           )}
         </li>
       ))}

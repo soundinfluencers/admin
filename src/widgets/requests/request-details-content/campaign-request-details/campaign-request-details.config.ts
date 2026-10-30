@@ -11,6 +11,7 @@ type TCampaignPersonalRequestField = {
 
 export const PERSONAL_INFO_FIELDS = [
   { key: "campaignName", label: "Campaign name:" },
+  { key: "price", label: "Campaign price:" },
   { key: "paymentMethod", label: "Payment method:" },
   { key: "firstName", label: "First name:" },
   { key: "lastName", label: "Last name:" },
@@ -24,7 +25,6 @@ export const PAYMENT_METHODS_LABEL = {
   bank_transfer_eu: "Bank transfer EU",
   bank_transfer_international: "Bank transfer International",
 } as const satisfies Record<TCampaignPaymentMethod, string>;
-
 
 type TCampaignField = {
   key: keyof ICampaignItem;
