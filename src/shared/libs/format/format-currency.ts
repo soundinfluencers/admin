@@ -1,6 +1,6 @@
 import type { TCurrency } from "@/shared/types/types.ts";
 
-const CURRENCY_SYMBOL: Record<TCurrency, string> = {
+export const CURRENCY_SYMBOL: Record<TCurrency, string> = {
   EUR: "\u20AC",
   USD: "\u0024",
   GBP: "\u00A3",

@@ -30,10 +30,10 @@
 .gridRow {
   display: grid;
   grid-template-columns:
-    minmax(75px, 190fr)
+    minmax(75px, 180fr)
     minmax(52px, 139fr)
     minmax(40px, 73fr)
-    minmax(32px, 35fr)
+    minmax(32px, 50fr)
     minmax(51px, 62fr);
   align-items: center;
   min-width: 0;
@@ -63,6 +63,9 @@
 }
 
 .cell {
+  display: flex;
+  gap: 4px;
+  
   font-size: 10px;
   font-weight: 400;
   padding-inline: 4px;

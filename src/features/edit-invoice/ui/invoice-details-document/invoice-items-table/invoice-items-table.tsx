@@ -5,6 +5,7 @@ import { formatCompactNumber } from "@/shared/libs/format/format-compact-number.
 import type { IInvoice } from "@/entities/invoices/model/invoice.types.ts";
 
 import s from './invoice-items-table.module.scss';
+import { formatCurrency } from "@/shared/libs/format/format-currency.ts";
 
 interface InvoiceItemsTableProps {
   invoice: IInvoice;
@@ -35,19 +36,36 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({ invoice })
                 inputClassName={s.input}
               />
             </div>
+            
             <div
               className={s.cell}
               title={invoice.campaignFollowers ? String(invoice.campaignFollowers) : "—"}
             >
               {invoice.campaignFollowers ? formatCompactNumber(invoice.campaignFollowers) : "—"}
             </div>
-            <div className={s.cell}>{invoice.amount ? `${String(invoice.amount)}€` : "—"}</div>
+            
+            <div className={s.cell}>
+              <InvoiceDetailsEditableField
+                initialValue={String(invoice.amount)}
+                invoiceId={invoice.invoiceId}
+                fieldKey="amount"
+                inputClassName={s.input}
+              />
+              
+              <InvoiceDetailsEditableField
+                initialValue={invoice.currency}
+                invoiceId={invoice.invoiceId}
+                fieldKey="currency"
+                inputClassName={s.input}
+              />
+              {/*{invoice.amount ? `${formatCurrency(invoice.amount, invoice.currency)}` : "—"}*/}
+            </div>
           </div>
         </div>
 
         <div className={s.footer}>
           <span>Total:</span>
-          <span>{invoice.amount}€</span>
+          <span>{formatCurrency(invoice.amount, invoice.currency)}</span>
         </div>
       </div>
 

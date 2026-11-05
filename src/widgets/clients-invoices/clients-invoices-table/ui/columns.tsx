@@ -97,7 +97,7 @@ export const CLIENTS_INVOICES_COLUMNS: ColumnDef<IClientInvoiceTableRowDto>[] = 
     maxSize: 115,
     cell: ({ row }) => (
       <BaseTableCell>
-        {row.original.amount ? formatCurrency(row.original.amount, "EUR") : "—"}
+        {row.original.amount ? formatCurrency(row.original.amount, row.original.currency) : "—"}
       </BaseTableCell>
     ),
   },
