@@ -5,6 +5,10 @@ import { toast } from "react-toastify";
 import type { TInvoiceEditableKey } from "@/features/edit-invoice/model/types.ts";
 
 import s from './invoice-details-editable-field.module.scss';
+import { CURRENCY_SYMBOL } from "@/shared/libs/format/format-currency.ts";
+
+const isCurrency = (value: string): value is keyof typeof CURRENCY_SYMBOL =>
+  Object.hasOwn(CURRENCY_SYMBOL, value);
 
 interface InvoiceDetailsEditableFieldProps {
   invoiceId: string;
@@ -62,7 +66,12 @@ export const InvoiceDetailsEditableField: React.FC<InvoiceDetailsEditableFieldPr
       {
         invoiceId,
         dto: {
-          [fieldKey]: draft,
+          [fieldKey]: 
+            fieldKey === "amount" 
+              ? Number(draft) 
+              : fieldKey === "currency" 
+                ? draft.toUpperCase() 
+                : draft,
         },
       },
       {
@@ -87,11 +96,15 @@ export const InvoiceDetailsEditableField: React.FC<InvoiceDetailsEditableFieldPr
   };
 
   const displayValue = normalizedInitialValue.trim() ? normalizedInitialValue : "—";
+  const formattedValue = fieldKey === "currency" && isCurrency(displayValue)
+    ? CURRENCY_SYMBOL[displayValue]
+    : displayValue;
 
   return (
     <div
       className={clsx(s.root, {
         [s.isDisabled]: isDisabled,
+        [s.amount]: fieldKey === "amount",
       })}
       onClick={isTouchDevice ? openEditor : undefined}
       onDoubleClick={!isTouchDevice ? openEditor : undefined}
@@ -113,7 +126,7 @@ export const InvoiceDetailsEditableField: React.FC<InvoiceDetailsEditableFieldPr
           autoFocus
         />
       ) : (
-        <span className={s.text}>{displayValue}</span>
+        <span className={s.text}>{formattedValue}</span>
       )}
     </div>
   );

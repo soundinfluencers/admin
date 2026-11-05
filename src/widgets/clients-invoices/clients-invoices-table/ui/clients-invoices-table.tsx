@@ -14,7 +14,6 @@ export const ClientsInvoicesTable: React.FC<ClientsInvoicesTableProps> = ({
   isLoading,
   isFetching,
 }) => {
-  console.log("ClientsInvoicesTable data:", data);
 
   return (
     <Table

@@ -38,7 +38,7 @@ export const InvoiceDetailsDocument: React.FC<InvoiceDetailsDocumentProps> = ({
       <div className={s.content}>
         <InvoiceParties invoice={data} role={role} />
 
-        <InvoiceBalance balance={data.amount}/>
+        <InvoiceBalance balance={data.amount} currency={data.currency}/>
 
         {role === "client" && (
           <>

@@ -1,4 +1,5 @@
 import type { IInvoice } from "@/entities/invoices/model/invoice.types.ts";
+import type { TCurrency } from "@/shared/types/types.ts";
 
 export type TInvoiceStatus = "submitted" | "paid";
 
@@ -10,7 +11,9 @@ export interface IClientInvoiceTableRowDto {
   company: string;
   campaignName: string;
   date: string;
+  invoiceDate: string;
   amount: number;
+  currency: TCurrency;
   status: TInvoiceStatus;
 }
 
